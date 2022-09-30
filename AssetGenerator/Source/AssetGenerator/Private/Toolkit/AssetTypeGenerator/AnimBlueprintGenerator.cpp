@@ -313,7 +313,8 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 }*/
 
 FName UAnimBlueprintGenerator::GetAssetClass() {
-	return UAnimBlueprint::StaticClass()->GetFName();
+    return TEXT("");
+	// return UAnimBlueprint::StaticClass()->GetFName();
 }
 
 #undef LOCTEXT_NAMESPACE
