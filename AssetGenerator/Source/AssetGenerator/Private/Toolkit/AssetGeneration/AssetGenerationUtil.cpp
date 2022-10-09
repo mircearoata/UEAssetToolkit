@@ -245,7 +245,12 @@ void GetPropertyCategoryInfo(const TSharedPtr<FJsonObject> PropertyObject, FName
 	} else if (FieldClass->IsChildOf(FStructProperty::StaticClass())) {
 		OutCategory = UEdGraphSchema_K2::PC_Struct;
 		const int32 StructObjectIndex = PropertyObject->GetIntegerField(TEXT("Struct"));
-		UScriptStruct* Struct = CastChecked<UScriptStruct>(ObjectSerializer->DeserializeObject(StructObjectIndex));
+		auto DeserializeStruct = ObjectSerializer->DeserializeObject(StructObjectIndex);
+		if (!DeserializeStruct) {
+			OutCategory = TEXT("bad_type");
+			return;
+		}
+		UScriptStruct* Struct = CastChecked<UScriptStruct>(DeserializeStruct);
 		OutSubCategoryObject = Struct;
 		
 		//Match IsTypeCompatibleWithProperty and erase REINST_ structs here:

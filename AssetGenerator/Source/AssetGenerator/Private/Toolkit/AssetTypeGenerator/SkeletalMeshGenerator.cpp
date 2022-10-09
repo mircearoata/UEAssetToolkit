@@ -88,9 +88,11 @@ void USkeletalMeshGenerator::SetupFbxImportSettings(UFbxImportUI* ImportUI) cons
 
 	if (!IsGeneratingPublicProject()) {
 		const int32 SkeletonObjectIndex = GetAssetData()->GetObjectField(TEXT("AssetObjectData"))->GetIntegerField(TEXT("Skeleton"));
-		USkeleton* Skeleton = CastChecked<USkeleton>(GetObjectSerializer()->DeserializeObject(SkeletonObjectIndex));
-		
-		ImportUI->Skeleton = Skeleton;
+		auto DeserializeSkeleton = GetObjectSerializer()->DeserializeObject(SkeletonObjectIndex);
+		if (DeserializeSkeleton) {
+			USkeleton* Skeleton = CastChecked<USkeleton>(DeserializeSkeleton);
+			ImportUI->Skeleton = Skeleton;
+		}
 	} else {
 		ImportUI->Skeleton = FPublicProjectStubHelper::DefaultSkeletalMeshSkeleton.GetObject();
 	}

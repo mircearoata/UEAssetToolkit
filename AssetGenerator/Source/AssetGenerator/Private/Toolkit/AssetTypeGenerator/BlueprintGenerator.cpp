@@ -220,9 +220,10 @@ void UBlueprintGenerator::FinalizeAssetCDO() {
 		//Deserialize new SCS, update the flags accordingly and assign it to the blueprint
 		//There is no need to duplicate it because it's owner is actually supposed to be the BPGC (for whatever reason)
 		UObject* SimpleConstructionScript = GetObjectSerializer()->DeserializeObject(SimpleConstructionScriptIndex);
-		SimpleConstructionScript->SetFlags(RF_Transactional);
-		Blueprint->SimpleConstructionScript = CastChecked<USimpleConstructionScript>(SimpleConstructionScript);
-		
+		if (SimpleConstructionScript) {
+			SimpleConstructionScript->SetFlags(RF_Transactional);
+			Blueprint->SimpleConstructionScript = CastChecked<USimpleConstructionScript>(SimpleConstructionScript);
+		}
 		UpdateDeserializerBlueprintClassObject(true);
 		MarkAssetChanged();
 	}
