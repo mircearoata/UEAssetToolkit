@@ -436,6 +436,12 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 		return MakeShareable(new FJsonValueNumber(ObjectIndex));
 	}
 
+	if (Property->IsA<FSoftObjectProperty>()) {
+		//For soft object reference, path is enough too for deserialization.
+		const FSoftObjectPtr* ObjectPtr = reinterpret_cast<const FSoftObjectPtr*>(Value);
+		return MakeShareable(new FJsonValueString(ObjectPtr->ToSoftObjectPath().ToString()));
+	}
+
 	if (const FObjectPropertyBase* ObjectProperty = CastField<const FObjectPropertyBase>(Property)) {
 		//Need to serialize full UObject for object property
 		UObject* ObjectPointer = ObjectProperty->GetObjectPropertyValue(Value);
@@ -451,12 +457,6 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 	if (const FStructProperty* StructProperty = CastField<const FStructProperty>(Property)) {
 		//To serialize struct, we need it's type and value pointer, because struct value doesn't contain type information
 		return MakeShareable(new FJsonValueObject(SerializeStruct(StructProperty->Struct, Value, OutReferencedSubobjects)));
-	}
-
-	if (Property->IsA<FSoftObjectProperty>()) {
-		//For soft object reference, path is enough too for deserialization.
-		const FSoftObjectPtr* ObjectPtr = reinterpret_cast<const FSoftObjectPtr*>(Value);
-		return MakeShareable(new FJsonValueString(ObjectPtr->ToSoftObjectPath().ToString()));
 	}
 
 	if (const FByteProperty* ByteProperty = CastField<const FByteProperty>(Property)) {
