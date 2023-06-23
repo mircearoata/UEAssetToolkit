@@ -10,7 +10,6 @@ class UMaterialAssetSerializer : public UAssetTypeSerializer {
 public:
     virtual void SerializeAsset(TSharedRef<FSerializationContext> Context) const override;
 
-	static void DisableMaterialExpressionProperties(UPropertySerializer* Serializer);
 	static void DisableMaterialFunctionSerialization(UPropertySerializer* Serializer);
 	static void SerializeReferencedFunctions(const FMaterialCachedExpressionData& ExpressionData, const TSharedPtr<FJsonObject> Data);
 	

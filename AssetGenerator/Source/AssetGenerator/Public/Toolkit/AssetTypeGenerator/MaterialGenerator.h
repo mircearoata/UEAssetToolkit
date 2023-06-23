@@ -3,12 +3,14 @@
 
 #include "Engine/Font.h"
 #include "Materials/MaterialLayersFunctions.h"
+#include "MaterialCachedData.h"
+#include "MaterialEditingLibrary.h"
+#include "MaterialGraph/MaterialGraph.h"
 #include "Toolkit/AssetGeneration/AssetTypeGenerator.h"
 #include "MaterialGenerator.generated.h"
 
-enum class EMaterialParameterType : int32;
+enum class EMaterialParameterType : uint8;
 struct FMaterialCachedExpressionData;
-struct FMaterialCachedParameters;
 class UMaterial;
 class UFont;
 class UTexture;
@@ -18,7 +20,7 @@ class ULandscapeGrassType;
 class UMaterialExpressionComment;
 
 struct FSimpleFontParameterValue {
-	UFont* Font;
+	TSoftObjectPtr<UFont> Font;
 	int32 FontPage;
 
 	FORCEINLINE FString ToString() const {
@@ -46,16 +48,16 @@ struct FMaterialLayoutChangeInfo {
 	//Added parameters with their values
 	TArray<TMaterialParameter<float>> NewScalarParameters;
 	TArray<TMaterialParameter<FLinearColor>> NewVectorParameters;
-	TArray<TMaterialParameter<UTexture*>> NewTextureParameters;
+	TArray<TMaterialParameter<TSoftObjectPtr<UTexture>>> NewTextureParameters;
 	TArray<TMaterialParameter<FSimpleFontParameterValue>> NewFontParameters;
-	TArray<TMaterialParameter<URuntimeVirtualTexture*>> NewVirtualTextureParameters;
+	TArray<TMaterialParameter<TSoftObjectPtr<URuntimeVirtualTexture>>> NewVirtualTextureParameters;
 
 	//Parameter value changes
 	TArray<TParameterValueChange<float>> ScalarParameterValueChanges;
 	TArray<TParameterValueChange<FLinearColor>> VectorParameterValueChanges;
-	TArray<TParameterValueChange<UTexture*>> TextureParameterValueChanges;
+	TArray<TParameterValueChange<TSoftObjectPtr<UTexture>>> TextureParameterValueChanges;
 	TArray<TParameterValueChange<FSimpleFontParameterValue>> FontParameterValueChanges;
-	TArray<TParameterValueChange<URuntimeVirtualTexture*>> VirtualTextureParameterValueChanges;
+	TArray<TParameterValueChange<TSoftObjectPtr<URuntimeVirtualTexture>>> VirtualTextureParameterValueChanges;
 
 	//Texture Sampler related changes
 	TArray<UMaterialParameterCollection*> NewReferencedParameterCollections;
@@ -104,9 +106,7 @@ struct FIndexedParameterInfo {
 UCLASS(MinimalAPI)
 class UMaterialGenerator : public UAssetTypeGenerator {
 	GENERATED_BODY()
-public:
-	static const int32 NumMaterialRuntimeParameterTypes = (int32)EMaterialParameterType::RuntimeCount;
-	
+public:	
 	UPROPERTY()
 	FMaterialCachedParameterEntry RuntimeEntries[NumMaterialRuntimeParameterTypes];
 	
@@ -134,9 +134,8 @@ protected:
 	static void ConnectDummyParameterNodes(UMaterial* Material);
 	
 	static void DetectMaterialExpressionChanges(const FMaterialCachedExpressionData& OldData, const FMaterialCachedExpressionData& NewData, FMaterialLayoutChangeInfo& ChangeInfo);
-	static void DetectMaterialParameterChanges(const FMaterialCachedParameters& OldParams, const FMaterialCachedParameters& NewParams, FMaterialLayoutChangeInfo& ChangeInfo);
-	static void AddNewParameterInfo(const FMaterialCachedParameters& Params, int32 Index, EMaterialParameterType Type, const FMaterialParameterInfo& ParameterInfo, FMaterialLayoutChangeInfo& ChangeInfo);
-	static void CompareParameterValues(const FMaterialCachedParameters& OldParams, const FMaterialCachedParameters& NewParams, int32 IndexOld, int32 IndexNew, EMaterialParameterType Type, FName ParameterName, FMaterialLayoutChangeInfo& ChangeInfo);
+	static void AddNewParameterInfo(const FMaterialCachedExpressionData& Data, int32 Index, EMaterialParameterType Type, const FMaterialParameterInfo& ParameterInfo, FMaterialLayoutChangeInfo& ChangeInfo);
+	static void CompareParameterValues(const FMaterialCachedExpressionData& OldData, const FMaterialCachedExpressionData& NewData, int32 IndexOld, int32 IndexNew, EMaterialParameterType Type, FName ParameterName, FMaterialLayoutChangeInfo& ChangeInfo);
 
 	static void CreateGeneratedMaterialComment(UMaterial* Material);
 	static FString CreateMaterialChangelistCommentText(const FMaterialLayoutChangeInfo& ChangeInfo);

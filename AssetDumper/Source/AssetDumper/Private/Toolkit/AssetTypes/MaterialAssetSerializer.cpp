@@ -5,6 +5,7 @@
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
 #include "AssetDumperModule.h"
+#include "MaterialCachedData.h"
 
 void UMaterialAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> Context) const {
     BEGIN_ASSET_SERIALIZATION(UMaterial)
@@ -12,9 +13,18 @@ void UMaterialAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
     //TODO we do not serialize shaders yet, but information exposed by normal object serialization should be enough for reasonable stubs
     //obviously they will be unable to show material in editor, but they can be used to reference it and even create new instances on top of it
 
-	DisableMaterialExpressionProperties(Serializer);
 	DisableMaterialFunctionSerialization(Serializer);
 	SerializeReferencedFunctions(Asset->GetCachedExpressionData(), Data);
+
+	TArray<int32> ReferencedSubobjects;
+	TSharedRef<FJsonObject> CachedExpressionData = ObjectSerializer->GetPropertySerializer()->SerializeStruct(StaticStruct<FMaterialCachedExpressionData>(), &Asset->GetCachedExpressionData(), &ReferencedSubobjects);
+	Data->SetObjectField(TEXT("CachedExpressionData"), CachedExpressionData);
+	
+	TArray<TSharedPtr<FJsonValue>> ReferencedSubobjectsArray;
+	for (const int32 ObjectIndex : ReferencedSubobjects) {
+		ReferencedSubobjectsArray.Add(MakeShareable(new FJsonValueNumber(ObjectIndex)));
+	}
+	Data->SetArrayField(TEXT("ReferencedObjects"), ReferencedSubobjectsArray);
 	
 	SERIALIZE_ASSET_OBJECT
 	
@@ -29,12 +39,12 @@ void UMaterialAssetSerializer::SerializeReferencedFunctions(const FMaterialCache
 	}
 
 	TArray<TSharedPtr<FJsonValue>> MaterialLayers;
-	for (UMaterialFunctionInterface* Function : ExpressionData.DefaultLayers) {
+	for (UMaterialFunctionInterface* Function : ExpressionData.MaterialLayers.Layers) {
 		MaterialLayers.Add(MakeShareable(new FJsonValueString(Function->GetPathName())));
 	}
 
 	TArray<TSharedPtr<FJsonValue>> MaterialLayerBlends;
-	for (UMaterialFunctionInterface* Function : ExpressionData.DefaultLayerBlends) {
+	for (UMaterialFunctionInterface* Function : ExpressionData.MaterialLayers.Blends) {
 		MaterialLayerBlends.Add(MakeShareable(new FJsonValueString(Function->GetPathName())));
 	}
 
@@ -45,22 +55,7 @@ void UMaterialAssetSerializer::SerializeReferencedFunctions(const FMaterialCache
 
 void UMaterialAssetSerializer::DisableMaterialFunctionSerialization(UPropertySerializer* Serializer) {
 	DISABLE_SERIALIZATION(FMaterialCachedExpressionData, FunctionInfos);
-	DISABLE_SERIALIZATION(FMaterialCachedExpressionData, DefaultLayers);
-	DISABLE_SERIALIZATION(FMaterialCachedExpressionData, DefaultLayerBlends);
-}
-
-void UMaterialAssetSerializer::DisableMaterialExpressionProperties(UPropertySerializer* Serializer) {
-	DISABLE_SERIALIZATION(UMaterial, Metallic);
-	DISABLE_SERIALIZATION(UMaterial, Specular);
-	DISABLE_SERIALIZATION(UMaterial, Anisotropy);
-	DISABLE_SERIALIZATION(UMaterial, Normal);
-	DISABLE_SERIALIZATION(UMaterial, Tangent);
-	DISABLE_SERIALIZATION(UMaterial, EmissiveColor);
-	DISABLE_SERIALIZATION(UMaterial, WorldPositionOffset);
-	DISABLE_SERIALIZATION(UMaterial, Refraction);
-	DISABLE_SERIALIZATION(UMaterial, PixelDepthOffset);
-	DISABLE_SERIALIZATION(UMaterial, ShadingModelFromMaterialExpression);
-	DISABLE_SERIALIZATION(UMaterial, MaterialAttributes);
+	DISABLE_SERIALIZATION(FMaterialCachedExpressionData, MaterialLayers);
 }
 
 FTopLevelAssetPath UMaterialAssetSerializer::GetAssetClass() const {
