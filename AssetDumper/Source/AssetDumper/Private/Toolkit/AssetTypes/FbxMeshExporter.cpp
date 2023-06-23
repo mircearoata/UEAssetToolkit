@@ -1,5 +1,6 @@
 #include "Toolkit/AssetTypes/FbxMeshExporter.h"
 #include "AnimEncoding.h"
+#include "AssetDumperModule.h"
 #include "Rendering/SkeletalMeshLODRenderData.h"
 #include "Rendering/SkeletalMeshRenderData.h"
 #include "Animation/AnimSequence.h"
@@ -569,7 +570,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
 	FbxVector4* ControlPoints = FbxMesh->GetControlPoints();
 	
     for (uint32 i = 0; i < NumVertices; i++) {
-        const FVector& SrcPosition = VertexBuffers.PositionVertexBuffer.VertexPosition(i);
+        const FVector3f& SrcPosition = VertexBuffers.PositionVertexBuffer.VertexPosition(i);
         FbxVector4& DestPosition = ControlPoints[i];
         DestPosition = FFbxDataConverter::ConvertToFbxPos(SrcPosition);
     }
@@ -602,7 +603,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
 	NormalArray.AddMultiple(NumVertices);
     
 	for (uint32 i = 0; i < NumVertices; i++) {
-		const FVector4 SrcNormal = VertexBuffers.StaticMeshVertexBuffer.VertexTangentZ(i);
+		const FVector3f SrcNormal = VertexBuffers.StaticMeshVertexBuffer.VertexTangentZ(i);
 		FbxVector4 DestNormal = FFbxDataConverter::ConvertToFbxPos(SrcNormal);
 		NormalArray.SetAt(i, DestNormal);
 	}
@@ -616,7 +617,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
 	TangentArray.AddMultiple(NumVertices);
     
 	for (uint32 i = 0; i < NumVertices; i++) {
-		const FVector4 SrcTangent = VertexBuffers.StaticMeshVertexBuffer.VertexTangentX(i);
+		const FVector3f SrcTangent = VertexBuffers.StaticMeshVertexBuffer.VertexTangentX(i);
 		FbxVector4 DestTangent = FFbxDataConverter::ConvertToFbxPos(SrcTangent);
 		TangentArray.SetAt(i, DestTangent);
 	}
@@ -630,7 +631,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
 	BinormalArray.AddMultiple(NumVertices);
     
 	for (uint32 i = 0; i < NumVertices; i++) {
-		const FVector4 SrcBinormal = VertexBuffers.StaticMeshVertexBuffer.VertexTangentY(i);
+		const FVector3f SrcBinormal = VertexBuffers.StaticMeshVertexBuffer.VertexTangentY(i);
 		FbxVector4 DestBinormal = FFbxDataConverter::ConvertToFbxPos(SrcBinormal);
 		BinormalArray.SetAt(i, DestBinormal);
 	}
@@ -655,7 +656,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
     for (uint32 j = 0; j < NumTexCoords; j++) {
         FbxLayerElementArrayTemplate<FbxVector2>* UVArray = UVCoordsArray[j];
         for (uint32 i = 0; i < NumVertices; i++) {
-            const FVector2D& SrcTextureCoord = VertexBuffers.StaticMeshVertexBuffer.GetVertexUV(i, j);
+            const FVector2f& SrcTextureCoord = VertexBuffers.StaticMeshVertexBuffer.GetVertexUV(i, j);
             FbxVector2 DestUVCoord(SrcTextureCoord.X, -SrcTextureCoord.Y + 1.0f);
             UVArray->SetAt(i, DestUVCoord);
         }
@@ -905,6 +906,10 @@ void FFbxMeshExporter::ExportStaticMesh(const FStaticMeshLODResources& StaticMes
     ExportCommonMeshResources(StaticMeshLOD.VertexBuffers, FbxMesh);
     
     const FRawStaticIndexBuffer& IndexBuffer = StaticMeshLOD.IndexBuffer;
+	if (!IndexBuffer.GetAllowCPUAccess()) {
+		UE_LOG(LogAssetDumper, Error, TEXT("Cannot export static mesh without CPU access to index buffer"));
+		return;
+	}
     FbxNode* MeshNode = FbxMesh->GetNode();
 
     //Create sections and initialize dummy materials

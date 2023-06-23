@@ -30,9 +30,23 @@ public:
 	 */
 	static FColor ConvertColor(FbxDouble3 Color);
 
-	static FbxVector4 ConvertToFbxPos(FVector Vector);
-	static FbxVector4 ConvertToFbxRot(FVector Vector);
-	static FbxVector4 ConvertToFbxScale(FVector Vector);
+	template<typename T>
+	static FbxVector4 ConvertToFbxPos(UE::Math::TVector<T> Vector);
+	
+	template<typename T>
+	static FbxVector4 ConvertToFbxRot(UE::Math::TVector<T> Vector);
+	
+	template<typename T>
+	static FbxVector4 ConvertToFbxScale(UE::Math::TVector<T> Vector);
+
+	template<typename T>
+	static FbxVector4 ConvertToFbxPos(UE::Math::TVector4<T> Vector);
+	
+	template<typename T>
+	static FbxVector4 ConvertToFbxRot(UE::Math::TVector4<T> Vector);
+	
+	template<typename T>
+	static FbxVector4 ConvertToFbxScale(UE::Math::TVector4<T> Vector);
 	
 	/*
 	* Convert sRGB FColor to fbx linear space color
