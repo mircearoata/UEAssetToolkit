@@ -55,15 +55,13 @@ public class AssetDumper : ModuleRules
         PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "zlib-md.lib"));
         PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "detex.lib"));
         
-        var projectName = Target.ProjectFile.GetFileNameWithoutAnyExtensions();
-        if (projectName == "FactoryGame") {
-	        PublicDefinitions.Add("WITH_CSS_ENGINE_PATCHES=1");
-        }
-
         var pluginsDirectory = DirectoryReference.Combine(Target.ProjectFile.Directory, "Plugins");
         var smlPluginDirectory = DirectoryReference.Combine(pluginsDirectory, "SML");
         
-        if (Directory.Exists(smlPluginDirectory.FullName)) {
+        var modsDirectory = DirectoryReference.Combine(Target.ProjectFile.Directory, "Mods");
+        var smlModDirectory = DirectoryReference.Combine(modsDirectory, "SML");
+        
+        if (Directory.Exists(smlPluginDirectory.FullName) || Directory.Exists(smlModDirectory.FullName)) {
 	        PrivateDependencyModuleNames.Add("SML");
 	        PublicDefinitions.Add("METHOD_PATCHING_SUPPORTED=1");
         }
