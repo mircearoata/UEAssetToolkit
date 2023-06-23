@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
+﻿#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
 #include "K2Node_FunctionEntry.h"
 #include "Dom/JsonObject.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -207,7 +207,7 @@ void UBlueprintGenerator::FinalizeAssetCDO() {
 	const bool bScriptObjectChanged = !GetObjectSerializer()->CompareUObjects(
 		SimpleConstructionScriptIndex, OldSimpleConstructionScript, false, false);
 	
-	if (bScriptObjectChanged) {
+	if (bScriptObjectChanged && SimpleConstructionScriptIndex != INDEX_NONE) {
 		//Trash out old SimpleConstructionScript so we can straight up replace it with the new one
 		if(Blueprint->SimpleConstructionScript != NULL) {
 			MoveToTransientPackageAndRename(Blueprint->SimpleConstructionScript);
