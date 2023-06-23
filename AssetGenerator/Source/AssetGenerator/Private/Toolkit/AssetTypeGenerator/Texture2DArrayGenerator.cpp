@@ -12,6 +12,6 @@ TSubclassOf<UTexture> UTexture2DArrayGenerator::GetTextureClass() {
 	return UTexture2DArray::StaticClass();
 }
 
-FName UTexture2DArrayGenerator::GetAssetClass() {
-	return UTexture2DArray::StaticClass()->GetFName();
+FTopLevelAssetPath UTexture2DArrayGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UTexture2DArray::StaticClass());
 }

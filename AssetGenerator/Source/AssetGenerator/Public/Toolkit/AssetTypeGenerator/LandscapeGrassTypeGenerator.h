@@ -9,5 +9,5 @@ class ULandscapeGrassTypeGenerator : public USimpleAssetGenerator {
 protected:
 	virtual UClass* GetAssetObjectClass() const override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

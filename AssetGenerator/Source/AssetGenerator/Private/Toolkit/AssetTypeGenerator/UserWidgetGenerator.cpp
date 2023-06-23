@@ -110,8 +110,8 @@ UClass* UUserWidgetGenerator::GetFallbackParentClass() const {
 	return UUserWidget::StaticClass();
 }
 
-FName UUserWidgetGenerator::GetAssetClass() {
-	return TEXT("WidgetBlueprint");
+FTopLevelAssetPath UUserWidgetGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UWidgetBlueprint::StaticClass());
 }
 
 void UUserWidgetGenerator::PopulateStageDependencies(TArray<FPackageDependency>& AssetDependencies) const {

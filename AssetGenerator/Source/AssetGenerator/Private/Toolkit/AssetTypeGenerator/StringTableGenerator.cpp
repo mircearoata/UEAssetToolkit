@@ -118,6 +118,6 @@ bool UStringTableGenerator::IsStringTableUpToDate(UStringTable* StringTable) con
 	return true;
 }
 
-FName UStringTableGenerator::GetAssetClass() {
-	return UStringTable::StaticClass()->GetFName();
+FTopLevelAssetPath UStringTableGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UStringTable::StaticClass());
 }

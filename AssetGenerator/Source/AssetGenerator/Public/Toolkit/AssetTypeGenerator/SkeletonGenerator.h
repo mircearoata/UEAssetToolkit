@@ -25,5 +25,5 @@ protected:
 	virtual void CreateAssetPackage() override;
 	virtual void OnExistingPackageLoaded() override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

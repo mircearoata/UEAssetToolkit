@@ -1,5 +1,5 @@
 ﻿#include "Toolkit/AssetDumping/AssetDumperCommands.h"
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Toolkit/AssetDumping/AssetDumperWidget.h"
 #include "Toolkit/AssetDumping/AssetDumpConsoleWidget.h"
 #include "Toolkit/AssetDumping/AssetRegistryViewWidget.h"
@@ -57,7 +57,7 @@ void FAssetDumperCommands::DumpAllGameAssets(const FString& Params) {
 		}
 	}
 
-	TArray<FName> AssetClassWhitelist;
+	TArray<FTopLevelAssetPath> AssetClassWhitelist;
 	
 	for (UAssetTypeSerializer* Serializer : UAssetTypeSerializer::GetAvailableAssetSerializers()) {
 		AssetClassWhitelist.Add(Serializer->GetAssetClass());
@@ -72,12 +72,12 @@ void FAssetDumperCommands::DumpAllGameAssets(const FString& Params) {
 
 			AssetClassWhitelist.Empty();
 			for (const FString& AssetClass : NewClassWhitelist) {
-				AssetClassWhitelist.Add(*AssetClass);
+				AssetClassWhitelist.Add(FTopLevelAssetPath(AssetClass));
 			}
 		}
 	}
 
-	for (const FName& AssetClass : AssetClassWhitelist) {
+	for (const FTopLevelAssetPath& AssetClass : AssetClassWhitelist) {
 		SelectedAssetsStruct->AddAssetClassWhitelist(AssetClass);
 	}
 
@@ -98,7 +98,7 @@ void FAssetDumperCommands::DumpAllGameAssets(const FString& Params) {
 	UE_LOG(LogAssetDumper, Log, TEXT("Gathering asset data under the path, this may take a while..."));
 	SelectedAssetsStruct->GatherAssetsData();
 
-	const TMap<FName, FAssetData>& AssetData = SelectedAssetsStruct->GetGatheredAssets();
+	const TMap<FSoftObjectPath, FAssetData>& AssetData = SelectedAssetsStruct->GetGatheredAssets();
 	UE_LOG(LogAssetDumper, Log, TEXT("Asset data gathered successfully! Gathered %d assets for dumping"), AssetData.Num());
 	
 	FPaths::NormalizeDirectoryName(DumpSettings.RootDumpDirectory);
@@ -113,7 +113,7 @@ void DumpAllGameAssets(const TArray<FString>& Args, UWorld* World, FOutputDevice
 }
 
 void FAssetDumperCommands::FindUnknownAssetClasses(const FString& PackagePathFilter, TArray<FUnknownAssetClass>& OutUnknownAssetClasses) {
-	TArray<FName> SupportedClasses;
+	TArray<FTopLevelAssetPath> SupportedClasses;
 	for (UAssetTypeSerializer* Serializer : UAssetTypeSerializer::GetAvailableAssetSerializers()) {
 		SupportedClasses.Add(Serializer->GetAssetClass());
 		Serializer->GetAdditionallyHandledAssetClasses(SupportedClasses);
@@ -129,7 +129,7 @@ void PrintUnknownAssetClasses(const TArray<FString>& Args, UWorld* World, FOutpu
 	if (UnknownAssetClasses.Num() > 0) {
 		Ar.Logf(TEXT("Unknown asset classes in asset registry under path %s: "), *FilterAssetPath);
 		for (const FUnknownAssetClass& AssetClass : UnknownAssetClasses) {
-			Ar.Logf(TEXT("%s (%d)"), *AssetClass.AssetClass.ToString(), AssetClass.FoundAssets.Num());
+			Ar.Logf(TEXT("%s (%d)"), *AssetClass.AssetPath.ToString(), AssetClass.FoundAssets.Num());
 
 			for (int32 i = 0; i < FMath::Min(AssetClass.FoundAssets.Num(), 10); i++) {
 				Ar.Logf(TEXT("  %s"), *AssetClass.FoundAssets[i].ToString());

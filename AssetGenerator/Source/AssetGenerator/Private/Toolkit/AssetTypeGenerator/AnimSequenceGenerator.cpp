@@ -121,6 +121,6 @@ void UAnimSequenceGenerator::PopulateStageDependencies(TArray<FPackageDependency
 	}
 }
 
-FName UAnimSequenceGenerator::GetAssetClass() {
-	return UAnimSequence::StaticClass()->GetFName();
+FTopLevelAssetPath UAnimSequenceGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UAnimSequence::StaticClass());
 }

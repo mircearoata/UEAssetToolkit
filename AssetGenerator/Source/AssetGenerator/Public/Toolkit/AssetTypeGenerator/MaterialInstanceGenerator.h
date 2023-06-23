@@ -19,7 +19,7 @@ public:
 protected:
 	virtual void PreFinishAssetGeneration() override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 private:
 	FProperty* AssetUserDataProperty;
 };

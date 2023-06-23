@@ -103,6 +103,6 @@ bool UUserDefinedEnumGenerator::IsEnumerationUpToDate(UUserDefinedEnum* Enum) co
 	return true;
 }
 
-FName UUserDefinedEnumGenerator::GetAssetClass() {
-	return UUserDefinedEnum::StaticClass()->GetFName();
+FTopLevelAssetPath UUserDefinedEnumGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UUserDefinedEnum::StaticClass());
 }

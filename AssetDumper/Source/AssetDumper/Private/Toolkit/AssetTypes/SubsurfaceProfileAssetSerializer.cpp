@@ -10,6 +10,6 @@ void USubsurfaceProfileAssetSerializer::SerializeAsset(TSharedRef<FSerialization
     END_ASSET_SERIALIZATION
 }
 
-FName USubsurfaceProfileAssetSerializer::GetAssetClass() const {
-    return USubsurfaceProfile::StaticClass()->GetFName();
+FTopLevelAssetPath USubsurfaceProfileAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(USubsurfaceProfile::StaticClass());
 }

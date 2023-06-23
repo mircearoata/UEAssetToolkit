@@ -51,6 +51,6 @@ bool UFontFaceGenerator::IsFontFaceUpToDate(UFontFace* FontFace) const {
 	return true;
 }
 
-FName UFontFaceGenerator::GetAssetClass() {
-	return UFontFace::StaticClass()->GetFName();
+FTopLevelAssetPath UFontFaceGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UFontFace::StaticClass());
 }

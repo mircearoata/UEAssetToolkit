@@ -10,6 +10,6 @@ public:
 
     static void SerializeReferenceSkeleton(const struct FReferenceSkeleton& ReferenceSkeleton, TSharedPtr<class FJsonObject> OutObject);
     
-    virtual FName GetAssetClass() const override;
+    virtual FTopLevelAssetPath GetAssetClass() const override;
 	virtual bool SupportsParallelDumping() const override;
 };

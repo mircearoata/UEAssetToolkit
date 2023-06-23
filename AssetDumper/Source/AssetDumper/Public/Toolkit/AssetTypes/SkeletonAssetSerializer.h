@@ -9,6 +9,6 @@ public:
     virtual void SerializeAsset(TSharedRef<FSerializationContext> Context) const override;
     static void SerializeSmartNameContainer(const struct FSmartNameContainer& Container, TSharedPtr<class FJsonObject> OutObject);
     
-    virtual FName GetAssetClass() const override;
+    virtual FTopLevelAssetPath GetAssetClass() const override;
 	virtual bool SupportsParallelDumping() const override;
 };

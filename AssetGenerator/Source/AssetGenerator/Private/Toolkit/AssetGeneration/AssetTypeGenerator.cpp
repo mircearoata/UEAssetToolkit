@@ -204,7 +204,7 @@ UAssetTypeGenerator* UAssetTypeGenerator::InitializeFromFile(const FString& Root
 		return NULL;
 	}
 
-	const FName AssetClass = FName(*RootFileObject->GetStringField(TEXT("AssetClass")));
+	const FTopLevelAssetPath AssetClass = FTopLevelAssetPath(*RootFileObject->GetStringField(TEXT("AssetClassPath")));
 	UClass* AssetTypeGenerator = FindGeneratorForClass(AssetClass);
 	if (AssetTypeGenerator == NULL) {
 		UE_LOG(LogAssetGenerator, Error, TEXT("Asset generator not found for asset class '%s', loaded from %s"), *AssetClass.ToString(), *AssetDumpFilePath);
@@ -220,7 +220,7 @@ UAssetTypeGenerator* UAssetTypeGenerator::InitializeFromFile(const FString& Root
 class FAssetTypeGeneratorRegistry {
 public:
 	//Native classes should never get unloaded, so we can get away with using TSubclassOf without weak pointer
-	TMap<FName, TWeakObjectPtr<UClass>> Generators;
+	TMap<FTopLevelAssetPath, TWeakObjectPtr<UClass>> Generators;
 
 	//Constructor that will automatically populate registry serializers
 	FAssetTypeGeneratorRegistry();
@@ -249,28 +249,28 @@ FAssetTypeGeneratorRegistry::FAssetTypeGeneratorRegistry() {
             
 		//Check asset type in class default object
 		UAssetTypeGenerator* ClassDefaultObject = CastChecked<UAssetTypeGenerator>(Class->GetDefaultObject());
-		if (ClassDefaultObject->GetAssetClass() != NAME_None) {
+		if (ClassDefaultObject->GetAssetClass().IsValid()) {
 			OutFoundInitializers.Add(ClassDefaultObject);
 		}
 	}
 
 	//First register additional asset classes, so primary ones will overwrite them later
 	for (UAssetTypeGenerator* Generator : OutFoundInitializers) {
-		TArray<FName> OutExtraAssetClasses;
+		TArray<FTopLevelAssetPath> OutExtraAssetClasses;
 		Generator->GetAdditionallyHandledAssetClasses(OutExtraAssetClasses);
-		for (const FName& AssetClass : OutExtraAssetClasses) {
+		for (const FTopLevelAssetPath& AssetClass : OutExtraAssetClasses) {
 			this->Generators.Add(AssetClass, Generator->GetClass());
 		}
 	}
 
 	//Now setup primary asset classes and add serializers into array
 	for (UAssetTypeGenerator* Generator : OutFoundInitializers) {
-		const FName AssetClass = Generator->GetAssetClass();
+		const FTopLevelAssetPath AssetClass = Generator->GetAssetClass();
 		this->Generators.Add(AssetClass, Generator->GetClass());
 	}
 }
 
-TSubclassOf<UAssetTypeGenerator> UAssetTypeGenerator::FindGeneratorForClass(const FName AssetClass) {
+TSubclassOf<UAssetTypeGenerator> UAssetTypeGenerator::FindGeneratorForClass(const FTopLevelAssetPath AssetClass) {
 	const TWeakObjectPtr<UClass>* Class = FAssetTypeGeneratorRegistry::Get().Generators.Find(AssetClass);
 	return Class ? (*Class).Get() : NULL;
 }
@@ -278,7 +278,7 @@ TSubclassOf<UAssetTypeGenerator> UAssetTypeGenerator::FindGeneratorForClass(cons
 TArray<TSubclassOf<UAssetTypeGenerator>> UAssetTypeGenerator::GetAllGenerators() {
 	TArray<TSubclassOf<UAssetTypeGenerator>> ResultArray;
 
-	for (const TPair<FName, TWeakObjectPtr<UClass>>& Pair : FAssetTypeGeneratorRegistry::Get().Generators) {
+	for (const TPair<FTopLevelAssetPath, TWeakObjectPtr<UClass>>& Pair : FAssetTypeGeneratorRegistry::Get().Generators) {
 		UClass* ResultingValue = Pair.Value.Get();
 		if (ResultingValue) {
 			ResultArray.AddUnique(ResultingValue);

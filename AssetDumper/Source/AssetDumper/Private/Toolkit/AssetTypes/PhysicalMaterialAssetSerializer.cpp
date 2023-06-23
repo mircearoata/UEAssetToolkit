@@ -10,6 +10,6 @@ void UPhysicalMaterialAssetSerializer::SerializeAsset(TSharedRef<FSerializationC
     END_ASSET_SERIALIZATION
 }
 
-FName UPhysicalMaterialAssetSerializer::GetAssetClass() const {
-    return UPhysicalMaterial::StaticClass()->GetFName();
+FTopLevelAssetPath UPhysicalMaterialAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UPhysicalMaterial::StaticClass());
 }

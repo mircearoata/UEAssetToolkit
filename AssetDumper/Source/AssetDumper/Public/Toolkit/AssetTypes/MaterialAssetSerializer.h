@@ -14,5 +14,5 @@ public:
 	static void DisableMaterialFunctionSerialization(UPropertySerializer* Serializer);
 	static void SerializeReferencedFunctions(const FMaterialCachedExpressionData& ExpressionData, const TSharedPtr<FJsonObject> Data);
 	
-    virtual FName GetAssetClass() const override;
+    virtual FTopLevelAssetPath GetAssetClass() const override;
 };

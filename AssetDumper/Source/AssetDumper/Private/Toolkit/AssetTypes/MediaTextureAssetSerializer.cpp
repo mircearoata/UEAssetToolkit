@@ -18,6 +18,6 @@ void UMediaTextureAssetSerializer::SerializeAsset(TSharedRef<FSerializationConte
 	END_ASSET_SERIALIZATION
 }
 
-FName UMediaTextureAssetSerializer::GetAssetClass() const {
-	return UMediaTexture::StaticClass()->GetFName();
+FTopLevelAssetPath UMediaTextureAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(UMediaTexture::StaticClass());
 }

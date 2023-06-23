@@ -5,6 +5,6 @@ TSubclassOf<UTexture> UTextureCubeGenerator::GetTextureClass() {
 	return UTextureCube::StaticClass();
 }
 
-FName UTextureCubeGenerator::GetAssetClass() {
-	return UTextureCube::StaticClass()->GetFName();
+FTopLevelAssetPath UTextureCubeGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UTextureCube::StaticClass());
 }

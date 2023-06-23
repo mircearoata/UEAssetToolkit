@@ -8,5 +8,5 @@ class UTextureCubeGenerator : public UTextureGenerator {
 protected:
 	virtual TSubclassOf<UTexture> GetTextureClass() override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

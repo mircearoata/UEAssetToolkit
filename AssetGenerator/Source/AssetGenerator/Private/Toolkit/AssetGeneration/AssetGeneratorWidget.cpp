@@ -50,7 +50,7 @@ FReply SAssetGeneratorWidget::OnGenerateAssetsButtonPressed() {
 		return FReply::Handled();
 	}
 
-	TSet<FName> WhitelistedAssetCategories = LocalSettings->WhitelistedAssetCategories;
+	TSet<FTopLevelAssetPath> WhitelistedAssetCategories = LocalSettings->WhitelistedAssetCategories;
 	ExpandWhitelistedAssetCategories(WhitelistedAssetCategories);
 	
 	TArray<FName> SelectedAssetPackages;
@@ -77,10 +77,10 @@ TSharedRef<SWidget> SAssetGeneratorWidget::CreateAssetTypeFilterCategory()
 	int32 AssetTypesStored = 0;
 	const int32 MaxAssetTypesPerRow = 8;
 	
-	TSet<FName> AllAssetClasses;
+	TSet<FTopLevelAssetPath> AllAssetClasses;
 
 	for (TSubclassOf<UAssetTypeGenerator> AssetGeneratorClass : UAssetTypeGenerator::GetAllGenerators()) {
-		const FName AssetClass = AssetGeneratorClass.GetDefaultObject()->GetAssetClass();
+		const FTopLevelAssetPath AssetClass = AssetGeneratorClass.GetDefaultObject()->GetAssetClass();
 		AllAssetClasses.Add(AssetClass);
 
 		if (!CurrentVerticalBox.IsValid() || AssetTypesStored >= MaxAssetTypesPerRow) {
@@ -237,13 +237,13 @@ TSharedRef<SWidget> SAssetGeneratorWidget::CreateSettingsCategory() {
 		];
 }
 
-void SAssetGeneratorWidget::ExpandWhitelistedAssetCategories(TSet<FName>& WhitelistedAssetCategories) {
+void SAssetGeneratorWidget::ExpandWhitelistedAssetCategories(TSet<FTopLevelAssetPath>& WhitelistedAssetCategories) {
 	for (TSubclassOf<UAssetTypeGenerator> AssetGeneratorClass : UAssetTypeGenerator::GetAllGenerators()) {
 		UAssetTypeGenerator* AssetGenerator = AssetGeneratorClass.GetDefaultObject();
-		const FName AssetClass = AssetGenerator->GetAssetClass();
+		const FTopLevelAssetPath AssetClass = AssetGenerator->GetAssetClass();
 
 		if (WhitelistedAssetCategories.Contains(AssetClass)) {
-			TArray<FName> OutAdditionalClasses;
+			TArray<FTopLevelAssetPath> OutAdditionalClasses;
 			AssetGenerator->GetAdditionallyHandledAssetClasses(OutAdditionalClasses);
 			WhitelistedAssetCategories.Append(OutAdditionalClasses);
 		}

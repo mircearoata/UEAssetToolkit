@@ -6,8 +6,8 @@ UClass* UPhysicalMaterialGenerator::GetAssetObjectClass() const {
 	return UPhysicalMaterial::StaticClass();
 }
 
-FName UPhysicalMaterialGenerator::GetAssetClass() {
-	return UPhysicalMaterial::StaticClass()->GetFName();
+FTopLevelAssetPath UPhysicalMaterialGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UPhysicalMaterial::StaticClass());
 }
 
 //UClass* UPhysicalMaterialGenerator::GetAssetObjectClass() const {
@@ -16,5 +16,5 @@ FName UPhysicalMaterialGenerator::GetAssetClass() {
 //}
 //
 //FName UPhysicalMaterialGenerator::GetAssetClass() {
-//	return UPhysicalMaterial::StaticClass()->GetFName();
+//	return FTopLevelAssetPath(UPhysicalMaterial::StaticClass());
 //}

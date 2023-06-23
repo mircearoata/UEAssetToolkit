@@ -31,6 +31,6 @@ bool UCurveLinearColorAtlasGenerator::IsAtlasUpToDate(UCurveLinearColorAtlas* As
 	return UTexture2DGenerator::IsTextureUpToDate(Asset, GetObjectSerializer(), GetAssetData());
 }
 
-FName UCurveLinearColorAtlasGenerator::GetAssetClass() {
-	return UCurveLinearColorAtlas::StaticClass()->GetFName();
+FTopLevelAssetPath UCurveLinearColorAtlasGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UCurveLinearColorAtlas::StaticClass());
 }

@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypes/StaticMeshAssetSerializer.h"
+#include "Toolkit/AssetTypes/StaticMeshAssetSerializer.h"
 #include "AI/Navigation/NavCollisionBase.h"
 #include "Toolkit/AssetTypes/FbxMeshExporter.h"
 #include "Engine/StaticMesh.h"
@@ -60,8 +60,8 @@ void UStaticMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
     END_ASSET_SERIALIZATION
 }
 
-FName UStaticMeshAssetSerializer::GetAssetClass() const {
-    return UStaticMesh::StaticClass()->GetFName();
+FTopLevelAssetPath UStaticMeshAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UStaticMesh::StaticClass());
 }
 
 bool UStaticMeshAssetSerializer::SupportsParallelDumping() const {

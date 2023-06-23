@@ -299,6 +299,6 @@ void USkeletonGenerator::OnExistingPackageLoaded() {
 	}
 }
 
-FName USkeletonGenerator::GetAssetClass() {
-	return USkeleton::StaticClass()->GetFName();
+FTopLevelAssetPath USkeletonGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(USkeleton::StaticClass());
 }

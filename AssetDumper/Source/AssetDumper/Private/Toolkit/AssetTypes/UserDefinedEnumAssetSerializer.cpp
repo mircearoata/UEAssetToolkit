@@ -22,6 +22,6 @@ void UUserDefinedEnumAssetSerializer::SerializeAsset(TSharedRef<FSerializationCo
     END_ASSET_SERIALIZATION
 }
 
-FName UUserDefinedEnumAssetSerializer::GetAssetClass() const {
-    return UUserDefinedEnum::StaticClass()->GetFName();
+FTopLevelAssetPath UUserDefinedEnumAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UUserDefinedEnum::StaticClass());
 }

@@ -10,8 +10,8 @@ void ULandscapeGrassTypeAssetSerializer::SerializeAsset(TSharedRef<FSerializatio
 	END_ASSET_SERIALIZATION
 }
 
-FName ULandscapeGrassTypeAssetSerializer::GetAssetClass() const {
-	return ULandscapeGrassType::StaticClass()->GetFName();
+FTopLevelAssetPath ULandscapeGrassTypeAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(ULandscapeGrassType::StaticClass());
 }
 
 

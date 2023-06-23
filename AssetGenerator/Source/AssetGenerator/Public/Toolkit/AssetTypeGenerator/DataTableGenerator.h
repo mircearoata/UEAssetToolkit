@@ -16,5 +16,5 @@ protected:
 	bool IsDataTableUpToDate(class UDataTable* DataTable, const FTableRowMap& TableRowMap) const;
 public:
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

@@ -12,6 +12,6 @@ void UCurveLinearColorAtlasAssetSerializer::SerializeAsset(TSharedRef<FSerializa
     END_ASSET_SERIALIZATION
 }
 
-FName UCurveLinearColorAtlasAssetSerializer::GetAssetClass() const {
-    return UCurveLinearColorAtlas::StaticClass()->GetFName();
+FTopLevelAssetPath UCurveLinearColorAtlasAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UCurveLinearColorAtlas::StaticClass());
 }

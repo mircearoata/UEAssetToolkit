@@ -8,24 +8,24 @@ UClass* UMediaPlayerGenerator::GetAssetObjectClass() const {
 	return UMediaPlayer::StaticClass();
 }
 
-FName UMediaPlayerGenerator::GetAssetClass() {
-	return UMediaPlayer::StaticClass()->GetFName();
+FTopLevelAssetPath UMediaPlayerGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UMediaPlayer::StaticClass());
 }
 
 UClass* UMediaTextureGenerator::GetAssetObjectClass() const {
 	return UMediaTexture::StaticClass();
 }
 
-FName UMediaTextureGenerator::GetAssetClass() {
-	return UMediaTexture::StaticClass()->GetFName();
+FTopLevelAssetPath UMediaTextureGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UMediaTexture::StaticClass());
 }
 
 UClass* UFileMediaSourceGenerator::GetAssetObjectClass() const {
 	return UFileMediaSource::StaticClass();
 }
 
-FName UFileMediaSourceGenerator::GetAssetClass() {
-	return UFileMediaSource::StaticClass()->GetFName();
+FTopLevelAssetPath UFileMediaSourceGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UFileMediaSource::StaticClass());
 }
 
 void UFileMediaSourceGenerator::PopulateSimpleAssetWithData(UObject* Asset) {

@@ -27,6 +27,6 @@ void UUserDefinedStructAssetSerializer::SerializeAsset(TSharedRef<FSerialization
     END_ASSET_SERIALIZATION
 }
 
-FName UUserDefinedStructAssetSerializer::GetAssetClass() const {
-    return UUserDefinedStruct::StaticClass()->GetFName();
+FTopLevelAssetPath UUserDefinedStructAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UUserDefinedStruct::StaticClass());
 }

@@ -37,6 +37,6 @@ void UStringTableAssetSerializer::SerializeAsset(TSharedRef<FSerializationContex
     END_ASSET_SERIALIZATION
 }
 
-FName UStringTableAssetSerializer::GetAssetClass() const {
-    return UStringTable::StaticClass()->GetFName();
+FTopLevelAssetPath UStringTableAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UStringTable::StaticClass());
 }

@@ -42,22 +42,22 @@ TSharedPtr<FAssetDumpTreeNode> FAssetDumpTreeNode::MakeChildNode() {
 	return NewNode;
 }
 
-FString FAssetDumpTreeNode::ComputeAssetClass() {
+FTopLevelAssetPath FAssetDumpTreeNode::ComputeAssetClass() {
 	if (!bIsLeafNode) {
-		return TEXT("");
+		return nullptr;
 	}
 	
 	FString FileContentsString;
 	if (!FFileHelper::LoadFileToString(FileContentsString, *DiskPackagePath)) {
 		UE_LOG(LogAssetGenerator, Error, TEXT("Failed to load asset dump json file %s"), *DiskPackagePath);
-		return TEXT("Unknown");
+		return nullptr;
 	}
 
 	//Try quick and dirty method that saves us time from parsing JSON fully
-	const FString AssetClassPrefix = TEXT("\"AssetClass\": \"");
+	const FString AssetClassPrefix = TEXT("\"AssetClassPath\": \"");
 	const int32 AssetClassIndex = FileContentsString.Find(*AssetClassPrefix);
 	if (AssetClassIndex != INDEX_NONE) {
-		return CollectQuotedString(FileContentsString, AssetClassIndex + AssetClassPrefix.Len());
+		return FTopLevelAssetPath(CollectQuotedString(FileContentsString, AssetClassIndex + AssetClassPrefix.Len()));
 	}
 	
 	UE_LOG(LogAssetGenerator, Warning, TEXT("Quick AssetClass computation method failed for asset file %s"), *DiskPackagePath);
@@ -65,11 +65,11 @@ FString FAssetDumpTreeNode::ComputeAssetClass() {
 	//Fallback to heavy json file scanning
 	TSharedPtr<FJsonObject> JsonObject;
 	if (FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(FileContentsString), JsonObject)) {
-		return JsonObject->GetStringField(TEXT("AssetClass"));
+		return FTopLevelAssetPath(JsonObject->GetStringField(TEXT("AssetClassPath")));
 	}
 
 	UE_LOG(LogAssetGenerator, Error, TEXT("Failed to parse asset dump file %s as valid json"), *DiskPackagePath);
-	return TEXT("Unknown");
+	return nullptr;
 }
 
 void FAssetDumpTreeNode::SetupPackageNameFromDiskPath() {
@@ -93,7 +93,7 @@ void FAssetDumpTreeNode::SetupPackageNameFromDiskPath() {
 	this->NodeName = PackageNameNew.Len() > 1 ? FPackageName::GetShortName(PackageNameNew) : PackageNameNew;
 }
 
-FString FAssetDumpTreeNode::GetOrComputeAssetClass() {
+FTopLevelAssetPath FAssetDumpTreeNode::GetOrComputeAssetClass() {
 	if (!bAssetClassComputed) {
 		this->AssetClass = ComputeAssetClass();
 		this->bAssetClassComputed = true;
@@ -169,11 +169,11 @@ void FAssetDumpTreeNode::UpdateSelectedState(bool bIsCheckedNew, bool bIsSetByPa
 	}
 }
 
-void FAssetDumpTreeNode::PopulateGeneratedPackages(TArray<FName>& OutPackageNames, const TSet<FName>* WhitelistedAssetClasses) {
+void FAssetDumpTreeNode::PopulateGeneratedPackages(TArray<FName>& OutPackageNames, const TSet<FTopLevelAssetPath>* WhitelistedAssetClasses) {
 	if (bIsLeafNode) {
 		//If we represent leaf node, append our package name if we are checked
 		if (bIsChecked) {
-			if (WhitelistedAssetClasses == NULL || WhitelistedAssetClasses->Contains(*GetOrComputeAssetClass())) {
+			if (WhitelistedAssetClasses == NULL || WhitelistedAssetClasses->Contains(GetOrComputeAssetClass())) {
 				OutPackageNames.Add(*PackageName);
 			}
 		}
@@ -240,7 +240,7 @@ void SAssetDumpViewWidget::SetAssetDumpRootDirectory(const FString& RootDirector
 	this->TreeView->RequestTreeRefresh();
 }
 
-void SAssetDumpViewWidget::PopulateSelectedPackages(TArray<FName>& OutPackageNames, const TSet<FName>* WhitelistedAssetClasses) const {
+void SAssetDumpViewWidget::PopulateSelectedPackages(TArray<FName>& OutPackageNames, const TSet<FTopLevelAssetPath>* WhitelistedAssetClasses) const {
 	this->RootNode->PopulateGeneratedPackages(OutPackageNames, WhitelistedAssetClasses);
 }
 
@@ -272,7 +272,7 @@ TSharedRef<SWidget> SAssetDumpTreeNodeRow::GenerateWidgetForColumn(const FName& 
 	if (InColumnName == TEXT("AssetClass")) {
 		if (TreeNode->bIsLeafNode) {
 			return SNew(STextBlock)
-                .Text(FText::FromString(TreeNode->GetOrComputeAssetClass()));
+                .Text(FText::FromString(TreeNode->GetOrComputeAssetClass().ToString()));
 		}
 		return SNullWidget::NullWidget;
 	}

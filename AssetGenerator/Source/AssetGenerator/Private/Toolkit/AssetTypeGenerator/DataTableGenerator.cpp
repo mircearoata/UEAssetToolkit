@@ -118,6 +118,6 @@ void UDataTableGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 	}
 }
 
-FName UDataTableGenerator::GetAssetClass() {
-	return UDataTable::StaticClass()->GetFName();
+FTopLevelAssetPath UDataTableGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UDataTable::StaticClass());
 }

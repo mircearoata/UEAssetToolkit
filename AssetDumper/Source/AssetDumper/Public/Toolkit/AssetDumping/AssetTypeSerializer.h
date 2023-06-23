@@ -21,7 +21,7 @@ public:
      * Returns asset class tis handler is capable of serializing
      * Note that this method will be called on Class Default Object
      */
-    virtual FName GetAssetClass() const PURE_VIRTUAL(UAssetTypeSerializer::GetAssetCategory, return NAME_None; );
+    virtual FTopLevelAssetPath GetAssetClass() const PURE_VIRTUAL(UAssetTypeSerializer::GetAssetCategory, return nullptr; );
 
 	/**
 	 * Allows type serializer to handle extra asset classes additional to it's primary class returned by GetAssetClass
@@ -29,7 +29,7 @@ public:
 	 * so here they can opt in to handle children asset types additionally
 	 * Keep in mind that primary asset class serializers are preferred over additional ones when multiple are present
 	 */
-	virtual void GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {}
+	virtual void GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {}
 
 	/** Determines whenever this asset should be serialized by default */
 	virtual bool ShouldSerializeByDefault() const { return true; }
@@ -42,7 +42,7 @@ public:
      * or NULL if such serializer cannot be resolved.
      * Uses reflection internally to find matching serializer
      */
-    static UAssetTypeSerializer* FindSerializerForAssetClass(FName AssetClass);
+    static UAssetTypeSerializer* FindSerializerForAssetClass(FTopLevelAssetPath AssetClass);
 
 	static TArray<UAssetTypeSerializer*> GetAvailableAssetSerializers();
 };

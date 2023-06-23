@@ -70,6 +70,6 @@ void UBlueprintAssetSerializer::SerializeBlueprintClass(UBlueprintGeneratedClass
     SERIALIZE_ASSET_OBJECT
 }
 
-FName UBlueprintAssetSerializer::GetAssetClass() const {
-    return TEXT("Blueprint"); //UBlueprint::StaticClass()->GetFName()
+FTopLevelAssetPath UBlueprintAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UBlueprint::StaticClass());
 }

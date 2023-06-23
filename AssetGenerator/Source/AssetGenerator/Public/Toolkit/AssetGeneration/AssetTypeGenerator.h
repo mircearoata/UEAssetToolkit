@@ -136,10 +136,10 @@ public:
 	FGeneratorStateAdvanceResult AdvanceGenerationState();
 
 	/** Additional asset classes handled by this generator, can be empty, these have lower priority than GetAssetClass */
-	virtual void GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {}
+	virtual void GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {}
 	
 	/** Determines class of the asset this generator is capable of generating. Will be called on CDO, do not access any state here! */
-	virtual FName GetAssetClass() PURE_VIRTUAL(GetAssetClass, return NAME_None;);
+	virtual FTopLevelAssetPath GetAssetClass() PURE_VIRTUAL(GetAssetClass, return nullptr;);
 
 	/** Returns file path corresponding to the provided package in the root directory */
 	static FString GetAssetFilePath(const FString& RootDirectory, FName PackageName);
@@ -150,5 +150,5 @@ public:
 	static TArray<TSubclassOf<UAssetTypeGenerator>> GetAllGenerators();
 
 	/** Finds generator capable of generating asset of the given class */
-	static TSubclassOf<UAssetTypeGenerator> FindGeneratorForClass(FName AssetClass);
+	static TSubclassOf<UAssetTypeGenerator> FindGeneratorForClass(FTopLevelAssetPath AssetClass);
 };

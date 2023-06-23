@@ -3,7 +3,7 @@
 
 /** Struct holding information about unknown asset class */
 struct ASSETDUMPER_API FUnknownAssetClass {
-	FName AssetClass;
+	FTopLevelAssetPath AssetPath;
 	TArray<FName> FoundAssets;
 };
 
@@ -21,10 +21,10 @@ private:
 	TArray<FName> ExcludedPackagePaths;
 
 	/** When not empty, only assets of the specified classes are included into the search result */
-	TArray<FName> AssetClassesWhitelist;
+	TArray<FTopLevelAssetPath> AssetClassesWhitelist;
 	
 	/** Asset packages already gathered */
-	TMap<FName, FAssetData> GatheredAssetPackages;
+	TMap<FSoftObjectPath, FAssetData> GatheredAssetPackages;
 
 	/** Called by asset registry to process asset being enumerated */
 	bool ProcessIncludedPathAsset(const FAssetData& AssetData);
@@ -43,7 +43,7 @@ public:
 	void AddExcludedPackageName(const FString& PackageName);
 
 	/** Adds asset class into the whitelist */
-	void AddAssetClassWhitelist(FName AssetClass);
+	void AddAssetClassWhitelist(FTopLevelAssetPath AssetClass);
 	
 	/** Performs asset registry lookup using included and excluded asset paths */
 	void GatherAssetsData();
@@ -52,10 +52,10 @@ public:
 	void LogSettings();
 
 	/** Find unknown asset classes in the asset registry */
-	static void FindUnknownAssetClasses(const FString& PackagePathFilter, const TArray<FName>& KnownAssetClasses, TArray<FUnknownAssetClass>& OutUnknownClasses);
+	static void FindUnknownAssetClasses(const FString& PackagePathFilter, const TArray<FTopLevelAssetPath>& KnownAssetClasses, TArray<FUnknownAssetClass>& OutUnknownClasses);
 
 	/** Returns the map of gathered assets. Keep in mind you need to use GatherAssetsData before using it */
-	FORCEINLINE const TMap<FName, FAssetData>& GetGatheredAssets() const { return GatheredAssetPackages; }
+	FORCEINLINE const TMap<FSoftObjectPath, FAssetData>& GetGatheredAssets() const { return GatheredAssetPackages; }
 };
 
 struct ASSETDUMPER_API FAssetTreeNode : TSharedFromThis<FAssetTreeNode> {
@@ -67,7 +67,7 @@ public:
 	/** Last fragment of the path, representing this node's name */
 	FString NodeName;
 	/** Class of the asset, if this info represents an asset */
-	FName AssetClass;
+	FTopLevelAssetPath AssetPath;
 
 	FAssetTreeNode();
 private:

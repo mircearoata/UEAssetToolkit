@@ -41,8 +41,8 @@ UClass* USoundCueGenerator::GetAssetObjectClass()  const {
 	return USoundCue::StaticClass();
 }
 
-FName USoundCueGenerator::GetAssetClass() {
-	return USoundCue::StaticClass()->GetFName();
+FTopLevelAssetPath USoundCueGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(USoundCue::StaticClass());
 }
 
 void USoundCueGenerator::CreateAssetPackage() {

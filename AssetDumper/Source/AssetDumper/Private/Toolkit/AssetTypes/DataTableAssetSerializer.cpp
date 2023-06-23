@@ -32,6 +32,6 @@ void UDataTableAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext>
     END_ASSET_SERIALIZATION
 }
 
-FName UDataTableAssetSerializer::GetAssetClass() const {
-    return UDataTable::StaticClass()->GetFName();
+FTopLevelAssetPath UDataTableAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UDataTable::StaticClass());
 }

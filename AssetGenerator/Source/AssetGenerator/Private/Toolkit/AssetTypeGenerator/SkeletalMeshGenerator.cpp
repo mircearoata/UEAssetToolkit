@@ -222,6 +222,6 @@ void USkeletalMeshGenerator::PopulateStageDependencies(TArray<FPackageDependency
 	}
 }
 
-FName USkeletalMeshGenerator::GetAssetClass() {
-	return USkeletalMesh::StaticClass()->GetFName();
+FTopLevelAssetPath USkeletalMeshGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(USkeletalMesh::StaticClass());
 }

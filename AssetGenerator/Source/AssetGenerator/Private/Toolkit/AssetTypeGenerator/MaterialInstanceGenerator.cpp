@@ -186,6 +186,6 @@ bool UMaterialInstanceGenerator::IsSimpleAssetUpToDate(UObject* Asset) const {
 		StaticParameterOverrides.StaticComponentMaskParameters == ExistingStaticParameters.StaticComponentMaskParameters;
 }
 
-FName UMaterialInstanceGenerator::GetAssetClass() {
-	return UMaterialInstanceConstant::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialInstanceGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UMaterialInstanceConstant::StaticClass());
 }

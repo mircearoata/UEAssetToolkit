@@ -34,6 +34,6 @@ void UFontFaceAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
     END_ASSET_SERIALIZATION
 }
 
-FName UFontFaceAssetSerializer::GetAssetClass() const {
-    return UFontFace::StaticClass()->GetFName();
+FTopLevelAssetPath UFontFaceAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UFontFace::StaticClass());
 }

@@ -77,6 +77,6 @@ void UFontAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> Cont
     END_ASSET_SERIALIZATION
 }
 
-FName UFontAssetSerializer::GetAssetClass() const {
-    return UFont::StaticClass()->GetFName();
+FTopLevelAssetPath UFontAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UFont::StaticClass());
 }

@@ -19,7 +19,7 @@ protected:
 	virtual UClass* GetFallbackParentClass() const;
 public:
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };
 
 class ASSETGENERATOR_API FBlueprintGeneratorUtils {

@@ -74,8 +74,8 @@ void USkeletalMeshAssetSerializer::SerializeReferenceSkeleton(const FReferenceSk
     //from serialize bone info structure
 }
 
-FName USkeletalMeshAssetSerializer::GetAssetClass() const {
-    return USkeletalMesh::StaticClass()->GetFName();
+FTopLevelAssetPath USkeletalMeshAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(USkeletalMesh::StaticClass());
 }
 
 bool USkeletalMeshAssetSerializer::SupportsParallelDumping() const {

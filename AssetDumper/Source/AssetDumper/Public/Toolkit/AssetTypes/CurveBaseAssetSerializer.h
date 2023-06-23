@@ -8,6 +8,6 @@ class UCurveBaseAssetSerializer : public UAssetTypeSerializer {
 public:
     virtual void SerializeAsset(TSharedRef<FSerializationContext> Context) const override;
 
-    virtual void GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) override;
-    virtual FName GetAssetClass() const override;
+    virtual void GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) override;
+    virtual FTopLevelAssetPath GetAssetClass() const override;
 };

@@ -31,7 +31,7 @@ FAssetDumpProcessor::FAssetDumpProcessor(const FAssetDumpSettings& Settings, con
 	InitializeAssetDump();
 }
 
-FAssetDumpProcessor::FAssetDumpProcessor(const FAssetDumpSettings& Settings, const TMap<FName, FAssetData>& InAssets) {
+FAssetDumpProcessor::FAssetDumpProcessor(const FAssetDumpSettings& Settings, const TMap<FSoftObjectPath, FAssetData>& InAssets) {
 	this->Settings = Settings;
 	InAssets.GenerateValueArray(this->PackagesToLoad);
 	InitializeAssetDump();
@@ -59,7 +59,7 @@ TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAsset
 	return NewProcessor;
 }
 
-TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAssetDumpSettings& Settings, const TMap<FName, FAssetData>& InAssets) {
+TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAssetDumpSettings& Settings, const TMap<FSoftObjectPath, FAssetData>& InAssets) {
 	checkf(!ActiveDumpProcessor.IsValid(), TEXT("StartAssetDump is called while another asset dump is in progress"));
 	
 	TSharedRef<FAssetDumpProcessor> NewProcessor = MakeShareable(new FAssetDumpProcessor(Settings, InAssets));
@@ -209,10 +209,10 @@ bool FAssetDumpProcessor::IsTickableWhenPaused() const {
 
 bool FAssetDumpProcessor::CreatePackageData(UPackage* Package, FPendingPackageData& PendingPackageData) {
 	const FAssetData* AssetData = AssetDataByPackageName.FindChecked(Package->GetFName());
-	UAssetTypeSerializer* Serializer = UAssetTypeSerializer::FindSerializerForAssetClass(AssetData->AssetClass);
+	UAssetTypeSerializer* Serializer = UAssetTypeSerializer::FindSerializerForAssetClass(AssetData->AssetClassPath);
 
 	if (Serializer == NULL) {
-		UE_LOG(LogAssetDumper, Warning, TEXT("Skipping dumping asset %s, failed to find serializer for the associated asset class '%s'"), *Package->GetName(), *AssetData->AssetClass.ToString());
+		UE_LOG(LogAssetDumper, Warning, TEXT("Skipping dumping asset %s, failed to find serializer for the associated asset class '%s'"), *Package->GetName(), *AssetData->AssetClassPath.ToString());
 		return false;
 	}
 

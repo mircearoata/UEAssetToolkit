@@ -180,6 +180,6 @@ bool UFontGenerator::IsFontUpToDate(UFont* Font, const FFontGlyphData& GlyphData
 	return true;
 }
 
-FName UFontGenerator::GetAssetClass() {
-	return UFont::StaticClass()->GetFName();
+FTopLevelAssetPath UFontGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UFont::StaticClass());
 }

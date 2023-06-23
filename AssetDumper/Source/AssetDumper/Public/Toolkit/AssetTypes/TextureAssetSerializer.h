@@ -14,5 +14,5 @@ public:
     /** Serializes Texture2D, including exporting it to image file saved alongside json */
     static void SerializeTexture2D(class UTexture2D* Asset, TSharedPtr<class FJsonObject> Data, TSharedRef<class FSerializationContext> Context, const FString& Postfix);
     
-    virtual FName GetAssetClass() const override;    
+    virtual FTopLevelAssetPath GetAssetClass() const override;    
 };

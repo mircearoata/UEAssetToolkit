@@ -9,5 +9,5 @@ protected:
 	virtual void UpdateTextureSource(UTexture* Texture) override;
 	virtual TSubclassOf<UTexture> GetTextureClass() override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

@@ -12,5 +12,5 @@ protected:
 	void PopulateStringTableWithData(class UStringTable* StringTable);
 	bool IsStringTableUpToDate(class UStringTable* StringTable) const;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

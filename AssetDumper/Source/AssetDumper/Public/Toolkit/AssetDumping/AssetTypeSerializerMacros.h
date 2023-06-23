@@ -43,6 +43,11 @@ struct FAssetTypeSerializerMacros_ToStringHelper<FName> {
 	FORCEINLINE static FString ValueToString(const FName& SourceValue) { return SourceValue.ToString(); }
 };
 
+template<>
+struct FAssetTypeSerializerMacros_ToStringHelper<FTopLevelAssetPath> {
+	FORCEINLINE static FString ValueToString(const FTopLevelAssetPath& SourceValue) { return SourceValue.ToString(); }
+};
+
 struct FAssetTypeSerializerMacros_Internals {
 private:
 	template<typename T>

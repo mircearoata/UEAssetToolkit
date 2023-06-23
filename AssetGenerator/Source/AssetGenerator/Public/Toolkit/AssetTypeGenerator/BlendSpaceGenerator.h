@@ -9,6 +9,6 @@ class UBlendSpaceGenerator : public USimpleAssetGenerator {
 protected:
 	virtual UClass* GetAssetObjectClass() const override;
 public:
-	virtual void GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) override;
-	virtual FName GetAssetClass() override;
+	virtual void GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

@@ -21,5 +21,5 @@ protected:
 	void SetupFbxImportSettings(class UFbxImportUI* ImportUI) const;
 public:
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

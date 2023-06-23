@@ -9,12 +9,12 @@ UClass* UCurveBaseGenerator::GetAssetObjectClass() const {
     return FindObjectChecked<UClass>(NULL, *AssetClassPath);
 }
 
-void UCurveBaseGenerator::GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {
-	OutExtraAssetClasses.Add(UCurveVector::StaticClass()->GetFName());
-	OutExtraAssetClasses.Add(UCurveFloat::StaticClass()->GetFName());
-	OutExtraAssetClasses.Add(UCurveLinearColor::StaticClass()->GetFName());
+void UCurveBaseGenerator::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveVector::StaticClass()));
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveFloat::StaticClass()));
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveLinearColor::StaticClass()));
 }
 
-FName UCurveBaseGenerator::GetAssetClass() {
-	return UCurveBase::StaticClass()->GetFName();
+FTopLevelAssetPath UCurveBaseGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UCurveBase::StaticClass());
 }

@@ -12,5 +12,5 @@ protected:
 	void PopulateFontFaceWithData(class UFontFace* FontFace);
 	bool IsFontFaceUpToDate(class UFontFace* FontFace) const;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

@@ -5,6 +5,6 @@ UClass* ULandscapeGrassTypeGenerator::GetAssetObjectClass() const {
 	return ULandscapeGrassType::StaticClass();
 }
 
-FName ULandscapeGrassTypeGenerator::GetAssetClass() {
-	return ULandscapeGrassType::StaticClass()->GetFName();
+FTopLevelAssetPath ULandscapeGrassTypeGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(ULandscapeGrassType::StaticClass());
 }

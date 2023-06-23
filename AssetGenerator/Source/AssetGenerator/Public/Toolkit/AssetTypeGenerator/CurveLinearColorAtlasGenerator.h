@@ -12,5 +12,5 @@ protected:
 	void PopulateAtlasAssetWithData(class UCurveLinearColorAtlas* Asset);
 	bool IsAtlasUpToDate(class UCurveLinearColorAtlas* Asset) const;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

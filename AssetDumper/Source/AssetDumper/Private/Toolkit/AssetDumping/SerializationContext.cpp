@@ -66,7 +66,7 @@ UObject* FSerializationContext::GetAssetObjectFromPackage(UPackage* Package, con
 
 void FSerializationContext::Finalize() const {
 	TSharedRef<FJsonObject> RootObject = MakeShareable(new FJsonObject());
-	RootObject->SetStringField(TEXT("AssetClass"), AssetData.AssetClass.ToString());
+	RootObject->SetStringField(TEXT("AssetClassPath"), AssetData.AssetClassPath.ToString());
 	RootObject->SetStringField(TEXT("AssetPackage"), Package->GetName());
 	RootObject->SetStringField(TEXT("AssetName"), AssetData.AssetName.ToString());
 	

@@ -21,7 +21,7 @@ private:
 	/** True if our state has been explicitly overriden by the user and we should be listed as a manual override */
 	bool bIsOverridingParentState;
 	/** Asset class if it's relevant for this node */
-	FString AssetClass;
+	FTopLevelAssetPath AssetClass;
 	/** True if we have already computed asset class */
 	bool bAssetClassComputed;
 	
@@ -32,11 +32,11 @@ private:
 	
     void RegenerateChildren();
 	TSharedPtr<FAssetDumpTreeNode> MakeChildNode();
-	FString ComputeAssetClass();
+	FTopLevelAssetPath ComputeAssetClass();
 public:
 	void SetupPackageNameFromDiskPath();
 
-	FString GetOrComputeAssetClass();
+	FTopLevelAssetPath GetOrComputeAssetClass();
 
 	FORCEINLINE bool IsChecked() const { return bIsChecked; }
 
@@ -47,7 +47,7 @@ public:
 	void GetChildrenNodes(TArray<TSharedPtr<FAssetDumpTreeNode>>& OutChildrenNodes);
 
 	/** Appends selected package names to the package list */
-	void PopulateGeneratedPackages(TArray<FName>& OutPackageNames, const TSet<FName>* WhitelistedAssetClasses = NULL);
+	void PopulateGeneratedPackages(TArray<FName>& OutPackageNames, const TSet<FTopLevelAssetPath>* WhitelistedAssetClasses = NULL);
 
 	/** Creates a root node for the asset tree */
 	static TSharedPtr<FAssetDumpTreeNode> CreateRootTreeNode(const FString& DumpDirectory);
@@ -60,7 +60,7 @@ public:
 
     void Construct(const FArguments& InArgs);
 	void SetAssetDumpRootDirectory(const FString& RootDirectory);
-	void PopulateSelectedPackages(TArray<FName>& OutPackageNames, const TSet<FName>* WhitelistedAssetClasses) const;
+	void PopulateSelectedPackages(TArray<FName>& OutPackageNames, const TSet<FTopLevelAssetPath>* WhitelistedAssetClasses) const;
 protected:
 	TSharedPtr<STreeView<TSharedPtr<FAssetDumpTreeNode>>> TreeView;
 	TSharedPtr<FAssetDumpTreeNode> RootNode;

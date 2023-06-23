@@ -59,7 +59,7 @@ private:
 	int32 MaxPackagesToProcessInOneTick;
 	
 	explicit FAssetDumpProcessor(const FAssetDumpSettings& Settings, const TArray<FAssetData>& InAssets);
-	explicit FAssetDumpProcessor(const FAssetDumpSettings& Settings, const TMap<FName, FAssetData>& InAssets);
+	explicit FAssetDumpProcessor(const FAssetDumpSettings& Settings, const TMap<FSoftObjectPath, FAssetData>& InAssets);
 public:
 	~FAssetDumpProcessor();
 	
@@ -68,7 +68,7 @@ public:
 
 	/** Begins asset dumping with specified settings for provided assets. Crashes when dumping is already in progress */
 	static TSharedRef<FAssetDumpProcessor> StartAssetDump(const FAssetDumpSettings& Settings, const TArray<FAssetData>& InAssets);
-	static TSharedRef<FAssetDumpProcessor> StartAssetDump(const FAssetDumpSettings& Settings, const TMap<FName, FAssetData>& InAssets);
+	static TSharedRef<FAssetDumpProcessor> StartAssetDump(const FAssetDumpSettings& Settings, const TMap<FSoftObjectPath, FAssetData>& InAssets);
 	
 	/** Returns current progress of the asset dumping */
 	FORCEINLINE float GetProgressPct() const { return (PackagesSkipped.GetValue() + PackagesProcessed.GetValue()) / (PackagesTotal * 1.0f); }

@@ -23,7 +23,7 @@ public:
 
 	/** Asset categories that have been whitelisted for the generation. Editable through asset generator UI */
 	UPROPERTY(VisibleAnywhere, Config, Category = "Asset Generator")
-	TSet<FName> WhitelistedAssetCategories;
+	TSet<FTopLevelAssetPath> WhitelistedAssetCategories;
 
 	/** Maximum amount of asset generators to advance in one tick */
 	UPROPERTY(EditAnywhere, Config, Category = "Asset Generator")

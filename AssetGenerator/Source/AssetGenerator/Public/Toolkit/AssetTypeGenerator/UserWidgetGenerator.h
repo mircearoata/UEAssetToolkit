@@ -14,6 +14,6 @@ protected:
 	virtual void FinalizeAssetCDO() override;
 	virtual UClass* GetFallbackParentClass() const override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
 };

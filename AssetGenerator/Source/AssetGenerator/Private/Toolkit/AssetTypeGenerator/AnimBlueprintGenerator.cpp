@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypeGenerator/AnimBlueprintGenerator.h"
+#include "Toolkit/AssetTypeGenerator/AnimBlueprintGenerator.h"
 #include "K2Node_FunctionEntry.h"
 #include "Dom/JsonObject.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -308,8 +308,8 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 	}
 }*/
 
-FName UAnimBlueprintGenerator::GetAssetClass() {
-    return TEXT("");
+FTopLevelAssetPath UAnimBlueprintGenerator::GetAssetClass() {
+    return nullptr;
 	// return UAnimBlueprint::StaticClass()->GetFName();
 }
 

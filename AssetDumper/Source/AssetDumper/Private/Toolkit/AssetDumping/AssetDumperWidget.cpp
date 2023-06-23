@@ -47,10 +47,10 @@ TSharedRef<SWidget> SAssetDumperWidget::CreateAssetTypeFilterCategory() {
 	const int32 MaxAssetTypesPerRow = 8;
 	
 	for (UAssetTypeSerializer* Serializer : UAssetTypeSerializer::GetAvailableAssetSerializers()) {
-		const FName AssetClass = Serializer->GetAssetClass();
+		const FTopLevelAssetPath AssetClass = Serializer->GetAssetClass();
 		this->AssetClassSerializationRules.Add(AssetClass, Serializer->ShouldSerializeByDefault());
 
-		TArray<FName> AdditionalAssetClasses;
+		TArray<FTopLevelAssetPath> AdditionalAssetClasses;
 		Serializer->GetAdditionallyHandledAssetClasses(AdditionalAssetClasses);
 		this->AdditionalAssetTypes.Add(AssetClass, AdditionalAssetClasses);
 
@@ -193,10 +193,10 @@ FReply SAssetDumperWidget::OnAssetDumpButtonPressed() {
 	AssetRegistryViewWidget->PopulateSelectedAssets(SelectedAssetsStruct);
 	
 	int32 AssetClassesSelected = 0;
-	for (const TPair<FName, bool>& AssetCategoryFilterPair : this->AssetClassSerializationRules) {
+	for (const TPair<FTopLevelAssetPath, bool>& AssetCategoryFilterPair : this->AssetClassSerializationRules) {
 		if (AssetCategoryFilterPair.Value) {
 			SelectedAssetsStruct->AddAssetClassWhitelist(AssetCategoryFilterPair.Key);
-			for (const FName& AdditionalClass : this->AdditionalAssetTypes.FindChecked(AssetCategoryFilterPair.Key)) {
+			for (const FTopLevelAssetPath& AdditionalClass : this->AdditionalAssetTypes.FindChecked(AssetCategoryFilterPair.Key)) {
 				SelectedAssetsStruct->AddAssetClassWhitelist(AdditionalClass);
 			}
 			AssetClassesSelected++;

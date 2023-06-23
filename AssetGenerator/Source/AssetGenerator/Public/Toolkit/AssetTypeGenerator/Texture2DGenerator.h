@@ -24,5 +24,5 @@ public:
 		const TSharedPtr<FJsonObject> AssetData,
 		bool bIsGeneratingPublicProject = false);
 	
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

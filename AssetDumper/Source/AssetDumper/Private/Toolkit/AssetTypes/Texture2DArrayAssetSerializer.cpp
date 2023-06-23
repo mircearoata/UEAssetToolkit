@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypes/Texture2DArrayAssetSerializer.h"
+#include "Toolkit/AssetTypes/Texture2DArrayAssetSerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
@@ -15,6 +15,6 @@ void UTexture2DArrayAssetSerializer::SerializeAsset(TSharedRef<FSerializationCon
 	END_ASSET_SERIALIZATION
 }
 
-FName UTexture2DArrayAssetSerializer::GetAssetClass() const {
-	return UTexture2DArray::StaticClass()->GetFName();
+FTopLevelAssetPath UTexture2DArrayAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(UTexture2DArray::StaticClass());
 }

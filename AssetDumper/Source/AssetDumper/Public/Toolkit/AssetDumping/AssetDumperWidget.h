@@ -9,8 +9,8 @@ public:
 
     void Construct(const FArguments& InArgs);
 protected:
-	TMap<FName, bool> AssetClassSerializationRules;
-	TMap<FName, TArray<FName>> AdditionalAssetTypes;
+	TMap<FTopLevelAssetPath, bool> AssetClassSerializationRules;
+	TMap<FTopLevelAssetPath, TArray<FTopLevelAssetPath>> AdditionalAssetTypes;
 	
 	TSharedPtr<class SAssetRegistryViewWidget> AssetRegistryViewWidget;
 	TSharedPtr<class SButton> AssetDumpButton;

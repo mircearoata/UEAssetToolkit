@@ -119,6 +119,6 @@ void UTextureAssetSerializer::SerializeTexture2D(UTexture2D* Asset, TSharedPtr<F
     SerializeTextureData(Asset->GetPathName(), Asset->PlatformData, Data, Context, false, Postfix);   
 }
 
-FName UTextureAssetSerializer::GetAssetClass() const {
-    return UTexture2D::StaticClass()->GetFName();
+FTopLevelAssetPath UTextureAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UTexture2D::StaticClass());
 }

@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
+#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
 #include "K2Node_FunctionEntry.h"
 #include "Dom/JsonObject.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -309,8 +309,8 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 	}
 }
 
-FName UBlueprintGenerator::GetAssetClass() {
-	return UBlueprint::StaticClass()->GetFName();
+FTopLevelAssetPath UBlueprintGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UBlueprint::StaticClass());
 }
 
 //Never generate __DelegateSignature methods, they are automatically handled

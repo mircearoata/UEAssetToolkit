@@ -85,6 +85,6 @@ void UUserWidgetAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
     END_ASSET_SERIALIZATION
 }
 
-FName UUserWidgetAssetSerializer::GetAssetClass() const {
-    return TEXT("WidgetBlueprint"); //UWidgetBlueprint::StaticClass()->GetFName();
+FTopLevelAssetPath UUserWidgetAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(TEXT("/Script/UMGEditor.WidgetBlueprint"));
 }

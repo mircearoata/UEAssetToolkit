@@ -1,4 +1,6 @@
 #include "Toolkit/AssetTypes/AnimationBlueprintAssetSerializer.h"
+
+#include "Animation/AnimBlueprint.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/PropertySerializer.h"
@@ -10,6 +12,6 @@ void UAnimationBlueprintAssetSerializer::SerializeAsset(TSharedRef<FSerializatio
     END_ASSET_SERIALIZATION
 }
 
-FName UAnimationBlueprintAssetSerializer::GetAssetClass() const {
-    return TEXT("AnimBlueprint"); //UAnimBlueprint::StaticClass()->GetFName();
+FTopLevelAssetPath UAnimationBlueprintAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UAnimBlueprint::StaticClass());
 }

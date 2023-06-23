@@ -25,6 +25,6 @@ void UFileMediaSourceAssetSerializer::SerializeAsset(TSharedRef<FSerializationCo
 	END_ASSET_SERIALIZATION
 }
 
-FName UFileMediaSourceAssetSerializer::GetAssetClass() const {
-	return UFileMediaSource::StaticClass()->GetFName();
+FTopLevelAssetPath UFileMediaSourceAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(UFileMediaSource::StaticClass());
 }

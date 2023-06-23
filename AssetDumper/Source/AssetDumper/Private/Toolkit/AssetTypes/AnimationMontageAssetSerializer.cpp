@@ -15,7 +15,7 @@ void UAnimationMontageAssetSerializer::SerializeAsset(TSharedRef<FSerializationC
     END_ASSET_SERIALIZATION
 }
 
-FName UAnimationMontageAssetSerializer::GetAssetClass() const {
-    return UAnimMontage::StaticClass()->GetFName();
+FTopLevelAssetPath UAnimationMontageAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UAnimMontage::StaticClass());
 }
     

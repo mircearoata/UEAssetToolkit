@@ -20,6 +20,6 @@ protected:
 	void PopulateFontAssetWithData(class UFont* Font, const FFontGlyphData& GlyphData);
 	bool IsFontUpToDate(class UFont* Font, const FFontGlyphData& GlyphData) const;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
 };

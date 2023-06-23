@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetGeneration/AssetGeneratorCommandlet.h"
+#include "Toolkit/AssetGeneration/AssetGeneratorCommandlet.h"
 #include "FileHelpers.h"
 #include "Toolkit/AssetGeneration/AssetDumpViewWidget.h"
 #include "Toolkit/AssetGeneration/AssetGenerationProcessor.h"
@@ -83,16 +83,21 @@ int32 UAssetGeneratorCommandlet::Main(const FString& Params) {
 		}
 	}
 	
-	TSharedPtr<TSet<FName>> WhitelstedAssetClasses;
+	TSharedPtr<TSet<FTopLevelAssetPath>> WhitelstedAssetClasses;
 	{
 		FString AssetClassWhitelistString;
 		if (FParse::Value(*Params, TEXT("AssetClassWhitelist="), AssetClassWhitelistString)) {
-			TArray<FString> AssetClassWhitelist;
-			AssetClassWhitelistString.ParseIntoArray(AssetClassWhitelist, TEXT(","));
+			TArray<FString> AssetClassWhitelistStrs;
+			AssetClassWhitelistString.ParseIntoArray(AssetClassWhitelistStrs, TEXT(","));
 
-			WhitelstedAssetClasses = MakeShared<TSet<FName>>();
-			for (const FString& AssetClass : AssetClassWhitelist) {
-				WhitelstedAssetClasses->Add(*AssetClass);
+			TArray<FTopLevelAssetPath> AssetClassWhitelist;
+			for (const FString& AssetClassStr : AssetClassWhitelistStrs) {
+				AssetClassWhitelist.Add(FTopLevelAssetPath(AssetClassStr));
+			}
+
+			WhitelstedAssetClasses = MakeShared<TSet<FTopLevelAssetPath>>();
+			for (const FTopLevelAssetPath& AssetClass : AssetClassWhitelist) {
+				WhitelstedAssetClasses->Add(AssetClass);
 			}
 		}
 	}

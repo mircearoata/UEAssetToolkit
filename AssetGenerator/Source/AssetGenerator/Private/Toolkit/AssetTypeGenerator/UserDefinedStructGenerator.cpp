@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypeGenerator/UserDefinedStructGenerator.h"
+#include "Toolkit/AssetTypeGenerator/UserDefinedStructGenerator.h"
 #include "Dom/JsonObject.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
@@ -182,6 +182,6 @@ void UUserDefinedStructGenerator::PopulateStageDependencies(TArray<FPackageDepen
 	}
 }
 
-FName UUserDefinedStructGenerator::GetAssetClass() {
-	return UUserDefinedStruct::StaticClass()->GetFName();
+FTopLevelAssetPath UUserDefinedStructGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UUserDefinedStruct::StaticClass());
 }

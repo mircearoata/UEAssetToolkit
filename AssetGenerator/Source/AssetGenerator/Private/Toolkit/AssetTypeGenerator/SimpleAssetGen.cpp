@@ -6,8 +6,8 @@ UClass* USimpleAssetGen::GetAssetObjectClass() const {
 	return FindObjectChecked<UClass>(NULL, *AssetClassPath);
 }
 
-FName USimpleAssetGen::GetAssetClass() {
-	return TEXT("SimpleAsset"); //UPhysicalMaterial::StaticClass()->GetFName();
+FTopLevelAssetPath USimpleAssetGen::GetAssetClass() {
+	return nullptr;
 }
 
 void USimpleAssetGen::PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const {

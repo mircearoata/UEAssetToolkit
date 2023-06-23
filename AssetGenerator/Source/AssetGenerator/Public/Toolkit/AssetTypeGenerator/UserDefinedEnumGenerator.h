@@ -11,5 +11,5 @@ protected:
 	void PopulateEnumWithData(class UUserDefinedEnum* Enum);
 	bool IsEnumerationUpToDate(class UUserDefinedEnum* Enum) const;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

@@ -17,6 +17,6 @@ void UTextureCubeAssetSerializer::SerializeTextureCube(UTextureCube* Asset, TSha
     UTextureAssetSerializer::SerializeTextureData(Asset->GetPathName(), Asset->PlatformData, Data, Context, true, TEXT(""));
 }
 
-FName UTextureCubeAssetSerializer::GetAssetClass() const {
-    return UTextureCube::StaticClass()->GetFName();
+FTopLevelAssetPath UTextureCubeAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UTextureCube::StaticClass());
 }

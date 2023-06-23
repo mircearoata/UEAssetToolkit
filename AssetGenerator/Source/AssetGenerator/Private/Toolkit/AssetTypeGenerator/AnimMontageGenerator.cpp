@@ -5,6 +5,6 @@ UClass* UAnimMontageGenerator::GetAssetObjectClass() const {
 	return UAnimMontage::StaticClass();
 }
 
-FName UAnimMontageGenerator::GetAssetClass() {
-	return UAnimMontage::StaticClass()->GetFName();
+FTopLevelAssetPath UAnimMontageGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UAnimMontage::StaticClass());
 }

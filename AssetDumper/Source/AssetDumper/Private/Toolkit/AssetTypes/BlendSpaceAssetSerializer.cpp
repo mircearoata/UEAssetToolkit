@@ -15,13 +15,13 @@ void UBlendSpaceSerializer::SerializeAsset(TSharedRef<FSerializationContext> Con
     END_ASSET_SERIALIZATION
 }
 
-void UBlendSpaceSerializer::GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {
-    OutExtraAssetClasses.Add(UBlendSpace::StaticClass()->GetFName());
-    OutExtraAssetClasses.Add(UBlendSpace1D::StaticClass()->GetFName());
-    OutExtraAssetClasses.Add(UAimOffsetBlendSpace::StaticClass()->GetFName());
-    OutExtraAssetClasses.Add(UAimOffsetBlendSpace1D::StaticClass()->GetFName());
+void UBlendSpaceSerializer::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UBlendSpace::StaticClass()));
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UBlendSpace1D::StaticClass()));
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UAimOffsetBlendSpace::StaticClass()));
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UAimOffsetBlendSpace1D::StaticClass()));
 }
 
-FName UBlendSpaceSerializer::GetAssetClass() const {
-    return UBlendSpaceBase::StaticClass()->GetFName();
+FTopLevelAssetPath UBlendSpaceSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UBlendSpace::StaticClass());
 }

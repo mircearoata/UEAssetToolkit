@@ -114,8 +114,8 @@ void USkeletonAssetSerializer::SerializeSmartNameContainer(const FSmartNameConta
     OutObject->SetArrayField(TEXT("NameMappings"), NameMappings);
 }
 
-FName USkeletonAssetSerializer::GetAssetClass() const {
-    return USkeleton::StaticClass()->GetFName();
+FTopLevelAssetPath USkeletonAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(USkeleton::StaticClass());
 }
 
 bool USkeletonAssetSerializer::SupportsParallelDumping() const {

@@ -63,6 +63,6 @@ void UMaterialAssetSerializer::DisableMaterialExpressionProperties(UPropertySeri
 	DISABLE_SERIALIZATION(UMaterial, MaterialAttributes);
 }
 
-FName UMaterialAssetSerializer::GetAssetClass() const {
-    return UMaterial::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UMaterial::StaticClass());
 }

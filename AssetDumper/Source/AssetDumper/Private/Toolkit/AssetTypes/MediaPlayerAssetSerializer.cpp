@@ -10,6 +10,6 @@ void UMediaPlayerAssetSerializer::SerializeAsset(TSharedRef<FSerializationContex
 	END_ASSET_SERIALIZATION
 }
 
-FName UMediaPlayerAssetSerializer::GetAssetClass() const {
-	return UMediaPlayer::StaticClass()->GetFName();
+FTopLevelAssetPath UMediaPlayerAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(UMediaPlayer::StaticClass());
 }

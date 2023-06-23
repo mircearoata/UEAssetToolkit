@@ -18,7 +18,7 @@ protected:
 	TSharedRef<SWidget> CreateAssetTypeFilterCategory();
 	TSharedRef<SWidget> CreateSettingsCategory();
 
-	static void ExpandWhitelistedAssetCategories(TSet<FName>& WhitelistedAssetCategories);
+	static void ExpandWhitelistedAssetCategories(TSet<FTopLevelAssetPath>& WhitelistedAssetCategories);
 	FString GetAssetDumpFolderPath() const;
 	void UpdateDumpViewRootDirectory();
 	void SetAssetDumpFolderPath(const FString& InDumpFolderPath);

@@ -5,6 +5,6 @@ UClass* USubsurfaceProfileGenerator::GetAssetObjectClass() const {
 	return USubsurfaceProfile::StaticClass();
 }
 
-FName USubsurfaceProfileGenerator::GetAssetClass() {
-	return USubsurfaceProfile::StaticClass()->GetFName();
+FTopLevelAssetPath USubsurfaceProfileGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(USubsurfaceProfile::StaticClass());
 }

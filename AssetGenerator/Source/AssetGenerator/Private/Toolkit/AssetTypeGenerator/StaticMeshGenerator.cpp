@@ -225,6 +225,6 @@ void UStaticMeshGenerator::PopulateStageDependencies(TArray<FPackageDependency>&
 	}
 }
 
-FName UStaticMeshGenerator::GetAssetClass() {
-	return UStaticMesh::StaticClass()->GetFName();
+FTopLevelAssetPath UStaticMeshGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UStaticMesh::StaticClass());
 }

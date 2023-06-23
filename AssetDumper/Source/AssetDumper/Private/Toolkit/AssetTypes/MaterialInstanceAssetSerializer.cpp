@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypes/MaterialInstanceAssetSerializer.h"
+#include "Toolkit/AssetTypes/MaterialInstanceAssetSerializer.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
@@ -12,6 +12,6 @@ void UMaterialInstanceAssetSerializer::SerializeAsset(TSharedRef<FSerializationC
     END_ASSET_SERIALIZATION
 }
 
-FName UMaterialInstanceAssetSerializer::GetAssetClass() const {
-    return UMaterialInstanceConstant::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialInstanceAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UMaterialInstanceConstant::StaticClass());
 }

@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypeGenerator/Texture2DGenerator.h"
+#include "Toolkit/AssetTypeGenerator/Texture2DGenerator.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "AssetGeneration/AssetGeneratorSettings.h"
@@ -153,6 +153,6 @@ bool UTexture2DGenerator::IsTextureUpToDate(UTexture2D* ExistingTexture, UObject
 	return true;
 }
 
-FName UTexture2DGenerator::GetAssetClass() {
-	return UTexture2D::StaticClass()->GetFName();
+FTopLevelAssetPath UTexture2DGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UTexture2D::StaticClass());
 }

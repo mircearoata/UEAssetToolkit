@@ -9,13 +9,13 @@ UClass* UBlendSpaceGenerator::GetAssetObjectClass() const {
 	return FindObjectChecked<UClass>(NULL, *AssetClassPath);
 }
 
-void UBlendSpaceGenerator::GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {
-	OutExtraAssetClasses.Add(UBlendSpace::StaticClass()->GetFName());
-	OutExtraAssetClasses.Add(UBlendSpace1D::StaticClass()->GetFName());
-	OutExtraAssetClasses.Add(UAimOffsetBlendSpace::StaticClass()->GetFName());
-	OutExtraAssetClasses.Add(UAimOffsetBlendSpace1D::StaticClass()->GetFName());
+void UBlendSpaceGenerator::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UBlendSpace::StaticClass()));
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UBlendSpace1D::StaticClass()));
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UAimOffsetBlendSpace::StaticClass()));
+	OutExtraAssetClasses.Add(FTopLevelAssetPath(UAimOffsetBlendSpace1D::StaticClass()));
 }
 
-FName UBlendSpaceGenerator::GetAssetClass() {
-	return UBlendSpaceBase::StaticClass()->GetFName();
+FTopLevelAssetPath UBlendSpaceGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UBlendSpace::StaticClass());
 }

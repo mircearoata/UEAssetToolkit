@@ -24,6 +24,6 @@ void UMaterialParameterCollectionGenerator::PopulateSimpleAssetWithData(UObject*
 	ParameterCollection->PostLoad();
 }
 
-FName UMaterialParameterCollectionGenerator::GetAssetClass() {
-	return UMaterialParameterCollection::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialParameterCollectionGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UMaterialParameterCollection::StaticClass());
 }

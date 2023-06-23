@@ -187,8 +187,8 @@ void UMaterialGenerator::PopulateStageDependencies(TArray<FPackageDependency>& O
 	}
 }
 
-FName UMaterialGenerator::GetAssetClass() {
-	return UMaterial::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialGenerator::GetAssetClass() {
+	return FTopLevelAssetPath(UMaterial::StaticClass());
 }
 
 FVector2D UMaterialGenerator::GetGoodPlaceForNewMaterialExpression(UMaterial* Material) {

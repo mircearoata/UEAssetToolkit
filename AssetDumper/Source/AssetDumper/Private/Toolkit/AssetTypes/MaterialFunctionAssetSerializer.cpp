@@ -15,6 +15,6 @@ void UMaterialFunctionAssetSerializer::SerializeAsset(TSharedRef<FSerializationC
 	END_ASSET_SERIALIZATION
 }
 
-FName UMaterialFunctionAssetSerializer::GetAssetClass() const {
-	return UMaterialFunction::StaticClass()->GetFName();
+FTopLevelAssetPath UMaterialFunctionAssetSerializer::GetAssetClass() const {
+	return FTopLevelAssetPath(UMaterialFunction::StaticClass());
 }

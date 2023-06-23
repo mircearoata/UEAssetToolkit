@@ -10,5 +10,5 @@ protected:
 	virtual UClass* GetAssetObjectClass() const override;
 	virtual void CreateAssetPackage() override;
 public:
-	virtual FName GetAssetClass() override;
+	virtual FTopLevelAssetPath GetAssetClass() override;
 };

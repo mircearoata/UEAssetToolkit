@@ -13,12 +13,12 @@ void UCurveBaseAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext>
     END_ASSET_SERIALIZATION
 }
 
-void UCurveBaseAssetSerializer::GetAdditionallyHandledAssetClasses(TArray<FName>& OutExtraAssetClasses) {
-    OutExtraAssetClasses.Add(UCurveVector::StaticClass()->GetFName());
-    OutExtraAssetClasses.Add(UCurveFloat::StaticClass()->GetFName());
-    OutExtraAssetClasses.Add(UCurveLinearColor::StaticClass()->GetFName());
+void UCurveBaseAssetSerializer::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) {
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveVector::StaticClass()));
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveFloat::StaticClass()));
+    OutExtraAssetClasses.Add(FTopLevelAssetPath(UCurveLinearColor::StaticClass()));
 }
 
-FName UCurveBaseAssetSerializer::GetAssetClass() const {
-    return UCurveBase::StaticClass()->GetFName();
+FTopLevelAssetPath UCurveBaseAssetSerializer::GetAssetClass() const {
+    return FTopLevelAssetPath(UCurveBase::StaticClass());
 }
