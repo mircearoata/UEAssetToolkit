@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypes/StaticMeshAssetSerializer.h"
+﻿#include "Toolkit/AssetTypes/StaticMeshAssetSerializer.h"
 #include "AI/Navigation/NavCollisionBase.h"
 #include "Toolkit/AssetTypes/FbxMeshExporter.h"
 #include "Engine/StaticMesh.h"
@@ -15,8 +15,8 @@ void UStaticMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
 	DISABLE_SERIALIZATION(UStaticMesh, bAllowCPUAccess);
 	DISABLE_SERIALIZATION(UStaticMesh, MinLOD);
 	DISABLE_SERIALIZATION(UStaticMesh, ExtendedBounds);
-	DISABLE_SERIALIZATION(UStaticMesh, LightmapUVDensity);
-	DISABLE_SERIALIZATION(UStaticMesh, StaticMaterials);
+	DISABLE_SERIALIZATION_RAW(UStaticMesh, "LightmapUVDensity");
+	DISABLE_SERIALIZATION_RAW(UStaticMesh, "StaticMaterials");
 	
     //Just serialize normal properties into root object
     SERIALIZE_ASSET_OBJECT

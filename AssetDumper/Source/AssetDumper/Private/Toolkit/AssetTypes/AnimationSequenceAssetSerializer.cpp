@@ -18,9 +18,10 @@ void UAnimationSequenceAssetSerializer::SerializeAsset(TSharedRef<FSerialization
     SERIALIZE_ASSET_OBJECT
 
 	//Serialize precomputed framerate because we skip NumFrames serialization
-	Data->SetNumberField(TEXT("FrameRate"), (int32) Asset->GetFrameRate());
-	Data->SetNumberField(TEXT("NumFrames"), Asset->GetNumberOfFrames());
-	Data->SetNumberField(TEXT("SequenceLength"), Asset->SequenceLength);
+	Data->SetNumberField(TEXT("FrameRateNumerator"), Asset->GetSamplingFrameRate().Numerator);
+	Data->SetNumberField(TEXT("FrameRateDenominator"), Asset->GetSamplingFrameRate().Denominator);
+	Data->SetNumberField(TEXT("NumFrames"), Asset->GetNumberOfSampledKeys());
+	Data->SetNumberField(TEXT("SequenceLength"), Asset->GetPlayLength());
 
     //Serialize animation data
     const FString OutFbxFileName = Context->GetDumpFilePath(TEXT(""), TEXT("fbx"));

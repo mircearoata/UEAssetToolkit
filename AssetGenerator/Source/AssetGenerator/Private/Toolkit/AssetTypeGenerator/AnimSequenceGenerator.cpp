@@ -77,9 +77,11 @@ void UAnimSequenceGenerator::SetupFbxImportSettings(UFbxImportUI* ImportUI) cons
 	ImportUI->AnimSequenceImportData = NewObject<UFbxAnimSequenceImportData>(ImportUI, NAME_None, RF_NoFlags);
 	ImportUI->AnimSequenceImportData->bRemoveRedundantKeys = true;
 
-	const int32 ExportedFrameRate = GetAssetData()->GetIntegerField(TEXT("FrameRate"));
+	const int32 ExportedFrameRateNumerator = GetAssetData()->GetIntegerField(TEXT("FrameRateNumerator"));
+	const int32 ExportedFrameRateDenominator = GetAssetData()->GetIntegerField(TEXT("FrameRateDenominator"));
 	ImportUI->AnimSequenceImportData->bUseDefaultSampleRate = false;
-	ImportUI->AnimSequenceImportData->CustomSampleRate = ExportedFrameRate;
+	ImportUI->AnimSequenceImportData->CustomSampleRate = ExportedFrameRateNumerator / ExportedFrameRateDenominator;
+	ImportUI->AnimSequenceImportData->bSnapToClosestFrameBoundary = true;
 
 	const int32 NumFrames = GetAssetData()->GetIntegerField(TEXT("NumFrames"));
 	ImportUI->AnimSequenceImportData->AnimationLength = EFBXAnimationLengthImportType::FBXALIT_SetRange;

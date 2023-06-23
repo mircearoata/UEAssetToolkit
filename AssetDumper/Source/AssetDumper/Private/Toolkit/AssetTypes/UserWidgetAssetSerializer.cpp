@@ -1,4 +1,5 @@
 #include "Toolkit/AssetTypes/UserWidgetAssetSerializer.h"
+#include "Animation/WidgetAnimation.h"
 #include "Blueprint/WidgetTree.h"
 #include "Toolkit/PropertySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"

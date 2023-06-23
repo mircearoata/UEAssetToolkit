@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypes/MaterialInstanceAssetSerializer.h"
+﻿#include "Toolkit/AssetTypes/MaterialInstanceAssetSerializer.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
@@ -7,7 +7,7 @@
 
 void UMaterialInstanceAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> Context) const {
     BEGIN_ASSET_SERIALIZATION(UMaterialInstanceConstant)
-    DISABLE_SERIALIZATION(FStaticParameterSet, MaterialLayersParameters);
+    DISABLE_SERIALIZATION(FStaticParameterSet, MaterialLayers);
     SERIALIZE_ASSET_OBJECT
     END_ASSET_SERIALIZATION
 }
