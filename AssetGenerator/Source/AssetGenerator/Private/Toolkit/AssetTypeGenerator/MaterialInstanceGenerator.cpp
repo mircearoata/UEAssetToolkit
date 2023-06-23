@@ -50,7 +50,7 @@ FStaticParameterSet UMaterialInstanceGenerator::GetStaticParameterOverrides() co
 }
 
 void UMaterialInstanceGenerator::PopulateStageDependencies(TArray<FPackageDependency>& AssetDependencies) const {
-	if (GetAssetData()->GetBoolField(TEXT("SkipDependecies"))) return;
+	if (GetAssetData()->HasField(TEXT("SkipDependencies")) && GetAssetData()->GetBoolField(TEXT("SkipDependencies"))) return;
 	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
 		const TSharedPtr<FJsonObject> AssetData = GetAssetData();
 		const TSharedPtr<FJsonObject> AssetObjectProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
