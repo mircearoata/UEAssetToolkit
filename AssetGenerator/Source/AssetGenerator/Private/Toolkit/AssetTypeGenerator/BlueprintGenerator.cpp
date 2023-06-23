@@ -51,11 +51,7 @@ void UBlueprintGenerator::CreateAssetPackage() {
 		ParentClass = GetFallbackParentClass();
 	}
 
-	UPackage* NewPackage = CreatePackage(
-#if ENGINE_MINOR_VERSION < 26
-	nullptr, 
-#endif
-*GetPackageName().ToString());
+	UPackage* NewPackage = CreatePackage(*GetPackageName().ToString());
 	UBlueprint* NewBlueprint = CreateNewBlueprint(NewPackage, ParentClass);
 	SetPackageAndAsset(NewPackage, NewBlueprint, false);
 

@@ -17,5 +17,4 @@ public:
 	virtual void ShutdownModule() override;
 private:
 	void EnableGlobalStaticMeshCPUAccess();
-	void EnableFixTireConfigSerialization();
 };

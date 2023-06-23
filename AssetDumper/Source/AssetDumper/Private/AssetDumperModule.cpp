@@ -13,7 +13,6 @@ void FAssetDumperModule::StartupModule() {
 	
 	if (!GIsEditor) {
 		EnableGlobalStaticMeshCPUAccess();
-		EnableFixTireConfigSerialization();
 	}
 
 	if (FParse::Param(FCommandLine::Get(), TEXT("DumpAllGameAssets"))) {
@@ -63,19 +62,6 @@ void FAssetDumperModule::EnableGlobalStaticMeshCPUAccess() {
 			ReloadPackage(Package, LOAD_None);
 		}
 	}
-#endif
-}
-
-void FAssetDumperModule::EnableFixTireConfigSerialization() {
-#if METHOD_PATCHING_SUPPORTED
-	//disable that weird shit because it apparently crashes on garbage collection
-	UClass* TireConfigClass = FindObject<UClass>(NULL, TEXT("/Script/PhysXVehicles.TireConfig"));
-	check(TireConfigClass);
-	SUBSCRIBE_METHOD_VIRTUAL(UObject::BeginDestroy, TireConfigClass->GetDefaultObject(), [TireConfigClass](auto& Scope, UObject* Object) {
-		if (Object->IsA(TireConfigClass)) {
-			Object->PostInitProperties();
-		}
-	});
 #endif
 }
 

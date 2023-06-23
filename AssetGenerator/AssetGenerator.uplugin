@@ -2,6 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0.0",
+	"EngineVersion": "5.1",
 	"FriendlyName": "Asset Generator",
 	"Description": "An editor plugin for asset generation from dumps",
 	"Category": "Modding",

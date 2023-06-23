@@ -6,11 +6,7 @@
 #include "UObject/StructOnScope.h"
 
 void UDataTableGenerator::CreateAssetPackage() {
-	UPackage* NewPackage = CreatePackage(
-#if ENGINE_MINOR_VERSION < 26
-	nullptr, 
-#endif
-*GetPackageName().ToString());
+	UPackage* NewPackage = CreatePackage(*GetPackageName().ToString());
 	UDataTable* NewDataTable = NewObject<UDataTable>(NewPackage, GetAssetName(), RF_Public | RF_Standalone);
 	SetPackageAndAsset(NewPackage, NewDataTable);
 

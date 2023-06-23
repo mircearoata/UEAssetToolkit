@@ -8,10 +8,8 @@ public class AssetGenerator : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         
-#if UE_4_24_OR_LATER
         bLegacyPublicIncludePaths = false;
         ShadowVariableWarningLevel = WarningLevel.Off;
-#endif     
         
         PublicDependencyModuleNames.AddRange(new[] {
             "Core", 
@@ -29,7 +27,8 @@ public class AssetGenerator : ModuleRules
             "UMGEditor",
 			"BlueprintGraph",
             "MovieSceneTracks",
-            "AssetDumper"
+            "AssetDumper",
+            "EditorStyle"
         });
         
 		PrivateDependencyModuleNames.AddRange(new[] {
@@ -45,9 +44,6 @@ public class AssetGenerator : ModuleRules
             "GraphEditor"
         });
 
-#if UE_4_26_OR_LATER
 	    PrivateDependencyModuleNames.Add("DeveloperSettings");
-#endif
-        
     }
 }

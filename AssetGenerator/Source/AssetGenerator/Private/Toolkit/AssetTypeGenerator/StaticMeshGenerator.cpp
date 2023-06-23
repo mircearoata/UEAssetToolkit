@@ -12,11 +12,7 @@
 #include "Toolkit/AssetGeneration/PublicProjectStubHelper.h"
 
 void UStaticMeshGenerator::CreateAssetPackage() {
-	UPackage* NewPackage = CreatePackage(
-#if ENGINE_MINOR_VERSION < 26
-	nullptr, 
-#endif
-*GetPackageName().ToString());
+	UPackage* NewPackage = CreatePackage(*GetPackageName().ToString());
 	UStaticMesh* NewStaticMesh = ImportStaticMesh(NewPackage, GetAssetName(), RF_Public | RF_Standalone);
 	SetPackageAndAsset(NewPackage, NewStaticMesh);
 	

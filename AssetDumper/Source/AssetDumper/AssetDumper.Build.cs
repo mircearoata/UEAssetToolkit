@@ -5,7 +5,7 @@ using System.IO;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Tools.DotNETCommon;
+using EpicGames.Core;
 
 public class AssetDumper : ModuleRules
 {
@@ -13,10 +13,8 @@ public class AssetDumper : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         
-#if UE_4_24_OR_LATER
         bLegacyPublicIncludePaths = false;
         ShadowVariableWarningLevel = WarningLevel.Off;
-#endif 
 
         PublicDependencyModuleNames.AddRange(new[] {
 	        "Core", 

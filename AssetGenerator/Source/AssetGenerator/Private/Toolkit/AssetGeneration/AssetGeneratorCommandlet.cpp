@@ -220,11 +220,7 @@ int32 UAssetGeneratorCommandlet::Main(const FString& Params) {
 
 	//Synchronize asset registry state with the current assets we have on the disk
 	ClearEmptyGamePackagesLoadedDuringDisregardGC();
-#if ENGINE_MINOR_VERSION >= 26
 	IAssetRegistry::GetChecked().SearchAllAssets(true);
-#else
-	Get().SearchAllAssets(true);
-#endif 
 	ProcessDeferredCommands();
 	FAssetGeneratorGCController AssetGeneratorGCController{};
 	AssetGeneratorGCController.ConditionallyCollectGarbage();
@@ -279,11 +275,7 @@ int32 UAssetGeneratorCommandlet::Main(const FString& Params) {
 	}
 	
 	//Synchronize asset registry state with all of the new packages we created
-#if ENGINE_MINOR_VERSION >= 26
 	IAssetRegistry::GetChecked().SearchAllAssets(true);
-#else
-	Get().SearchAllAssets(true);
-#endif 
 	UE_LOG(LogAssetGeneratorCommandlet, Display, TEXT("Asset generation finished successfully"));
 	return 0;
 }
@@ -313,11 +305,7 @@ void UAssetGeneratorCommandlet::ClearEmptyGamePackagesLoadedDuringDisregardGC() 
 		}
 		
 		int32 ExistingObjectsNum = 0;
-#if ENGINE_MINOR_VERSION >= 26
 		ForEachObjectWithPackage(Package, [&](UObject* Object){
-#else
-			ForEachObjectWithOuter(Package, [&](UObject* Object){
-#endif				
 			ExistingObjectsNum++;
 			return false;
 		});

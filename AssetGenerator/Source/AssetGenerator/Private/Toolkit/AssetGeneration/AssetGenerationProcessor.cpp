@@ -318,11 +318,7 @@ void FAssetGenerationProcessor::OnAssetGenerationStarted() {
 	if (!IsRunningCommandlet())
 	{
 		FNotificationInfo NotificationInfo = FNotificationInfo(LOCTEXT("AssetGenerator_Startup", "Asset Generation Starting Up..."));
-#if ENGINE_MINOR_VERSION >= 26
-			NotificationInfo.Hyperlink = FSimpleDelegate::CreateStatic([](){ FGlobalTabmanager::Get()->TryInvokeTab(FName(TEXT("OutputLog"))); });
-#elif ENGINE_MINOR_VERSION < 26
-			NotificationInfo.Hyperlink = FSimpleDelegate::CreateStatic([](){ FGlobalTabmanager::Get()->InvokeTab(FName(TEXT("OutputLog"))); });
-#endif
+		NotificationInfo.Hyperlink = FSimpleDelegate::CreateStatic([](){ FGlobalTabmanager::Get()->TryInvokeTab(FName(TEXT("OutputLog"))); });
 		NotificationInfo.HyperlinkText = LOCTEXT("ShowMessageLogHyperlink", "Show Output Log");
 		NotificationInfo.bFireAndForget = false;
 		
