@@ -1,7 +1,7 @@
 #include "Toolkit/AssetTypeGenerator/BlendSpaceGenerator.h"
 #include "Animation/AimOffsetBlendSpace.h"
 #include "Animation/AimOffsetBlendSpace1D.h"
-#include "Animation/BlendSpaceBase.h"
+#include "Animation/BlendSpace.h"
 #include "Dom/JsonObject.h"
 
 UClass* UBlendSpaceGenerator::GetAssetObjectClass() const {

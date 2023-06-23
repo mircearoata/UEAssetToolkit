@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypes/Texture2DArrayAssetSerializer.h"
+﻿#include "Toolkit/AssetTypes/Texture2DArrayAssetSerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
@@ -11,7 +11,7 @@ void UTexture2DArrayAssetSerializer::SerializeAsset(TSharedRef<FSerializationCon
 	DISABLE_SERIALIZATION_RAW(UTexture, TEXT("LightingGuid"));
 	
 	SERIALIZE_ASSET_OBJECT
-	UTextureAssetSerializer::SerializeTextureData(Asset->GetPathName(), Asset->PlatformData, Data, Context, false, TEXT(""));   
+	UTextureAssetSerializer::SerializeTextureData(Asset->GetPathName(), Asset->GetPlatformData(), Data, Context, false, TEXT(""));   
 	END_ASSET_SERIALIZATION
 }
 

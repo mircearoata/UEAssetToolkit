@@ -14,7 +14,7 @@ void UTextureCubeAssetSerializer::SerializeAsset(TSharedRef<FSerializationContex
 void UTextureCubeAssetSerializer::SerializeTextureCube(UTextureCube* Asset, TSharedPtr<FJsonObject> Data, TSharedRef<FSerializationContext> Context) {
     UObjectHierarchySerializer* ObjectSerializer = Context->GetObjectSerializer();
     SERIALIZE_ASSET_OBJECT
-    UTextureAssetSerializer::SerializeTextureData(Asset->GetPathName(), Asset->PlatformData, Data, Context, true, TEXT(""));
+    UTextureAssetSerializer::SerializeTextureData(Asset->GetPathName(), Asset->GetPlatformData(), Data, Context, true, TEXT(""));
 }
 
 FTopLevelAssetPath UTextureCubeAssetSerializer::GetAssetClass() const {

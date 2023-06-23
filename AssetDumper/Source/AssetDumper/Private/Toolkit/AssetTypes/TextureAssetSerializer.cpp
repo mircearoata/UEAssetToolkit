@@ -116,7 +116,7 @@ void UTextureAssetSerializer::SerializeTexture2D(UTexture2D* Asset, TSharedPtr<F
 	DISABLE_SERIALIZATION(UTexture2D, FirstResourceMemMip);
 	
     SERIALIZE_ASSET_OBJECT
-    SerializeTextureData(Asset->GetPathName(), Asset->PlatformData, Data, Context, false, Postfix);   
+    SerializeTextureData(Asset->GetPathName(), Asset->GetPlatformData(), Data, Context, false, Postfix);   
 }
 
 FTopLevelAssetPath UTextureAssetSerializer::GetAssetClass() const {

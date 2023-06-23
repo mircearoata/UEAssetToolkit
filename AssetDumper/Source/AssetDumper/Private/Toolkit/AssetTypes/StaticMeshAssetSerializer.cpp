@@ -24,7 +24,7 @@ void UStaticMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
 	//Serialize material slot names and values
 	TArray<TSharedPtr<FJsonValue>> Materials;
 
-	for (const FStaticMaterial& StaticMaterial : Asset->StaticMaterials) {
+	for (const FStaticMaterial& StaticMaterial : Asset->GetStaticMaterials()) {
 		TSharedPtr<FJsonObject> Material = MakeShareable(new FJsonObject());
 		Material->SetStringField(TEXT("MaterialSlotName"), StaticMaterial.MaterialSlotName.ToString());
 		Material->SetNumberField(TEXT("MaterialInterface"), ObjectSerializer->SerializeObject(StaticMaterial.MaterialInterface));
@@ -34,16 +34,16 @@ void UStaticMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
 	Data->SetArrayField(TEXT("Materials"), Materials);
 
     //Serialize extra properties using native serialization
-    Data->SetNumberField(TEXT("NavCollision"), ObjectSerializer->SerializeObject(Asset->NavCollision));
-    Data->SetNumberField(TEXT("BodySetup"), ObjectSerializer->SerializeObject(Asset->BodySetup));
+    Data->SetNumberField(TEXT("NavCollision"), ObjectSerializer->SerializeObject(Asset->GetNavCollision()));
+    Data->SetNumberField(TEXT("BodySetup"), ObjectSerializer->SerializeObject(Asset->GetBodySetup()));
 
 	//Serialize screen LOD sizes to carry them to the editor
-	Data->SetNumberField(TEXT("MinimumLodNumber"), Asset->MinLOD.Default);
+	Data->SetNumberField(TEXT("MinimumLodNumber"), Asset->GetMinLOD().Default);
 	Data->SetNumberField(TEXT("LodNumber"), Asset->GetNumLODs());
 	
 	TArray<TSharedPtr<FJsonValue>> ScreenSize;
 	for (int32 i = 0; i < MAX_STATIC_MESH_LODS; i++) {
-		ScreenSize.Add(MakeShareable(new FJsonValueNumber(Asset->RenderData->ScreenSize[i].Default)));
+		ScreenSize.Add(MakeShareable(new FJsonValueNumber(Asset->GetRenderData()->ScreenSize[i].Default)));
 	}
 	Data->SetArrayField(TEXT("ScreenSize"), ScreenSize);
 

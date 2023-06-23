@@ -740,7 +740,7 @@ TSharedPtr<FKismetTerminal> FKismetBytecodeTransformer::ProcessLiteralExpression
                 } else {
                     const TCHAR* LiteralPropertyValue = *PropertyValue->StringLiteral;
                     void* PropertyValuePtr = Property->ContainerPtrToValuePtr<void>(AllocatedStructInstance, ArrayIter);
-                    Property->ImportText(LiteralPropertyValue, PropertyValuePtr, PPF_None, NULL);
+                    Property->ImportText_Direct(LiteralPropertyValue, PropertyValuePtr, NULL, PPF_None);
                 }
             }
         }

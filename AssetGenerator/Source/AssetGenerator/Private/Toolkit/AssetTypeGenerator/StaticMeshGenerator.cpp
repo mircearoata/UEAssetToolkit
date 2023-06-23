@@ -118,12 +118,12 @@ void UStaticMeshGenerator::PopulateStaticMeshWithData(UStaticMesh* Asset) {
 	//TODO not quite exactly the case, because for some LODs the material instances can be different, but we discard any LODs
 	//ensure(Materials.Num() == Asset->StaticMaterials.Num());
 	
-	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->StaticMaterials.Num()); i++) {
+	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->GetStaticMaterials().Num()); i++) {
 		const TSharedPtr<FJsonObject> MaterialObject = Materials[i]->AsObject();
 		const FName MaterialSlotName = FName(*MaterialObject->GetStringField(TEXT("MaterialSlotName")));
 		UObject* MaterialInterface = GetObjectSerializer()->DeserializeObject(MaterialObject->GetIntegerField(TEXT("MaterialInterface")));
 		
-		FStaticMaterial& StaticMaterial = Asset->StaticMaterials[i];
+		FStaticMaterial& StaticMaterial = Asset->GetStaticMaterials()[i];
 		StaticMaterial.MaterialSlotName = MaterialSlotName;
 		if (MaterialInterface) {
 			StaticMaterial.MaterialInterface = CastChecked<UMaterialInterface>(MaterialInterface);
@@ -132,9 +132,9 @@ void UStaticMeshGenerator::PopulateStaticMeshWithData(UStaticMesh* Asset) {
 	
 	UObject* NavCollision = GetObjectSerializer()->DeserializeObject(AssetData->GetIntegerField(TEXT("NavCollision")));
 	UObject* BodySetupObject = GetObjectSerializer()->DeserializeObject(AssetData->GetIntegerField(TEXT("BodySetup")));
-	
-	Asset->NavCollision = Cast<UNavCollisionBase>(NavCollision);
-	Asset->BodySetup = Cast<UBodySetup>(BodySetupObject);
+
+	Asset->SetNavCollision(Cast<UNavCollisionBase>(NavCollision));
+	Asset->SetBodySetup(Cast<UBodySetup>(BodySetupObject));
 	MarkAssetChanged();
 }
 
@@ -152,12 +152,12 @@ bool UStaticMeshGenerator::IsStaticMeshDataUpToDate(UStaticMesh* Asset) const {
 	//TODO not quite exactly the case, because for some LODs the material instances can be different, but we discard any LODs
 	//ensure(Materials.Num() == Asset->StaticMaterials.Num());
 	
-	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->StaticMaterials.Num()); i++) {
+	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->GetStaticMaterials().Num()); i++) {
 		const TSharedPtr<FJsonObject> MaterialObject = Materials[i]->AsObject();
 		
 		const FName MaterialSlotName = FName(*MaterialObject->GetStringField(TEXT("MaterialSlotName")));
 		const int32 MaterialInterface = MaterialObject->GetIntegerField(TEXT("MaterialInterface"));
-		const FStaticMaterial& StaticMaterial = Asset->StaticMaterials[i];
+		const FStaticMaterial& StaticMaterial = Asset->GetStaticMaterials()[i];
 		
 		if (!GetObjectSerializer()->CompareUObjects(MaterialInterface, StaticMaterial.MaterialInterface, true, true) ||
 			StaticMaterial.MaterialSlotName != MaterialSlotName) {
@@ -169,10 +169,10 @@ bool UStaticMeshGenerator::IsStaticMeshDataUpToDate(UStaticMesh* Asset) const {
 	const int32 NavCollisionObjectIndex = AssetData->GetIntegerField(TEXT("NavCollision"));
 	const int32 BodySetupObjectIndex = AssetData->GetIntegerField(TEXT("BodySetup"));
 	
-	if (!GetObjectSerializer()->CompareUObjects(NavCollisionObjectIndex, Asset->NavCollision, false, false)) {
+	if (!GetObjectSerializer()->CompareUObjects(NavCollisionObjectIndex, Asset->GetNavCollision(), false, false)) {
 		return false;
 	}
-	if (!GetObjectSerializer()->CompareUObjects(BodySetupObjectIndex, Asset->BodySetup, false, false)) {
+	if (!GetObjectSerializer()->CompareUObjects(BodySetupObjectIndex, Asset->GetBodySetup(), false, false)) {
 		return false;
 	}
 	return true;

@@ -3,13 +3,12 @@
 #include "Animation/AimOffsetBlendSpace1D.h"
 #include "Animation/BlendSpace.h"
 #include "Animation/BlendSpace1D.h"
-#include "Animation/BlendSpaceBase.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
 
 void UBlendSpaceSerializer::SerializeAsset(TSharedRef<FSerializationContext> Context) const {
-    BEGIN_ASSET_SERIALIZATION(UBlendSpaceBase)
+    BEGIN_ASSET_SERIALIZATION(UBlendSpace)
 	Data->SetStringField(TEXT("AssetClass"), Asset->GetClass()->GetPathName());
     SERIALIZE_ASSET_OBJECT
     END_ASSET_SERIALIZATION

@@ -63,7 +63,6 @@ void UBlueprintAssetSerializer::SerializeBlueprintClass(UBlueprintGeneratedClass
 
     //Disable unnecessary properties serialization
     DISABLE_SERIALIZATION(UBlueprintGeneratedClass, NumReplicatedProperties);
-    DISABLE_SERIALIZATION(UBlueprintGeneratedClass, bHasNativizedParent);
     DISABLE_SERIALIZATION(UBlueprintGeneratedClass, bHasCookedComponentInstancingData);
 
     //Serialize extra data present in the UBlueprintGeneratedClass (like SCS)

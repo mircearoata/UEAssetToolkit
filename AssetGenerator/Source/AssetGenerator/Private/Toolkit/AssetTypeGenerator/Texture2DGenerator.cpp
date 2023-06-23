@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypeGenerator/Texture2DGenerator.h"
+﻿#include "Toolkit/AssetTypeGenerator/Texture2DGenerator.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "AssetGeneration/AssetGeneratorSettings.h"
@@ -112,7 +112,7 @@ void UTexture2DGenerator::RebuildTextureData(UTexture2D* Texture, const FString&
 	ObjectSerializer->DeserializeObjectProperties(TextureProperties.ToSharedRef(), Texture);
 
 	//Disable mips by default if we are not sized appropriately for their generation
-	const int32 Log2Int = (int32) FMath::Log2(TextureWidth);
+	const int32 Log2Int = static_cast<int32>(FMath::Log2(static_cast<double>(TextureWidth)));
 	const int32 ClosestPowerOfTwoSize = 1 << Log2Int;
 	
 	if (TextureWidth != TextureHeight || TextureWidth != ClosestPowerOfTwoSize) {

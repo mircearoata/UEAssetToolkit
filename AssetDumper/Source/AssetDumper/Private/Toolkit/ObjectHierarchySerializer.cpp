@@ -531,7 +531,14 @@ UObject* UObjectHierarchySerializer::DeserializeExportedObject(int32 ObjectIndex
 		const EObjectFlags ObjectLoadFlags = (EObjectFlags) ObjectJson->GetIntegerField(TEXT("ObjectFlags"));
 		
 		UObject* Template = GetArchetypeFromRequiredInfo(ObjectClass, OuterObject, *ObjectName, ObjectLoadFlags);
-		ConstructedObject = StaticConstructObject_Internal(ObjectClass, OuterObject, *ObjectName, ObjectLoadFlags, EInternalObjectFlags::None, Template);	
+
+		FStaticConstructObjectParameters Params = FStaticConstructObjectParameters(ObjectClass);
+		Params.Outer = OuterObject;
+		Params.Name = *ObjectName;
+		Params.SetFlags = ObjectLoadFlags;
+		Params.Template = Template;
+		
+		ConstructedObject = StaticConstructObject_Internal(Params);	
 	}
 
 	//Record constructed object so when properties reference it through outer chain we do not run into stack overflow

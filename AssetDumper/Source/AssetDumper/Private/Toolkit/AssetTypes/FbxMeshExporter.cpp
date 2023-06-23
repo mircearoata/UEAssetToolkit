@@ -103,8 +103,8 @@ bool FFbxMeshExporter::ExportStaticMeshIntoFbxFile(UStaticMesh* StaticMesh, cons
     FbxMesh* OutExportedMesh = FbxMesh::Create(Scene, MeshNodeName);
     MeshNode->SetNodeAttribute(OutExportedMesh);
     
-    FStaticMeshLODResources& LODResources = StaticMesh->RenderData->LODResources[0];
-    ExportStaticMesh(LODResources, StaticMesh->StaticMaterials, OutExportedMesh);
+    FStaticMeshLODResources& LODResources = StaticMesh->GetRenderData()->LODResources[0];
+    ExportStaticMesh(LODResources, StaticMesh->GetStaticMaterials(), OutExportedMesh);
     
     Scene->GetRootNode()->AddChild(MeshNode);
 
@@ -154,7 +154,7 @@ bool FFbxMeshExporter::ExportSkeletalMeshIntoFbxFile(USkeletalMesh* SkeletalMesh
 	TArray<FbxNode*> BoneNodes;
 
 	// Add the skeleton to the scene
-	FbxNode* SkeletonRootNode = ExportSkeleton(Scene, SkeletalMesh->RefSkeleton, BoneNodes);
+	FbxNode* SkeletonRootNode = ExportSkeleton(Scene, SkeletalMesh->GetRefSkeleton(), BoneNodes);
 	if(SkeletonRootNode) {
 		TmpNodeNoTransform->AddChild(SkeletonRootNode);
 	}
@@ -168,7 +168,7 @@ bool FFbxMeshExporter::ExportSkeletalMeshIntoFbxFile(USkeletalMesh* SkeletalMesh
 	MeshRootNode->SetNodeAttribute(ExportedMesh);
 
 	//Populate basic mesh information
-	ExportSkeletalMesh(LODRenderData, SkeletalMesh->Materials, ExportedMesh);
+	ExportSkeletalMesh(LODRenderData, SkeletalMesh->GetMaterials(), ExportedMesh);
 	
 	TmpNodeNoTransform->AddChild(MeshRootNode);
 
@@ -373,8 +373,8 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 }
 
 bool FFbxMeshExporter::SetupAnimStack(const UAnimSequence* AnimSequence, FbxAnimStack* AnimStack) {
-	check(AnimSequence->SequenceLength > 0.0f);
-	const float FrameRate = FMath::TruncToFloat(((AnimSequence->GetRawNumberOfFrames() - 1) / AnimSequence->SequenceLength) + 0.5f);
+	check(AnimSequence->GetPlayLength() > 0.0f);
+	const float FrameRate = AnimSequence->GetSamplingFrameRate().AsDecimal();
 
 	//Configure the scene time line
 	FbxGlobalSettings& SceneGlobalSettings = AnimStack->GetScene()->GetGlobalSettings();
@@ -389,7 +389,7 @@ bool FFbxMeshExporter::SetupAnimStack(const UAnimSequence* AnimSequence, FbxAnim
 	// set time correctly
 	FbxTime ExportedStartTime, ExportedStopTime;
 	ExportedStartTime.SetSecondDouble(0.0f);
-	ExportedStopTime.SetSecondDouble(AnimSequence->SequenceLength);
+	ExportedStopTime.SetSecondDouble(AnimSequence->GetPlayLength());
 
 	FbxTimeSpan ExportedTimeSpan;
 	ExportedTimeSpan.Set(ExportedStartTime, ExportedStopTime);
@@ -400,18 +400,16 @@ bool FFbxMeshExporter::SetupAnimStack(const UAnimSequence* AnimSequence, FbxAnim
 
 void FFbxMeshExporter::IterateInsideAnimSequence(const UAnimSequence* AnimSeq, float AnimStartOffset, float AnimEndOffset, float AnimPlayRate, float StartTime, TFunctionRef<void(float, FbxTime, bool)> IterationLambda) {
 	float AnimTime = AnimStartOffset;
-	const float AnimEndTime = (AnimSeq->SequenceLength - AnimEndOffset);
-	// Subtracts 1 because NumFrames includes an initial pose for 0.0 second
+	const float AnimEndTime = (AnimSeq->GetPlayLength() - AnimEndOffset);
 
-	const double TimePerKey = (AnimSeq->SequenceLength / (AnimSeq->GetRawNumberOfFrames() - 1));
-	const float AnimTimeIncrement = TimePerKey * AnimPlayRate;
+	const float AnimTimeIncrement = AnimSeq->GetSamplingFrameRate().AsInterval() * AnimPlayRate;
 	uint32 AnimFrameIndex = 0;
 
 	FbxTime ExportTime;
 	ExportTime.SetSecondDouble(StartTime);
 
 	FbxTime ExportTimeIncrement;
-	ExportTimeIncrement.SetSecondDouble(TimePerKey);
+	ExportTimeIncrement.SetSecondDouble(AnimSeq->GetSamplingFrameRate().AsInterval());
 
 	// Step through each frame and add custom curve data
 	bool bLastKey = false;

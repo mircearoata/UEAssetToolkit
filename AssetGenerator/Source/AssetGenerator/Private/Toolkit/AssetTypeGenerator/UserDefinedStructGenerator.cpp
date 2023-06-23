@@ -1,4 +1,4 @@
-#include "Toolkit/AssetTypeGenerator/UserDefinedStructGenerator.h"
+﻿#include "Toolkit/AssetTypeGenerator/UserDefinedStructGenerator.h"
 #include "Dom/JsonObject.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
@@ -124,7 +124,7 @@ void UUserDefinedStructGenerator::FinalizeAssetCDO() {
 		FString ExportedPropertyText;
 		const void* PropertyValue = Property->ContainerPtrToValuePtr<void>(InstanceMemory);
 		
-		Property->ExportTextItem(ExportedPropertyText, PropertyValue, NULL, NULL, PPF_None);
+		Property->ExportTextItem_Direct(ExportedPropertyText, PropertyValue, NULL, NULL, PPF_None);
 		SerializedStructDefaults.Add(Property->GetName(), ExportedPropertyText);
 	}
 

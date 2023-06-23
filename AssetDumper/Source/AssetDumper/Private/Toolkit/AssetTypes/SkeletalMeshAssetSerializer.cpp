@@ -25,7 +25,7 @@ void USkeletalMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationConte
 	//Serialize material slot names and values
 	TArray<TSharedPtr<FJsonValue>> Materials;
 
-	for (const FSkeletalMaterial& SkeletalMaterial : Asset->Materials) {
+	for (const FSkeletalMaterial& SkeletalMaterial : Asset->GetMaterials()) {
 		TSharedPtr<FJsonObject> Material = MakeShareable(new FJsonObject());
 		Material->SetStringField(TEXT("MaterialSlotName"), SkeletalMaterial.MaterialSlotName.ToString());
 		Material->SetNumberField(TEXT("MaterialInterface"), ObjectSerializer->SerializeObject(SkeletalMaterial.MaterialInterface));
@@ -35,8 +35,8 @@ void USkeletalMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationConte
 	Data->SetArrayField(TEXT("Materials"), Materials);
 	
     //Serialize BodySetup if per poly collision is enabled
-    if (Asset->bEnablePerPolyCollision) {
-        Data->SetNumberField(TEXT("BodySetup"), ObjectSerializer->SerializeObject(Asset->BodySetup));
+    if (Asset->GetEnablePerPolyCollision()) {
+        Data->SetNumberField(TEXT("BodySetup"), ObjectSerializer->SerializeObject(Asset->GetBodySetup()));
     }
 
     //Export raw mesh data into separate FBX file that can be imported back into UE

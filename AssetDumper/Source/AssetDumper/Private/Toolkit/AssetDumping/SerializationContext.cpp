@@ -51,8 +51,8 @@ FSerializationContext::~FSerializationContext() {
 	this->PropertySerializer->RemoveFromRoot();
 	this->ObjectHierarchySerializer->RemoveFromRoot();
 
-	this->PropertySerializer->MarkPendingKill();
-	this->ObjectHierarchySerializer->MarkPendingKill();
+	this->PropertySerializer->MarkAsGarbage();
+	this->ObjectHierarchySerializer->MarkAsGarbage();
 }
 
 UObject* FSerializationContext::GetAssetObjectFromPackage(UPackage* Package, const FAssetData& AssetData) {

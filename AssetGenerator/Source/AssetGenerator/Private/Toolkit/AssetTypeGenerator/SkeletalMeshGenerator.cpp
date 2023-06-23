@@ -108,11 +108,11 @@ void USkeletalMeshGenerator::SetupFbxImportSettings(UFbxImportUI* ImportUI) cons
 void USkeletalMeshGenerator::GetAdditionalPackagesToSave(TArray<UPackage*>& OutPackages) {
 	const USkeletalMesh* SkeletalMesh = GetAsset<USkeletalMesh>();
 
-	if (SkeletalMesh->Skeleton) {
-		OutPackages.Add(SkeletalMesh->Skeleton->GetOutermost());
+	if (SkeletalMesh->GetSkeleton()) {
+		OutPackages.Add(SkeletalMesh->GetSkeleton()->GetOutermost());
 	}
-	if (SkeletalMesh->PhysicsAsset) {
-		OutPackages.Add(SkeletalMesh->PhysicsAsset->GetOutermost());
+	if (SkeletalMesh->GetPhysicsAsset()) {
+		OutPackages.Add(SkeletalMesh->GetPhysicsAsset()->GetOutermost());
 	}
 }
 
@@ -127,13 +127,13 @@ void USkeletalMeshGenerator::PopulateSkeletalMeshProperties(USkeletalMesh* Asset
 	//TODO not quite exactly the case, because for some LODs the material instances can be different, but we discard any LODs
 	//ensure(Materials.Num() == Asset->Materials.Num());
 	
-	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->Materials.Num()); i++) {
+	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->GetMaterials().Num()); i++) {
 		const TSharedPtr<FJsonObject> MaterialObject = Materials[i]->AsObject();
 		
 		const FName MaterialSlotName = FName(*MaterialObject->GetStringField(TEXT("MaterialSlotName")));
 		UObject* MaterialInterface = GetObjectSerializer()->DeserializeObject(MaterialObject->GetIntegerField(TEXT("MaterialInterface")));
 		
-		FSkeletalMaterial& StaticMaterial = Asset->Materials[i];
+		FSkeletalMaterial& StaticMaterial = Asset->GetMaterials()[i];
 		StaticMaterial.MaterialSlotName = MaterialSlotName;
 		
 		if (MaterialInterface) {
@@ -141,9 +141,9 @@ void USkeletalMeshGenerator::PopulateSkeletalMeshProperties(USkeletalMesh* Asset
 		}
 	}
 
-	if (Asset->bEnablePerPolyCollision) {
+	if (Asset->GetEnablePerPolyCollision()) {
 		UObject* BodySetupObject = GetObjectSerializer()->DeserializeObject(AssetData->GetIntegerField(TEXT("BodySetup")));
-		Asset->BodySetup = CastChecked<UBodySetup>(BodySetupObject);
+		Asset->SetBodySetup(CastChecked<UBodySetup>(BodySetupObject));
 	}
 	MarkAssetChanged();
 }
@@ -163,12 +163,12 @@ bool USkeletalMeshGenerator::IsSkeletalMeshPropertiesUpToDate(USkeletalMesh* Ass
 	//TODO not quite exactly the case, because for some LODs the material instances can be different, but we discard any LODs
 	//ensure(Materials.Num() == Asset->Materials.Num());
 
-	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->Materials.Num()); i++) {
+	for (int32 i = 0; i < FMath::Min(Materials.Num(), Asset->GetMaterials().Num()); i++) {
 		const TSharedPtr<FJsonObject> MaterialObject = Materials[i]->AsObject();
 		
 		const FName MaterialSlotName = FName(*MaterialObject->GetStringField(TEXT("MaterialSlotName")));
 		const int32 MaterialInterface = MaterialObject->GetIntegerField(TEXT("MaterialInterface"));
-		const FSkeletalMaterial& StaticMaterial = Asset->Materials[i];
+		const FSkeletalMaterial& StaticMaterial = Asset->GetMaterials()[i];
 		
 		if (!GetObjectSerializer()->CompareUObjects(MaterialInterface, StaticMaterial.MaterialInterface, true, true) ||
 			StaticMaterial.MaterialSlotName != MaterialSlotName) {
@@ -179,7 +179,7 @@ bool USkeletalMeshGenerator::IsSkeletalMeshPropertiesUpToDate(USkeletalMesh* Ass
 }
 
 bool USkeletalMeshGenerator::IsSkeletalMeshSourceFileUpToDate(USkeletalMesh* Asset) const {
-	const FAssetImportInfo& AssetImportInfo = Asset->AssetImportData->SourceData;
+	const FAssetImportInfo& AssetImportInfo = Asset->GetAssetImportData()->SourceData;
 	const FMD5Hash& ExistingFileHash = AssetImportInfo.SourceFiles[0].FileHash;
 	
 	const FString ExistingFileHashString = LexToString(ExistingFileHash);

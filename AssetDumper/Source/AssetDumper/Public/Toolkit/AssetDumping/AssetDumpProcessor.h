@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Tickable.h"
-#include "AssetData.h"
+#include "AssetRegistry/AssetData.h"
 #include "AssetDumperModule.h"
 
 /** Holds asset dumping related settings */
