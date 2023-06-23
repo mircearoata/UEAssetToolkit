@@ -694,6 +694,14 @@ bool UPropertySerializer::ComparePropertyValuesInner(FProperty* Property, const 
 		return ObjectHierarchySerializer->CompareObjectsWithContext(InterfaceObjectIndex, InterfaceObject, Context);
 	}
 
+	if (const FSoftObjectProperty* SoftObjectProperty = CastField<const FSoftObjectProperty>(Property)) {
+		//SoftObject properties are equal if objects they refer to are equal
+		UObject* PropertyObject = SoftObjectProperty->GetObjectPropertyValue(CurrentValue);
+		const FString AssetPath = JsonValue->AsString();
+		
+		return FSoftObjectPath(PropertyObject) == AssetPath;
+	}
+	
 	if (const FObjectPropertyBase* ObjectProperty = CastField<const FObjectPropertyBase>(Property)) {
 		//Need to serialize full UObject for object property
 		UObject* PropertyObject = ObjectProperty->GetObjectPropertyValue(CurrentValue);
