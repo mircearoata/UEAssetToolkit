@@ -257,7 +257,12 @@ void GetPropertyCategoryInfo(const TSharedPtr<FJsonObject> PropertyObject, FName
 		}
 		
 	} else if (FieldClass->IsChildOf(FFloatProperty::StaticClass())) {
-		OutCategory = UEdGraphSchema_K2::PC_Float;
+		OutCategory = UEdGraphSchema_K2::PC_Real;
+		OutSubCategory = UEdGraphSchema_K2::PC_Float;
+
+	} else if (FieldClass->IsChildOf(FDoubleProperty::StaticClass())) {
+		OutCategory = UEdGraphSchema_K2::PC_Real;
+		OutSubCategory = UEdGraphSchema_K2::PC_Double;
 
 	} else if (FieldClass->IsChildOf(FInt64Property::StaticClass())) {
 		OutCategory = UEdGraphSchema_K2::PC_Int64;

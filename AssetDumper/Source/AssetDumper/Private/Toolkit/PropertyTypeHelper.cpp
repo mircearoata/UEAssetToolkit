@@ -8,6 +8,7 @@ const FName PC_Class(TEXT("class"));
 const FName PC_Int(TEXT("int"));
 const FName PC_Int64(TEXT("int64"));
 const FName PC_Float(TEXT("float"));
+const FName PC_Double(TEXT("double"));
 const FName PC_Name(TEXT("name"));
 const FName PC_Delegate(TEXT("delegate"));
 const FName PC_MCDelegate(TEXT("mcdelegate"));
@@ -231,6 +232,8 @@ bool GetPropertyCategoryInfo(const FProperty* TestProperty, FName& OutCategory, 
 		OutSubCategoryObject = StructProperty->Struct;
 	} else if (TestProperty->IsA<FFloatProperty>()) {
 		OutCategory = PC_Float;
+	} else if (TestProperty->IsA<FDoubleProperty>()) {
+		OutCategory = PC_Double;
 	} else if (TestProperty->IsA<FInt64Property>()) {
 		OutCategory = PC_Int64;
 	} else if (TestProperty->IsA<FIntProperty>()) {
