@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
+#include "Toolkit/AssetTypeGenerator/BlueprintGenerator.h"
 #include "K2Node_FunctionEntry.h"
 #include "Dom/JsonObject.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -15,6 +15,9 @@
 #include "Engine/SimpleConstructionScript.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Animation/AnimBlueprint.h"
+#include "GameFramework/Info.h"
+#include "Toolkit/PropertySerializer.h"
+#include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 
 #define LOCTEXT_NAMESPACE "AssetGenerator"
 
@@ -80,6 +83,14 @@ void UBlueprintGenerator::OnExistingPackageLoaded() {
 	}
 	
 	PostConstructOrUpdateAsset(Blueprint);
+}
+
+void UBlueprintGenerator::PostInitializeAssetGenerator() {
+	UPropertySerializer* Serializer = GetPropertySerializer();
+
+	// Only exist in editor
+	DISABLE_SERIALIZATION_RAW(AInfo, "SpriteComponent");
+	DISABLE_SERIALIZATION_RAW(AInfo, "RootComponent");
 }
 
 void UBlueprintGenerator::PostConstructOrUpdateAsset(UBlueprint* Blueprint) {

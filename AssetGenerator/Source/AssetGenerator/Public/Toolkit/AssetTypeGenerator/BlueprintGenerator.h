@@ -10,6 +10,7 @@ GENERATED_BODY()
 protected:
 	virtual void CreateAssetPackage() override;
 	virtual void OnExistingPackageLoaded() override;
+	virtual void PostInitializeAssetGenerator() override;
 
 	virtual UBlueprint* CreateNewBlueprint(UPackage* Package, UClass* ParentClass);
 	virtual void PostConstructOrUpdateAsset(UBlueprint* Blueprint);
