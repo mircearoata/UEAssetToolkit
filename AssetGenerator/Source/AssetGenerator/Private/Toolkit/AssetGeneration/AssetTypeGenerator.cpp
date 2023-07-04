@@ -97,6 +97,7 @@ void UAssetTypeGenerator::ConstructAssetAndPackage() {
 
 void UAssetTypeGenerator::MarkAssetChanged() {
 	this->bAssetChanged = true;
+	this->bHasAssetEverBeenChanged = true;
 	if (this->AssetPackage) {
 		this->AssetPackage->MarkPackageDirty();
 	}
