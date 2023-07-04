@@ -1,5 +1,6 @@
 #include "Toolkit/AssetTypeGenerator/MaterialGenerator.h"
 #include "LandscapeGrassType.h"
+#include "MaterialEditorUtilities.h"
 #include "Engine/Texture.h"
 #include "Engine/Texture2DArray.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -550,7 +551,44 @@ void UMaterialGenerator::RemoveOutdatedMaterialLayoutNodes(UMaterial* Material, 
 	}
 
 	for (UMaterialExpression* RemovedExpression : ExpressionsToRemove) {
-		Material->GetEditorOnlyData()->ExpressionCollection.RemoveExpression(RemovedExpression);
+		// Removing an expression from the material does not unlink the connections, so we need to do that manually
+		// However, the Multiply nodes are not in the ExpressionCollection
+		// so the only way to reach them is through the material input expression references
+		// Is there any better way to do this? Is the generator missing something that would add the Multiply nodes?
+		FExpressionInput& BaseColorInput = Material->GetEditorOnlyData()->BaseColor;
+		FExpressionInput& NormalInput = Material->GetEditorOnlyData()->Normal;
+		FExpressionInput& RoughnessInput = Material->GetEditorOnlyData()->Roughness;
+
+		TQueue<FExpressionInput*> InputsToCheck;
+		InputsToCheck.Enqueue(&BaseColorInput);
+		InputsToCheck.Enqueue(&NormalInput);
+		InputsToCheck.Enqueue(&RoughnessInput);
+
+		TSet<UMaterialExpression*> CheckedExpressions;
+
+		while(!InputsToCheck.IsEmpty()) {
+			FExpressionInput* Input;
+			InputsToCheck.Dequeue(Input);
+
+			if (!Input) continue;
+
+			if (!Input->IsConnected()) continue;
+
+			if (!CheckedExpressions.Contains(Input->Expression)) {
+				CheckedExpressions.Add(Input->Expression);
+				for (FExpressionInput* ExpressionInput : Input->Expression->GetInputs()) {
+					InputsToCheck.Enqueue(ExpressionInput);
+				}
+			}
+			
+			if (Input->Expression == RemovedExpression) {
+				Input->Expression = NULL;
+			}
+		}
+		
+		Material->RemoveExpressionParameter(RemovedExpression);
+
+		Material->GetExpressionCollection().RemoveExpression(RemovedExpression);
 		if (RemovedExpression->GraphNode) {
 			FBlueprintEditorUtils::RemoveNode(NULL, RemovedExpression->GraphNode, true);
 		}
@@ -561,8 +599,7 @@ void UMaterialGenerator::CleanupStubMaterialNodes(UMaterial* Material) {
 	for (int32 i = Material->GetExpressions().Num() - 1; i >= 0; i--) {
 		UMaterialExpression* Expression = Material->GetExpressions()[i];
 		if (Expression->Desc.StartsWith(TEXT("[STUB NODE]"))) {
-			
-			Material->GetEditorOnlyData()->ExpressionCollection.RemoveExpression(Expression);
+			UMaterialEditingLibrary::DeleteMaterialExpression(Material, Expression);
 			if (Expression->GraphNode) {
 				FBlueprintEditorUtils::RemoveNode(NULL, Expression->GraphNode, true);
 			}
@@ -723,7 +760,8 @@ void UMaterialGenerator::RemoveMaterialComment(UMaterial* Material, UMaterialExp
 	if (Comment->GraphNode) {
 		FBlueprintEditorUtils::RemoveNode(NULL, Comment->GraphNode, true);
 	}
-	Material->GetEditorOnlyData()->ExpressionCollection.RemoveComment(Comment);
+
+	Material->GetExpressionCollection().RemoveComment(Comment);
 }
 
 void UMaterialGenerator::DetectMaterialExpressionChanges(const FMaterialCachedExpressionData& OldData, const FMaterialCachedExpressionData& NewData, FMaterialLayoutChangeInfo& ChangeInfo) {
@@ -745,10 +783,12 @@ void UMaterialGenerator::DetectMaterialExpressionChanges(const FMaterialCachedEx
 
 		for (const FMaterialParameterInfo& ParameterInfo : OldParameterEntry.ParameterInfoSet) {
 			OldParameters.Add(ParameterInfo.Name, {ParameterInfo, ParameterType, OldParameterEntry.ParameterInfoSet.FindId(ParameterInfo).AsInteger()});
+			AllParameterNames.Add(ParameterInfo.Name);
 		}
 
 		for (const FMaterialParameterInfo& ParameterInfo : NewParameterEntry.ParameterInfoSet) {
 			NewParameters.Add(ParameterInfo.Name, {ParameterInfo, ParameterType, NewParameterEntry.ParameterInfoSet.FindId(ParameterInfo).AsInteger()});
+			AllParameterNames.Add(ParameterInfo.Name);
 		}
 	}
 
