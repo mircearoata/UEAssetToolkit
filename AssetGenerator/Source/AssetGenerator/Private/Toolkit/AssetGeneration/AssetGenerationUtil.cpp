@@ -99,7 +99,7 @@ void FAssetGenerationUtil::GetPropertyDependencies(const TSharedPtr<FJsonObject>
 	}
 }
 
-FDeserializedProperty::FDeserializedProperty(const TSharedPtr<FJsonObject>& Object, UObjectHierarchySerializer* ObjectSerializer) {
+FDeserializedProperty::FDeserializedProperty(const TSharedPtr<FJsonObject>& Object, UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam) {
 	check(Object->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 	
 	this->PropertyName = FName(*Object->GetStringField(TEXT("ObjectName")));
@@ -108,7 +108,8 @@ FDeserializedProperty::FDeserializedProperty(const TSharedPtr<FJsonObject>& Obje
 	
 	this->RepNotifyFunc = FName(*Object->GetStringField(TEXT("RepNotifyFunc")));
 	this->BlueprintReplicationCondition = (ELifetimeCondition) Object->GetIntegerField(TEXT("BlueprintReplicationCondition"));
-	FAssetGenerationUtil::ConvertPropertyObjectToGraphPinType(Object, this->GraphPinType, ObjectSerializer);
+	
+	FAssetGenerationUtil::ConvertPropertyObjectToGraphPinType(Object, this->GraphPinType, ObjectSerializer, bPotentialFunctionParam);
 }
 
 FDeserializedFunction::FDeserializedFunction(const TSharedPtr<FJsonObject>& Object, UObjectHierarchySerializer* ObjectSerializer, bool bDeserializeOnlySignatureProperties) {
@@ -126,7 +127,7 @@ FDeserializedFunction::FDeserializedFunction(const TSharedPtr<FJsonObject>& Obje
 			continue;
 		}
 		
-		FDeserializedProperty DeserializedProperty(FunctionProperty, ObjectSerializer);
+		FDeserializedProperty DeserializedProperty(FunctionProperty, ObjectSerializer, true);
 
 		if (DeserializedProperty.HasAnyPropertyFlags(CPF_ReturnParm)) {
 			this->ReturnValue = DeserializedProperty;
@@ -158,7 +159,7 @@ FDeserializedFunction::FDeserializedFunction(const TSharedPtr<FJsonObject>& Obje
 	this->bIsDelegateSignatureFunction = FunctionNameString.EndsWith(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX);
 }
 
-void FAssetGenerationUtil::ConvertPropertyObjectToGraphPinType(const TSharedPtr<FJsonObject> PropertyObject, FEdGraphPinType& OutPinType, class UObjectHierarchySerializer* ObjectSerializer) {
+void FAssetGenerationUtil::ConvertPropertyObjectToGraphPinType(const TSharedPtr<FJsonObject> PropertyObject, FEdGraphPinType& OutPinType, class UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam) {
 	OutPinType.PinSubCategory = NAME_None;
 	const FString ObjectClass = PropertyObject->GetStringField(TEXT("ObjectClass"));
 	const FString ObjectName = PropertyObject->GetStringField(TEXT("ObjectName"));
@@ -203,10 +204,20 @@ void FAssetGenerationUtil::ConvertPropertyObjectToGraphPinType(const TSharedPtr<
 	//because that function in fact will not even exist without delegate in first place
 	if (FieldClass->IsChildOf(FMulticastDelegateProperty::StaticClass())) {
 		OutPinType.PinCategory = UEdGraphSchema_K2::PC_MCDelegate;
-		
+		if (bPotentialFunctionParam) {
+			const FString SignatureFunction = PropertyObject->GetStringField(TEXT("SignatureFunction"));
+			FTopLevelAssetPath FunctionPath(SignatureFunction);
+			OutPinType.PinSubCategoryMemberReference.MemberParent = FindObjectChecked<UObject>(NULL, *FunctionPath.GetPackageName().ToString());
+			OutPinType.PinSubCategoryMemberReference.MemberName = FunctionPath.GetAssetName();
+		}
 	} else if (FieldClass->IsChildOf(FDelegateProperty::StaticClass())) {
 		OutPinType.PinCategory = UEdGraphSchema_K2::PC_Delegate;
-		
+		if (bPotentialFunctionParam) {
+			const FString SignatureFunction = PropertyObject->GetStringField(TEXT("SignatureFunction"));
+			FTopLevelAssetPath FunctionPath(SignatureFunction);
+			OutPinType.PinSubCategoryMemberReference.MemberParent = FindObjectChecked<UObject>(NULL, *FunctionPath.GetPackageName().ToString());
+			OutPinType.PinSubCategoryMemberReference.MemberName = FunctionPath.GetAssetName();
+		}
 	} else {
 		UObject* SubCategoryObject = nullptr;
 		bool bIsWeakPointer = false;

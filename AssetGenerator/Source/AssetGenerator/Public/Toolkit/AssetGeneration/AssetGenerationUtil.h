@@ -15,7 +15,7 @@ public:
 
 	FORCEINLINE FDeserializedProperty() : PropertyFlags(CPF_None), ArrayDim(1), BlueprintReplicationCondition(COND_None) {}
 	
-	FDeserializedProperty(const TSharedPtr<FJsonObject>& Object, class UObjectHierarchySerializer* ObjectSerializer);
+	FDeserializedProperty(const TSharedPtr<FJsonObject>& Object, class UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam = false);
 
 	FORCEINLINE bool HasAllPropertyFlags(EPropertyFlags Flags) const {
 		return (PropertyFlags & Flags) == Flags;
@@ -68,7 +68,7 @@ public:
 
 class ASSETGENERATOR_API FAssetGenerationUtil {
 public:
-	static void ConvertPropertyObjectToGraphPinType(const TSharedPtr<FJsonObject> PropertyObject, FEdGraphPinType& OutPinType, class UObjectHierarchySerializer* ObjectSerializer);
+	static void ConvertPropertyObjectToGraphPinType(const TSharedPtr<FJsonObject> PropertyObject, FEdGraphPinType& OutPinType, class UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam = false);
 
 	static void GetPropertyDependencies(const TSharedPtr<FJsonObject> PropertyObject, UObjectHierarchySerializer* ObjectSerializer, TArray<FString>& OutDependencies);
 

@@ -166,7 +166,7 @@ void FAssetHelper::SerializeProperty(TSharedPtr<FJsonObject> OutObject, FPropert
         //For delegate properties, we need to serialize signature function
         //Since it will always be present in the Child array too, we serialize just it's name
         //and not actual full UFunction object
-        OutObject->SetStringField(TEXT("SignatureFunction"), DelegateProperty->SignatureFunction->GetName());
+        OutObject->SetStringField(TEXT("SignatureFunction"), DelegateProperty->SignatureFunction->GetPathName());
         
     } else if (FInterfaceProperty* InterfaceProperty = CastField<FInterfaceProperty>(Property)) {
         //For interface properties, we serialize interface type class
@@ -185,7 +185,7 @@ void FAssetHelper::SerializeProperty(TSharedPtr<FJsonObject> OutObject, FPropert
         
     } else if (FMulticastDelegateProperty* MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property)) {
         //For multicast delegate properties, record signature function name
-        OutObject->SetStringField(TEXT("SignatureFunction"), MulticastDelegateProperty->SignatureFunction->GetName());
+        OutObject->SetStringField(TEXT("SignatureFunction"), MulticastDelegateProperty->SignatureFunction->GetPathName());
         
     } else if (FSetProperty* SetProperty = CastField<FSetProperty>(Property)) {
         //For set properties, serialize element type
