@@ -12,8 +12,6 @@ void UAnimationSequenceAssetSerializer::SerializeAsset(TSharedRef<FSerialization
 
     DISABLE_SERIALIZATION(UAnimSequence, RawCurveData);
 	DISABLE_SERIALIZATION(UAnimSequence, SequenceLength);
-	DISABLE_SERIALIZATION_RAW(UAnimSequence, "TrackToSkeletonMapTable");
-	DISABLE_SERIALIZATION_RAW(UAnimSequence, "NumFrames");
 	
     SERIALIZE_ASSET_OBJECT
 
