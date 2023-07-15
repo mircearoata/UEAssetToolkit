@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetGeneration/AssetGenerationUtil.h"
+#include "Toolkit/AssetGeneration/AssetGenerationUtil.h"
 #include "Dom/JsonObject.h"
 #include "Engine/MemberReference.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
@@ -246,6 +246,11 @@ void GetPropertyCategoryInfo(const TSharedPtr<FJsonObject> PropertyObject, FName
 		OutCategory = UEdGraphSchema_K2::PC_SoftClass;
 		const int32 MetaClassIndex = PropertyObject->GetIntegerField(TEXT("MetaClass"));
 		OutSubCategoryObject = ObjectSerializer->DeserializeObject(MetaClassIndex);
+		
+	} else if (FieldClass->IsChildOf(FSoftObjectProperty::StaticClass())) {
+		OutCategory = UEdGraphSchema_K2::PC_SoftObject;
+		const int32 PropertyClassIndex = PropertyObject->GetIntegerField(TEXT("PropertyClass"));
+		OutSubCategoryObject = ObjectSerializer->DeserializeObject(PropertyClassIndex);
 		
 	} else if (FieldClass->IsChildOf(FObjectPropertyBase::StaticClass())) {
 		OutCategory = UEdGraphSchema_K2::PC_Object;
