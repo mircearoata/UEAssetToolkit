@@ -18,4 +18,3 @@ void UAnimationMontageAssetSerializer::SerializeAsset(TSharedRef<FSerializationC
 FTopLevelAssetPath UAnimationMontageAssetSerializer::GetAssetClass() const {
     return FTopLevelAssetPath(UAnimMontage::StaticClass());
 }
-    
