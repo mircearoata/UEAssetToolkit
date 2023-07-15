@@ -66,11 +66,16 @@ public:
 	}
 };
 
+struct ASSETGENERATOR_API FDependency {
+	FString Name;
+	bool bAllowPartialClass;
+};
+
 class ASSETGENERATOR_API FAssetGenerationUtil {
 public:
 	static void ConvertPropertyObjectToGraphPinType(const TSharedPtr<FJsonObject> PropertyObject, FEdGraphPinType& OutPinType, class UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam = false);
 
-	static void GetPropertyDependencies(const TSharedPtr<FJsonObject> PropertyObject, UObjectHierarchySerializer* ObjectSerializer, TArray<FString>& OutDependencies);
+	static void GetPropertyDependencies(const TSharedPtr<FJsonObject> PropertyObject, UObjectHierarchySerializer* ObjectSerializer, TArray<FDependency>& OutDependencies);
 
 	static bool PopulateStructVariable(const TSharedPtr<FJsonObject>& PropertyObject, UObjectHierarchySerializer* ObjectSerializer, struct FStructVariableDescription& OutStructVariable);
 

@@ -1,4 +1,4 @@
-#include "Toolkit/AssetGeneration/AssetGenerationUtil.h"
+﻿#include "Toolkit/AssetGeneration/AssetGenerationUtil.h"
 #include "Dom/JsonObject.h"
 #include "Engine/MemberReference.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
@@ -52,7 +52,7 @@ bool FAssetGenerationUtil::PopulateStructVariable(const TSharedPtr<FJsonObject>&
 	return true;
 }
 
-void FAssetGenerationUtil::GetPropertyDependencies(const TSharedPtr<FJsonObject> PropertyObject, UObjectHierarchySerializer* ObjectSerializer, TArray<FString>& OutDependencies) {
+void FAssetGenerationUtil::GetPropertyDependencies(const TSharedPtr<FJsonObject> PropertyObject, UObjectHierarchySerializer* ObjectSerializer, TArray<FDependency>& OutDependencies) {
 	const FString ObjectClass = PropertyObject->GetStringField(TEXT("ObjectClass"));
 	FFieldClass* FieldClass = FFieldClass::GetNameToFieldClassMap().FindChecked(*ObjectClass);
 	
@@ -77,24 +77,43 @@ void FAssetGenerationUtil::GetPropertyDependencies(const TSharedPtr<FJsonObject>
 	} else {
 		if (FieldClass->IsChildOf(FInterfaceProperty::StaticClass())) {
 			const int32 InterfaceClassIndex = PropertyObject->GetIntegerField(TEXT("InterfaceClass"));
-			ObjectSerializer->CollectObjectPackages(InterfaceClassIndex, OutDependencies);
+			TArray<FString> InterfaceClassNames;
+			ObjectSerializer->CollectObjectPackages(InterfaceClassIndex, InterfaceClassNames);
+			for (const FString& InterfaceClassName : InterfaceClassNames) {
+				OutDependencies.Add(FDependency{InterfaceClassName, true});
+			}
 		
 		} else if (FieldClass->IsChildOf(FClassProperty::StaticClass()) || FieldClass->IsChildOf(FSoftClassProperty::StaticClass())) {
 			const int32 MetaClassIndex = PropertyObject->GetIntegerField(TEXT("MetaClass"));
-			ObjectSerializer->CollectObjectPackages(MetaClassIndex, OutDependencies);
+			TArray<FString> MetaClassNames;
+			ObjectSerializer->CollectObjectPackages(MetaClassIndex, MetaClassNames);
+			for (const FString& MetaClassName : MetaClassNames) {
+				OutDependencies.Add(FDependency{MetaClassName, true});
+			}
 		
 		} else if (FieldClass->IsChildOf(FStructProperty::StaticClass())) {
 			const int32 StructObjectIndex = PropertyObject->GetIntegerField(TEXT("Struct"));
-            ObjectSerializer->CollectObjectPackages(StructObjectIndex, OutDependencies);
+			TArray<FString> StructClassNames;
+			ObjectSerializer->CollectObjectPackages(StructObjectIndex, StructClassNames);
+			for (const FString& StructClassName : StructClassNames) {
+				OutDependencies.Add(FDependency{StructClassName, false}); // Require that structs are completely valid
+			}			
 		
 		} else if (FieldClass->IsChildOf(FByteProperty::StaticClass()) || FieldClass->IsChildOf(FEnumProperty::StaticClass())) {
 			const int32 EnumObjectIndex = PropertyObject->GetIntegerField(TEXT("Enum"));
-			ObjectSerializer->CollectObjectPackages(EnumObjectIndex, OutDependencies);
+			TArray<FString> EnumClassNames;
+			ObjectSerializer->CollectObjectPackages(EnumObjectIndex, EnumClassNames);
+			for (const FString& EnumClassName : EnumClassNames) {
+				OutDependencies.Add(FDependency{EnumClassName, false}); // Require that enums are completely valid
+			}
 			
 		} else if (FieldClass->IsChildOf(FObjectPropertyBase::StaticClass())) {
-			
 			const int32 ObjectClassIndex = PropertyObject->GetIntegerField(TEXT("PropertyClass"));
-			ObjectSerializer->CollectObjectPackages(ObjectClassIndex, OutDependencies);
+			TArray<FString> ObjectClassNames;
+			ObjectSerializer->CollectObjectPackages(ObjectClassIndex, ObjectClassNames);
+			for (const FString& ObjectClassName : ObjectClassNames) {
+				OutDependencies.Add(FDependency{ObjectClassName, true});
+			}
 		}
 	}
 }

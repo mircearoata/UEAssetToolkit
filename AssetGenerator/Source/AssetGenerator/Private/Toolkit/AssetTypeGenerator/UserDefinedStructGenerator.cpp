@@ -160,14 +160,18 @@ void UUserDefinedStructGenerator::PopulateStageDependencies(TArray<FPackageDepen
 	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
 		const TArray<TSharedPtr<FJsonValue>>& ChildProperties = GetAssetData()->GetArrayField(TEXT("ChildProperties"));
 
-		TArray<FString> AllDependencyNames;
+		TArray<FDependency> AllDependencies;
 		for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 			const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
-			FAssetGenerationUtil::GetPropertyDependencies(PropertyObject, GetObjectSerializer(), AllDependencyNames);
+			FAssetGenerationUtil::GetPropertyDependencies(PropertyObject, GetObjectSerializer(), AllDependencies);
 		}
 
-		for (const FString& DependencyName : AllDependencyNames) {
-			OutDependencies.Add(FPackageDependency{FName(*DependencyName), EAssetGenerationStage::CONSTRUCTION});
+		for (const FDependency& Dependency : AllDependencies) {
+			OutDependencies.Add(FPackageDependency{
+				*Dependency.Name,
+				Dependency.bAllowPartialClass
+				? EAssetGenerationStage::CONSTRUCTION
+				: EAssetGenerationStage::PRE_FINSHED});
 		}
 
 	} else if (GetCurrentStage() == EAssetGenerationStage::CDO_FINALIZATION) {

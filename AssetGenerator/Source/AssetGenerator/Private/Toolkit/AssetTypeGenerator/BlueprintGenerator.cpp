@@ -277,12 +277,12 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 		const TArray<TSharedPtr<FJsonValue>>& ChildProperties = GetAssetData()->GetArrayField(TEXT("ChildProperties"));
 		const TArray<TSharedPtr<FJsonValue>>& Children = GetAssetData()->GetArrayField(TEXT("Children"));
 		
-		TArray<FString> AllDependencyNames;
+		TArray<FDependency> AllDependencies;
 		for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 			const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
 			check(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 			
-			FAssetGenerationUtil::GetPropertyDependencies(PropertyObject, GetObjectSerializer(), AllDependencyNames);
+			FAssetGenerationUtil::GetPropertyDependencies(PropertyObject, GetObjectSerializer(), AllDependencies);
 		}
 
 		for (int32 i = 0; i < Children.Num(); i++) {
@@ -296,12 +296,17 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 				check(FunctionProperty->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 			
 				if (FAssetGenerationUtil::IsFunctionSignatureRelevantProperty(FunctionProperty)) {
-					FAssetGenerationUtil::GetPropertyDependencies(FunctionProperty, GetObjectSerializer(), AllDependencyNames);
+					FAssetGenerationUtil::GetPropertyDependencies(FunctionProperty, GetObjectSerializer(), AllDependencies);
 				}
 			}
 		}
-		for (const FString& PackageName : AllDependencyNames) {
-			OutDependencies.Add(FPackageDependency{*PackageName, EAssetGenerationStage::CONSTRUCTION});
+		for (const FDependency& Dependency : AllDependencies) {
+			
+			OutDependencies.Add(FPackageDependency{
+				*Dependency.Name,
+				Dependency.bAllowPartialClass
+				? EAssetGenerationStage::CONSTRUCTION
+				: EAssetGenerationStage::PRE_FINSHED});
 		}
 	}
 
