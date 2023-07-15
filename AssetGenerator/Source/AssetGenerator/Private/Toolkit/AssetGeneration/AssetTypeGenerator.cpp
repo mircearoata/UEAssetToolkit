@@ -57,6 +57,7 @@ void UAssetTypeGenerator::InitializeInternal(const FString& DumpRootDirectory, c
 	this->PackageBaseDirectory = InPackageBaseDirectory;
 	this->PackageName = FName(*RootFileObject->GetStringField(TEXT("AssetPackage")));
 	this->AssetName = FName(*RootFileObject->GetStringField(TEXT("AssetName")));
+	this->AssetClassPath = FTopLevelAssetPath(*RootFileObject->GetStringField(TEXT("AssetClassPath")));
 	checkf(this->PackageName == InPackageName, TEXT("InitializeInternal called with inconsistent package name. Externally provided name was '%s', but internal dump package name is '%s'"),
 		*InPackageName.ToString(), *this->PackageName.ToString());
 

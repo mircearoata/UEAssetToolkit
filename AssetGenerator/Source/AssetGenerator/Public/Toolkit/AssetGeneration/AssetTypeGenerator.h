@@ -37,6 +37,7 @@ private:
 	FString PackageBaseDirectory;
     FName PackageName;
 	FName AssetName;
+	FTopLevelAssetPath AssetClassPath;
     TSharedPtr<FJsonObject> AssetData;
 	EAssetGenerationStage CurrentStage;
 	bool bUsingExistingPackage;
@@ -112,6 +113,8 @@ public:
 
 	/** Returns name of the asset object as it is loaded from the dump */
 	FORCEINLINE FName GetAssetName() const { return AssetName; }
+
+	FORCEINLINE FTopLevelAssetPath GetAssetClassPath() const { return AssetClassPath; }
 	
 	FORCEINLINE bool IsUsingExistingPackage() const { return bUsingExistingPackage; }
 
