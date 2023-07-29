@@ -29,7 +29,7 @@ void UDataAssetSerializer::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAs
     FARFilter Filter;
     Filter.ClassPaths.Add(FTopLevelAssetPath(UBlueprint::StaticClass()));
     for (const UClass* DerivedClass : DerivedClasses) {
-        Filter.TagsAndValues.Add(FBlueprintTags::NativeParentClassPath, FString::Printf(TEXT("%s'%s'"), *DerivedClass->GetClass()->GetPathName(), *DerivedClass->GetPathName()));
+		Filter.TagsAndValues.Add(FBlueprintTags::NativeParentClassPath, FObjectPropertyBase::GetExportPath(DerivedClass));
     }
     Filter.bRecursiveClasses = true;
     TArray<FAssetData> BlueprintDataAssets;
