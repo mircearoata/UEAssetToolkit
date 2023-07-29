@@ -93,6 +93,17 @@ void UAnimSequenceGenerator::PopulateAnimationProperties(UAnimSequence* Asset) {
 	const TSharedPtr<FJsonObject> AssetObjectProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
 
 	GetObjectSerializer()->DeserializeObjectProperties(AssetObjectProperties.ToSharedRef(), Asset);
+
+	int MaxNotifyTrack = 0;
+
+	for (const FAnimNotifyEvent& Notify : Asset->Notifies) {
+		MaxNotifyTrack = FMath::Max(MaxNotifyTrack, Notify.TrackIndex);
+	}
+
+	if (MaxNotifyTrack > Asset->AnimNotifyTracks.Num()) {
+		Asset->AnimNotifyTracks.SetNum(MaxNotifyTrack + 1);
+	}
+	
 	MarkAssetChanged();
 }
 
@@ -100,7 +111,21 @@ bool UAnimSequenceGenerator::IsAnimationPropertiesUpToDate(UAnimSequence* Asset)
 	const TSharedPtr<FJsonObject> AssetData = GetAssetData();
 	const TSharedPtr<FJsonObject> AssetObjectProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
 
-	return GetObjectSerializer()->AreObjectPropertiesUpToDate(AssetObjectProperties.ToSharedRef(), Asset);
+	if(!GetObjectSerializer()->AreObjectPropertiesUpToDate(AssetObjectProperties.ToSharedRef(), Asset)) {
+		return false;
+	}
+	
+	int MaxNotifyTrack = 0;
+
+	for (const FAnimNotifyEvent& Notify : Asset->Notifies) {
+		MaxNotifyTrack = FMath::Max(MaxNotifyTrack, Notify.TrackIndex);
+	}
+
+	if (MaxNotifyTrack > Asset->AnimNotifyTracks.Num()) {
+		return false;
+	}
+
+	return true;
 }
 
 bool UAnimSequenceGenerator::IsAnimationSourceUpToDate(UAnimSequence* Asset) const {
