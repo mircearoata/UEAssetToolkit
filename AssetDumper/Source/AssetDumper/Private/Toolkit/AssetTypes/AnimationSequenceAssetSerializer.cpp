@@ -10,8 +10,8 @@
 void UAnimationSequenceAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> Context) const {
     BEGIN_ASSET_SERIALIZATION(UAnimSequence)
 
-    DISABLE_SERIALIZATION(UAnimSequence, RawCurveData);
-	DISABLE_SERIALIZATION(UAnimSequence, SequenceLength);
+    DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("RawCurveData"));
+	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("SequenceLength"));
 	
     SERIALIZE_ASSET_OBJECT
 

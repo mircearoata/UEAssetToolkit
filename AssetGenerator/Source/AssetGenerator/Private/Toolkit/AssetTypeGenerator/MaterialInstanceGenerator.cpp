@@ -115,21 +115,22 @@ void EnsureStaticSwitchNodesPresent(UMaterial* Material, const FStaticParameterS
 	bool bMaterialGraphChanged = false;
 
 	// TODO: These are now editor only, so this won't do anything. What does this mean for the generated asset? Modified the code to use EditorOnly to compile without commenting
-	for (const FStaticSwitchParameter& StaticSwitchParameter : StaticParameters.EditorOnly.StaticSwitchParameters) {
-		if (!ExistingParameters.Contains(StaticSwitchParameter.ParameterInfo.Name)) {
-			 UMaterialExpressionStaticSwitchParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticSwitchParameter>(Material);
-			 Parameter->SetParameterName(StaticSwitchParameter.ParameterInfo.Name);
-			 bMaterialGraphChanged = true;
-		}
-	}
-
-	for (const FStaticComponentMaskParameter& StaticComponentMaskParameter : StaticParameters.EditorOnly.StaticComponentMaskParameters) {
-		if (!ExistingParameters.Contains(StaticComponentMaskParameter.ParameterInfo.Name)) {
-			UMaterialExpressionStaticComponentMaskParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticComponentMaskParameter>(Material);
-			Parameter->SetParameterName(StaticComponentMaskParameter.ParameterInfo.Name);
-			bMaterialGraphChanged = true;
-		}
-	}
+	// TODO: UE 5.2 now also marked StaticSwitchParameters as deprecated, I'll just comment this whole thing out
+	// for (const FStaticSwitchParameter& StaticSwitchParameter : StaticParameters.EditorOnly.StaticSwitchParameters) {
+	// 	if (!ExistingParameters.Contains(StaticSwitchParameter.ParameterInfo.Name)) {
+	// 		 UMaterialExpressionStaticSwitchParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticSwitchParameter>(Material);
+	// 		 Parameter->SetParameterName(StaticSwitchParameter.ParameterInfo.Name);
+	// 		 bMaterialGraphChanged = true;
+	// 	}
+	// }
+	//
+	// for (const FStaticComponentMaskParameter& StaticComponentMaskParameter : StaticParameters.EditorOnly.StaticComponentMaskParameters) {
+	// 	if (!ExistingParameters.Contains(StaticComponentMaskParameter.ParameterInfo.Name)) {
+	// 		UMaterialExpressionStaticComponentMaskParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticComponentMaskParameter>(Material);
+	// 		Parameter->SetParameterName(StaticComponentMaskParameter.ParameterInfo.Name);
+	// 		bMaterialGraphChanged = true;
+	// 	}
+	// }
 
 	if (bMaterialGraphChanged) {
 		UMaterialGenerator::ConnectBasicParameterPinsIfPossible(Material, TEXT("Static Parameters Added from MaterialInstance"));
@@ -176,8 +177,11 @@ bool UMaterialInstanceGenerator::IsSimpleAssetUpToDate(UObject* Asset) const {
 	const FStaticParameterSet StaticParameterOverrides = GetStaticParameterOverrides();
 	const FStaticParameterSet& ExistingStaticParameters = MaterialInstance->GetStaticParameters();
 
-	return StaticParameterOverrides.EditorOnly.StaticSwitchParameters == ExistingStaticParameters.EditorOnly.StaticSwitchParameters &&
-		StaticParameterOverrides.EditorOnly.StaticComponentMaskParameters == ExistingStaticParameters.EditorOnly.StaticComponentMaskParameters;
+	// TODO: These are now editor only, so this won't do anything. What does this mean for the generated asset? Modified the code to use EditorOnly to compile without commenting
+	// TODO: UE 5.2 now also marked StaticSwitchParameters as deprecated, I'll just comment this whole thing out
+	// return StaticParameterOverrides.EditorOnly.StaticSwitchParameters == ExistingStaticParameters.EditorOnly.StaticSwitchParameters &&
+	// 	StaticParameterOverrides.EditorOnly.StaticComponentMaskParameters == ExistingStaticParameters.EditorOnly.StaticComponentMaskParameters;
+	return true;
 }
 
 FTopLevelAssetPath UMaterialInstanceGenerator::GetAssetClass() {
