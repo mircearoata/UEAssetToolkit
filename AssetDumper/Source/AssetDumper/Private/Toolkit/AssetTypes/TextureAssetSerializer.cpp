@@ -116,6 +116,11 @@ void UTextureAssetSerializer::SerializeTexture2D(UTexture2D* Asset, TSharedPtr<F
 	DISABLE_SERIALIZATION(UTexture2D, FirstResourceMemMip);
 	
     SERIALIZE_ASSET_OBJECT
+	if(Asset->IsCurrentlyVirtualTextured()) {
+		Data->SetNumberField(TEXT("TextureWidth"), Asset->GetSizeX());
+		Data->SetNumberField(TEXT("TextureHeight"), Asset->GetSizeY());
+		return; // I have no idea how virtual textures work
+	}
     SerializeTextureData(Asset->GetPathName(), Asset->GetPlatformData(), Data, Context, false, Postfix);   
 }
 
