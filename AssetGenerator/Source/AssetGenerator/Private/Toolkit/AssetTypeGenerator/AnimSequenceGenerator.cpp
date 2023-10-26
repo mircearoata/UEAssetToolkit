@@ -80,7 +80,7 @@ void UAnimSequenceGenerator::SetupFbxImportSettings(UFbxImportUI* ImportUI) cons
 	const int32 ExportedFrameRateNumerator = GetAssetData()->GetIntegerField(TEXT("FrameRateNumerator"));
 	const int32 ExportedFrameRateDenominator = GetAssetData()->GetIntegerField(TEXT("FrameRateDenominator"));
 	ImportUI->AnimSequenceImportData->bUseDefaultSampleRate = false;
-	ImportUI->AnimSequenceImportData->CustomSampleRate = ExportedFrameRateNumerator / ExportedFrameRateDenominator;
+	ImportUI->AnimSequenceImportData->CustomSampleRate = 0;
 	ImportUI->AnimSequenceImportData->bSnapToClosestFrameBoundary = true;
 
 	const int32 NumFrames = GetAssetData()->GetIntegerField(TEXT("NumFrames"));
