@@ -10,6 +10,8 @@ class UAnimSequenceGenerator : public UAssetTypeGenerator {
 protected:
 	virtual void CreateAssetPackage() override;
 	virtual void OnExistingPackageLoaded() override;
+
+	virtual void PostInitializeAssetGenerator() override;
 	
 	void PopulateAnimationProperties(UAnimSequence* Asset);
 	bool IsAnimationPropertiesUpToDate(UAnimSequence* Asset) const;

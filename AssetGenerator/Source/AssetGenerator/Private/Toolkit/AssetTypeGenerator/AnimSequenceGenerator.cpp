@@ -6,6 +6,8 @@
 #include "Factories/FbxAnimSequenceImportData.h"
 #include "Factories/FbxImportUI.h"
 #include "Factories/ReimportFbxAnimSequenceFactory.h"
+#include "Toolkit/PropertySerializer.h"
+#include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 
 void UAnimSequenceGenerator::CreateAssetPackage() {
 	UPackage* NewPackage = CreatePackage(*GetPackageName().ToString());
@@ -26,6 +28,13 @@ void UAnimSequenceGenerator::OnExistingPackageLoaded() {
 		UE_LOG(LogAssetGenerator, Log, TEXT("Refreshing AnimationSequence %s Properties"), *GetPackageName().ToString());
 		PopulateAnimationProperties(ExistingAnimation);
 	}
+}
+
+void UAnimSequenceGenerator::PostInitializeAssetGenerator() {
+	UPropertySerializer* Serializer = GetPropertySerializer();
+	
+	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("TargetFrameRate"));
+	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("PlatformTargetFrameRate"));
 }
 
 UAnimSequence* UAnimSequenceGenerator::ImportAnimation(UPackage* Package, const FName& AssetName, const EObjectFlags ObjectFlags) {

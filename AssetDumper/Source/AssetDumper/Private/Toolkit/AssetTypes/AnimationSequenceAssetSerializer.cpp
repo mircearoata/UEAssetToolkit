@@ -12,6 +12,8 @@ void UAnimationSequenceAssetSerializer::SerializeAsset(TSharedRef<FSerialization
 
     DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("RawCurveData"));
 	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("SequenceLength"));
+	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("TargetFrameRate"));
+	DISABLE_SERIALIZATION_RAW(UAnimSequence, TEXT("PlatformTargetFrameRate"));
 	
     SERIALIZE_ASSET_OBJECT
 
