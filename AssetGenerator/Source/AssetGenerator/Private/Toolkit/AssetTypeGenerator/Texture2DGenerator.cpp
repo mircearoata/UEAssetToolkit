@@ -99,16 +99,22 @@ void UTexture2DGenerator::RebuildTextureData(UTexture2D* Texture, const FString&
 
 	//Reinitialize texture data with new dimensions and format
 	Texture->Source.Init2DWithMipChain(TextureWidth, TextureHeight, ETextureSourceFormat::TSF_BGRA8);
+
+	//The Asset Dumper doesn't support dumping virtual textures
+	const TSharedPtr<FJsonObject> TextureProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
+	const bool bIsVirtualTexture = TextureProperties->GetBoolField(TEXT("VirtualTextureStreaming"));
+	if (bIsVirtualTexture) {
+		UE_LOG(LogAssetGenerator, Warning, TEXT("Generating blank placeholder for virtual Texture2D '%s'"), *TextureFilePath);
+	}
 	
 	//Use dump file if we're not doing public project, otherwise use blank texture
-	if (!bIsGeneratingPublicProject) {
+	if (!bIsGeneratingPublicProject && !bIsVirtualTexture) {
 		FillTextureDataFromDump(Texture, TextureFilePath);
 	} else {
 		FillBlankTextureData(Texture);
 	}
 
 	//Apply settings from the serialized texture object
-	const TSharedPtr<FJsonObject> TextureProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
 	ObjectSerializer->DeserializeObjectProperties(TextureProperties.ToSharedRef(), Texture);
 
 	//Disable mips by default if we are not sized appropriately for their generation
