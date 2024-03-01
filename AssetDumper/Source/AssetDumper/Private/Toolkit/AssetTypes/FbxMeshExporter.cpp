@@ -341,7 +341,7 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 
 		auto ExportLambda = [&](float AnimTime, FbxTime ExportTime, bool bLastKey) {
 			FTransform BoneAtom;
-			AnimSeq->GetBoneTransform(BoneAtom, BoneTrackIndex, AnimTime, false);
+			AnimSeq->GetBoneTransform(BoneAtom, FSkeletonPoseBoneIndex(BoneTrackIndex), AnimTime, false);
 			
 			const FbxVector4 Translation = FFbxDataConverter::ConvertToFbxPos(SanitizeVector(BoneAtom.GetTranslation()));
 			const FbxVector4 Rotation = FFbxDataConverter::ConvertToFbxRot(SanitizeVector(BoneAtom.GetRotation().Euler()));
