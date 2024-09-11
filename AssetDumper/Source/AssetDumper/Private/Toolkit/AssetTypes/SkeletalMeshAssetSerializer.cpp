@@ -2,6 +2,7 @@
 #include "Toolkit/AssetTypes/FbxMeshExporter.h"
 #include "Toolkit/PropertySerializer.h"
 #include "Engine/SkeletalMesh.h"
+#include "PhysicsEngine/BodySetup.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"

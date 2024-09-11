@@ -31,22 +31,67 @@ public:
 	static FColor ConvertColor(FbxDouble3 Color);
 
 	template<typename T>
-	static FbxVector4 ConvertToFbxPos(UE::Math::TVector<T> Vector);
+	static FbxVector4 ConvertToFbxPos(UE::Math::TVector<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = -Vector[1];
+		Out[2] = Vector[2];
 	
-	template<typename T>
-	static FbxVector4 ConvertToFbxRot(UE::Math::TVector<T> Vector);
-	
-	template<typename T>
-	static FbxVector4 ConvertToFbxScale(UE::Math::TVector<T> Vector);
+		return Out;
+	}
 
 	template<typename T>
-	static FbxVector4 ConvertToFbxPos(UE::Math::TVector4<T> Vector);
-	
+	static FbxVector4 ConvertToFbxRot(UE::Math::TVector<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = -Vector[1];
+		Out[2] = -Vector[2];
+
+		return Out;
+	}
+
 	template<typename T>
-	static FbxVector4 ConvertToFbxRot(UE::Math::TVector4<T> Vector);
-	
+	static FbxVector4 ConvertToFbxScale(UE::Math::TVector<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = Vector[1];
+		Out[2] = Vector[2];
+
+		return Out;
+	}
+
 	template<typename T>
-	static FbxVector4 ConvertToFbxScale(UE::Math::TVector4<T> Vector);
+	static FbxVector4 ConvertToFbxPos(UE::Math::TVector4<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = -Vector[1];
+		Out[2] = Vector[2];
+		Out[3] = Vector[3];
+	
+		return Out;
+	}
+
+	template<typename T>
+	static FbxVector4 ConvertToFbxRot(UE::Math::TVector4<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = -Vector[1];
+		Out[2] = -Vector[2];
+		Out[3] = Vector[3];
+
+		return Out;
+	}
+
+	template<typename T>
+	static FbxVector4 ConvertToFbxScale(UE::Math::TVector4<T> Vector) {
+		FbxVector4 Out{};
+		Out[0] = Vector[0];
+		Out[1] = Vector[1];
+		Out[2] = Vector[2];
+		Out[3] = Vector[3];
+
+		return Out;
+	}
 	
 	/*
 	* Convert sRGB FColor to fbx linear space color

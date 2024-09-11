@@ -1,4 +1,6 @@
 #include "Toolkit/AssetTypeGenerator/MaterialInstanceGenerator.h"
+
+#include "MaterialDomain.h"
 #include "Materials/MaterialExpressionStaticBoolParameter.h"
 #include "Materials/MaterialExpressionStaticComponentMaskParameter.h"
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"

@@ -3,39 +3,20 @@
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "EdGraph/EdGraphNode.h"
 #include "Modules/ModuleManager.h"
-#include "EditorStyleSet.h"
-#include "SoundCueGraph/SoundCueGraph.h"
 #include "SoundCueGraph/SoundCueGraphNode.h"
-#include "SoundCueGraph/SoundCueGraphNode_Base.h"
 #include "SoundCueGraph/SoundCueGraphNode_Root.h"
-#include "SoundCueGraph/SoundCueGraphSchema.h"
 #include "Sound/SoundWave.h"
-#include "Sound/DialogueWave.h"
 #include "Sound/SoundCue.h"
-#include "Components/AudioComponent.h"
-#include "AudioEditorModule.h"
-#include "Sound/SoundNodeWavePlayer.h"
 #include "ScopedTransaction.h"
 #include "GraphEditor.h"
-#include "GraphEditorActions.h"
-#include "Kismet2/BlueprintEditorUtils.h"
 #include "EdGraphUtilities.h"
 #include "SNodePanel.h"
 #include "Editor.h"
-#include "SoundCueGraphEditorCommands.h"
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
 #include "Widgets/Docking/SDockTab.h"
-#include "Framework/Commands/GenericCommands.h"
-#include "Sound/SoundNodeDialoguePlayer.h"
-#include "HAL/PlatformApplicationMisc.h"
-#include "AudioDeviceManager.h"
-#include "Audio/AudioDebug.h"
-#include <Editor/UnrealEd/Public/EdGraphUtilities.h>
-#include <Editor/GraphEditor/Public/SNodePanel.h>
 
 #include "Dom/JsonObject.h"
-#include <Editor/AudioEditor/Private/SoundCueEditor.h>
 
 UClass* USoundCueGenerator::GetAssetObjectClass()  const {
 	return USoundCue::StaticClass();

@@ -8,6 +8,7 @@
 #include "Factories/FbxSkeletalMeshImportData.h"
 #include "Factories/ReimportFbxSkeletalMeshFactory.h"
 #include "PhysicsEngine/BodySetup.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include "Toolkit/AssetGeneration/PublicProjectStubHelper.h"
 
 void USkeletalMeshGenerator::CreateAssetPackage() {

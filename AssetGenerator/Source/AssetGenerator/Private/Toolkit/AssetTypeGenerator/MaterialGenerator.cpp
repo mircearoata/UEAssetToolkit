@@ -28,6 +28,7 @@
 #include "Engine/TextureCube.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2DArray.h"
 #include "MediaTexture.h"
+#include "Materials/MaterialExpressionFontSampleParameter.h"
 
 static const TArray<FName> ExcludedMaterialDumpProperties = {
 	//We cannot recompile game materials and add usages since we do not have their sources, so we ignore this value and force it to false
@@ -1191,4 +1192,3 @@ bool FMaterialLayoutChangeInfo::IsEmpty() const {
 			this->NewReferencedTextures.Num() == 0 &&
 			this->NoLongerReferencedTextures.Num() == 0;
 }
-

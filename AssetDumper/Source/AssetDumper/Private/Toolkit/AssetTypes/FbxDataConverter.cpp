@@ -135,69 +135,6 @@ FColor FFbxDataConverter::ConvertColor(FbxDouble3 Color) {
 	return SRGBColor;
 }
 
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxPos(UE::Math::TVector<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = -Vector[1];
-	Out[2] = Vector[2];
-	
-	return Out;
-}
-
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxRot(UE::Math::TVector<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = -Vector[1];
-	Out[2] = -Vector[2];
-
-	return Out;
-}
-
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxScale(UE::Math::TVector<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = Vector[1];
-	Out[2] = Vector[2];
-
-	return Out;
-}
-
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxPos(UE::Math::TVector4<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = -Vector[1];
-	Out[2] = Vector[2];
-	Out[3] = Vector[3];
-	
-	return Out;
-}
-
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxRot(UE::Math::TVector4<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = -Vector[1];
-	Out[2] = -Vector[2];
-	Out[3] = Vector[3];
-
-	return Out;
-}
-
-template<typename T>
-FbxVector4 FFbxDataConverter::ConvertToFbxScale(UE::Math::TVector4<T> Vector) {
-	FbxVector4 Out{};
-	Out[0] = Vector[0];
-	Out[1] = Vector[1];
-	Out[2] = Vector[2];
-	Out[3] = Vector[3];
-
-	return Out;
-}
-
 FbxDouble3 FFbxDataConverter::ConvertToFbxColor(FColor Color) {
 	//Fbx is in linear color space
 	FLinearColor FbxLinearColor(Color);
