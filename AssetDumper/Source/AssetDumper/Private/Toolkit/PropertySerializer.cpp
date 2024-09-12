@@ -341,7 +341,12 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 		FProperty* ValueProperty = MapProperty->ValueProp;
 		FScriptMapHelper MapHelper(MapProperty, Value);
 		TArray<TSharedPtr<FJsonValue>> ResultArray;
-		for (int32 i = 0; i < MapHelper.Num(); i++) {
+		// Maps store sparse data, with unused slots acting as a linked list of free slots
+		// so checking just MapHelper.Num() items can reach these unused slots and provide invalid data further down
+		for (int32 i = 0; i < MapHelper.GetMaxIndex(); i++) {
+			if (!MapHelper.IsValidIndex(i)) {
+				continue;
+			}
 			TSharedPtr<FJsonValue> EntryKey = SerializePropertyValue(KeyProperty, MapHelper.GetKeyPtr(i), OutReferencedSubobjects);
 			TSharedPtr<FJsonValue> EntryValue = SerializePropertyValue(ValueProperty, MapHelper.GetValuePtr(i), OutReferencedSubobjects);
 			TSharedRef<FJsonObject> Pair = MakeShareable(new FJsonObject());
@@ -356,7 +361,11 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 		FProperty* ElementProperty = SetProperty->ElementProp;
 		FScriptSetHelper SetHelper(SetProperty, Value);
 		TArray<TSharedPtr<FJsonValue>> ResultArray;
-		for (int32 i = 0; i < SetHelper.Num(); i++) {
+		// Sets also store sparse data, see above comment
+		for (int32 i = 0; i < SetHelper.GetMaxIndex(); i++) {
+			if (!SetHelper.IsValidIndex(i)) {
+				continue;
+			}
 			TSharedPtr<FJsonValue> Element = SerializePropertyValue(ElementProperty, SetHelper.GetElementPtr(i), OutReferencedSubobjects);
 			ResultArray.Add(Element);
 		}
