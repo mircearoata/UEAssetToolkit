@@ -65,6 +65,10 @@ void UUserWidgetAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
                 for (int32 i = 0; i < EventChannel.GetNumKeys(); i++) {
                     const FMovieSceneEvent& MovieSceneEvent = EventChannel.GetData().GetValues()[i];
 
+                    if (MovieSceneEvent.Ptrs.Function == NULL) {
+                        continue;
+                    }
+
                     const TSharedPtr<FJsonObject> Value = MakeShareable(new FJsonObject);
                     Value->SetNumberField(TEXT("KeyIndex"), i);
                     Value->SetStringField(TEXT("FunctionName"), MovieSceneEvent.Ptrs.Function->GetName());
