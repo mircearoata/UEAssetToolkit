@@ -277,10 +277,8 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 	//Prepare root anim curves data to be exported
 	TArray<FName> AnimCurveNames;
 	TMap<FName, FbxAnimCurve*> CustomCurveMap;
-	const FSmartNameMapping* AnimCurveMapping = Skeleton->GetSmartNameContainer(USkeleton::AnimCurveMappingName);
-	if (BoneNodes.Num() > 0 && AnimCurveMapping != NULL) {
-		AnimCurveMapping->FillNameArray(AnimCurveNames);
-			
+	Skeleton->GetCurveMetaDataNames(AnimCurveNames);
+	if (BoneNodes.Num() > 0) {		
 		for (const FName& AnimCurveName : AnimCurveNames) {
 			FbxProperty AnimCurveFbxProp = FbxProperty::Create(BoneNodes[0], FbxDoubleDT, TCHAR_TO_ANSI(*AnimCurveName.ToString()));
 			AnimCurveFbxProp.ModifyFlag(FbxPropertyFlags::eAnimatable, true);
@@ -314,12 +312,12 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 		Curves[8] = CurrentBoneNode->LclScaling.GetCurve(InAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
 
 		const int32 BoneTreeIndex = SkeletalMesh ? Skeleton->GetSkeletonBoneIndexFromMeshBoneIndex(SkeletalMesh, BoneIndex) : BoneIndex;
-		int32 BoneTrackIndex = USkeleton_GetCompressedAnimationTrackIndex(BoneTreeIndex, AnimSeq);
-		
-		if(BoneTrackIndex == INDEX_NONE) {
-			// If this sequence does not have a track for the current bone, then skip it
-			continue;
-		}
+		// int32 BoneTrackIndex = USkeleton_GetCompressedAnimationTrackIndex(BoneTreeIndex, AnimSeq);
+		//
+		// if(BoneTrackIndex == INDEX_NONE) {
+		// 	// If this sequence does not have a track for the current bone, then skip it
+		// 	continue;
+		// }
 		
 		for (FbxAnimCurve* Curve : Curves) {
 			Curve->KeyModifyBegin();
@@ -339,9 +337,9 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 			return ResultVector;
 		};
 
-		auto ExportLambda = [&](float AnimTime, FbxTime ExportTime, bool bLastKey) {
+		auto ExportLambda = [&](double AnimTime, FbxTime ExportTime, bool bLastKey) {
 			FTransform BoneAtom;
-			AnimSeq->GetBoneTransform(BoneAtom, BoneTrackIndex, AnimTime, false);
+			AnimSeq->GetBoneTransform(BoneAtom, FSkeletonPoseBoneIndex(BoneTreeIndex), AnimTime, false);
 			
 			const FbxVector4 Translation = FFbxDataConverter::ConvertToFbxPos(SanitizeVector(BoneAtom.GetTranslation()));
 			const FbxVector4 Rotation = FFbxDataConverter::ConvertToFbxRot(SanitizeVector(BoneAtom.GetRotation().Euler()));
@@ -432,40 +430,22 @@ void FFbxMeshExporter::ExportCustomAnimCurvesToFbx(const TMap<FName, FbxAnimCurv
 	const USkeleton* Skeleton = AnimSequence->GetSkeleton();
 	check(Skeleton);
 	
-	const FSmartNameMapping* SmartNameMapping = Skeleton->GetSmartNameContainer(USkeleton::AnimCurveMappingName);
-	check(SmartNameMapping);
-
-	TArray<SmartName::UID_Type> AnimCurveUIDs;
-
-	//We need to recreate the UIDs array manually so that we keep the empty entries otherwise the BlendedCurve won't have the correct mapping.
-	//TODO probably not needed because all empty entries are stripped in shipping during cooking
-	TArray<FName> UIDToNameArray;
-	SmartNameMapping->FillUIDToNameArray(UIDToNameArray);
-	AnimCurveUIDs.Reserve(UIDToNameArray.Num());
-	for (int32 NameIndex = 0; NameIndex < UIDToNameArray.Num(); ++NameIndex) {
-		AnimCurveUIDs.Add(NameIndex);
-	}
-
+	TArray<FName> AnimCurveNames;
+	Skeleton->GetCurveMetaDataNames(AnimCurveNames);
+	
 	for (const TTuple<FName, FbxAnimCurve*>& CustomCurve : CustomCurves) {
 		CustomCurve.Value->KeyModifyBegin();
 	}
 	
 	auto ExportLambda = [&](float AnimTime, FbxTime ExportTime, bool bLastKey) {
 		FBlendedCurve BlendedCurve;
-		BlendedCurve.InitFrom(&AnimCurveUIDs);
 		AnimSequence->EvaluateCurveData(BlendedCurve, AnimTime, false);
 		
-		if (BlendedCurve.IsValid()) {
-			//Loop over the custom curves and add the actual keys
-			for (auto CustomCurve : CustomCurves) {
-				const SmartName::UID_Type NameUID = Skeleton->GetUIDByName(USkeleton::AnimCurveMappingName, CustomCurve.Key);
-				
-				if (NameUID != SmartName::MaxUID) {
-					const float CurveValueAtTime = BlendedCurve.Get(NameUID);
-					const int32 KeyIndex = CustomCurve.Value->KeyAdd(ExportTime);
-					CustomCurve.Value->KeySetValue(KeyIndex, CurveValueAtTime);
-				}
-			}
+		//Loop over the custom curves and add the actual keys
+		for (auto CustomCurve : CustomCurves) {
+			const float CurveValueAtTime = BlendedCurve.Get(CustomCurve.Key);
+			const int32 KeyIndex = CustomCurve.Value->KeyAdd(ExportTime);
+			CustomCurve.Value->KeySetValue(KeyIndex, CurveValueAtTime);
 		}
 	};
 

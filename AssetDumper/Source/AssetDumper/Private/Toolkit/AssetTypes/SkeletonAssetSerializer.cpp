@@ -70,50 +70,6 @@ void USkeletonAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
     END_ASSET_SERIALIZATION
 }
 
-void USkeletonAssetSerializer::SerializeSmartNameContainer(const FSmartNameContainer& Container, TSharedPtr<FJsonObject> OutObject) {
-    //Serialize smart name mappings
-    TArray<TSharedPtr<FJsonValue>> NameMappings;
-
-	TArray<FName> MappingNames { USkeleton::AnimCurveMappingName, USkeleton::AnimTrackCurveMappingName };
-	
-    for (FName SmartNameId : MappingNames) {
-        const FSmartNameMapping* Mapping = Container.GetContainer(SmartNameId);
-    	if (Mapping == NULL) {
-    		continue;
-    	}
-        
-        TSharedPtr<FJsonObject> NameMapping = MakeShareable(new FJsonObject());
-        NameMapping->SetStringField(TEXT("Name"), SmartNameId.ToString());
-        
-        TArray<FName> MetaDataKeys;
-        Mapping->FillUIDToNameArray(MetaDataKeys);
-
-        TArray<TSharedPtr<FJsonValue>> CurveMetaDataMap;
-        
-        for (const FName& MetaDataKey : MetaDataKeys) {
-            const TSharedPtr<FJsonObject> MetaDataObject = MakeShareable(new FJsonObject());
-            const FCurveMetaData* MetaData = Mapping->GetCurveMetaData(MetaDataKey);
-            
-            MetaDataObject->SetStringField(TEXT("MetaDataKey"), MetaDataKey.ToString());
-            MetaDataObject->SetBoolField(TEXT("bMaterial"), MetaData->Type.bMaterial);
-            MetaDataObject->SetBoolField(TEXT("bMorphtarget"), MetaData->Type.bMorphtarget);
-            MetaDataObject->SetNumberField(TEXT("MaxLOD"), MetaData->MaxLOD);
-            
-            TArray<TSharedPtr<FJsonValue>> LinkedBones;
-            for (const FBoneReference& BoneReference : MetaData->LinkedBones) {
-                LinkedBones.Add(MakeShareable(new FJsonValueString(BoneReference.BoneName.ToString())));
-            }
-            
-            MetaDataObject->SetArrayField(TEXT("LinkedBones"), LinkedBones);
-            CurveMetaDataMap.Add(MakeShareable(new FJsonValueObject(MetaDataObject)));
-        }
-        
-        NameMapping->SetArrayField(TEXT("CurveMetaDataMap"), CurveMetaDataMap);
-        NameMappings.Add(MakeShareable(new FJsonValueObject(NameMapping)));
-    }
-    OutObject->SetArrayField(TEXT("NameMappings"), NameMappings);
-}
-
 FTopLevelAssetPath USkeletonAssetSerializer::GetAssetClass() const {
     return FTopLevelAssetPath(USkeleton::StaticClass());
 }
