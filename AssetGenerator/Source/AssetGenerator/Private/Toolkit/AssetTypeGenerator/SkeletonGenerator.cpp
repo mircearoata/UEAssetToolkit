@@ -61,6 +61,10 @@ bool FSkeletonCompareData::IsSkeletonUpToDate(USkeleton* Skeleton) const {
 	FReferenceSkeleton& ExistingReferenceSkeleton = const_cast<FReferenceSkeleton&>(Skeleton->GetReferenceSkeleton());
 	FReferenceSkeletonModifier ReferenceSkeletonModifier(ExistingReferenceSkeleton, Skeleton);
 
+	if (ExistingReferenceSkeleton.GetRawBoneNum() != ReferenceSkeleton.GetRawBoneNum()) {
+		return false;
+	}
+	
 	for (int32 RawBoneIndex = 0; RawBoneIndex < ReferenceSkeleton.GetRawBoneNum(); RawBoneIndex++) {
 		const FMeshBoneInfo& NewBoneInfo = ReferenceSkeleton.GetRawRefBoneInfo()[RawBoneIndex];
 		const FTransform& NewBonePose = ReferenceSkeleton.GetRawRefBonePose()[RawBoneIndex];
@@ -70,6 +74,11 @@ bool FSkeletonCompareData::IsSkeletonUpToDate(USkeleton* Skeleton) const {
 		if (ExistingBoneIndex == INDEX_NONE) {
 			return false;
 		}
+
+		if (ExistingReferenceSkeleton.GetRawRefBoneInfo()[ExistingBoneIndex].ParentIndex != NewBoneInfo.ParentIndex) {
+			return false;
+		}
+		
 		const FTransform& OldBonePose = ExistingReferenceSkeleton.GetRawRefBonePose()[ExistingBoneIndex];
 			
 		if (!OldBonePose.Equals(NewBonePose)) {
@@ -142,6 +151,25 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 	FReferenceSkeleton& ExistingReferenceSkeleton = const_cast<FReferenceSkeleton&>(Skeleton->GetReferenceSkeleton());
 	FReferenceSkeletonModifier ReferenceSkeletonModifier(ExistingReferenceSkeleton, Skeleton);
 
+	if (ReferenceSkeleton.GetRawBoneNum() > 0) {
+		// Bone 0 must always be the root bone
+		FName RootBoneName = ReferenceSkeleton.GetRawRefBoneInfo()[0].Name;
+		FName ExistingRootBoneName = NAME_None;
+		if (ExistingReferenceSkeleton.GetRawBoneNum() > 0) {
+			// Apparently some asset has no bones
+			ExistingRootBoneName = ExistingReferenceSkeleton.GetRawRefBoneInfo()[0].Name;
+		}
+		if (RootBoneName != ExistingRootBoneName) {
+			ReferenceSkeletonModifier.Remove(RootBoneName, false); // Remove the existing non-root bone if it exists
+			if (ExistingRootBoneName != NAME_None) {
+				ReferenceSkeletonModifier.Rename(ExistingReferenceSkeleton.GetRawRefBoneInfo()[0].Name, RootBoneName);
+			} else {
+				ReferenceSkeletonModifier.Add(FMeshBoneInfo(RootBoneName, RootBoneName.ToString(), INDEX_NONE), FTransform::Identity);
+			}
+			bModifiedSkeleton = true;
+		}
+	}
+	
 	for (int32 RawBoneIndex = 0; RawBoneIndex < ReferenceSkeleton.GetRawBoneNum(); RawBoneIndex++) {
 		const FMeshBoneInfo& NewBoneInfo = ReferenceSkeleton.GetRawRefBoneInfo()[RawBoneIndex];
 		const FTransform& NewBonePose = ReferenceSkeleton.GetRawRefBonePose()[RawBoneIndex];
@@ -172,6 +200,19 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 		}
 	}
 
+	{
+		// Remove any bones that are no longer in the reference skeleton
+		TSet<FName> RemovedBoneNames = TSet<FName>(ExistingReferenceSkeleton.GetRawRefBoneNames());
+		for (int32 RawBoneIndex = 0; RawBoneIndex < ReferenceSkeleton.GetRawBoneNum(); RawBoneIndex++) {
+			const FName NewBoneName = ReferenceSkeleton.GetBoneName(RawBoneIndex);
+			RemovedBoneNames.Remove(NewBoneName);
+		}
+		for (const FName& RemovedBoneName : RemovedBoneNames) {
+			ReferenceSkeletonModifier.Remove(RemovedBoneName, false);
+			bModifiedSkeleton = true;
+		}
+	}
+
 	//MAKE SURE BONE TREE HAS THE CORRECT SIZE
 	FProperty* BoneTreeProperty = USkeleton::StaticClass()->FindPropertyByName(TEXT("BoneTree"));
 	TArray<FBoneNode>* ExistingBoneTree = BoneTreeProperty->ContainerPtrToValuePtr<TArray<FBoneNode>>(Skeleton);
@@ -186,7 +227,7 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 		const EBoneTranslationRetargetingMode::Type TranslationRetargetingMode = BoneTree[BoneIndex];
 		
 		//find a name correlating with the provided bone
-		const FName BoneName = ReferenceSkeleton.GetBoneName(BoneIndex);
+		const FName BoneName = ReferenceSkeleton.GetRawRefBoneNames()[BoneIndex];
 		check(BoneName != NAME_None);
 		
 		//Find bone index in the existing reference skeleton matching the provided bone name
