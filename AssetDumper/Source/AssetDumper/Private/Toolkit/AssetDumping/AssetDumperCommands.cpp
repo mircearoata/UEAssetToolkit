@@ -1,4 +1,4 @@
-﻿#include "Toolkit/AssetDumping/AssetDumperCommands.h"
+#include "Toolkit/AssetDumping/AssetDumperCommands.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Toolkit/AssetDumping/AssetDumperWidget.h"
 #include "Toolkit/AssetDumping/AssetDumpConsoleWidget.h"
@@ -32,6 +32,7 @@ void FAssetDumperCommands::DumpAllGameAssets(const FString& Params) {
 	FString RootAssetPath = TEXT("/Game");
 	FParse::Value(*Params, TEXT("RootAssetPath="), RootAssetPath);
 	SelectedAssetsStruct->AddIncludedPackagePath(RootAssetPath);
+	SelectedAssetsStruct->AddIncludedPackageName(RootAssetPath); // If the asset path provided is an actual asset
 
 	{
 		FString ExcludedPackagePaths;
