@@ -183,16 +183,49 @@ bool UMaterialGenerator::IsMaterialUpToDate(UMaterial* Asset, FMaterialLayoutCha
 
 void UMaterialGenerator::PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const {
 	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
-		PopulateReferencedObjectsDependencies(OutDependencies);
+		const TSharedPtr<FJsonObject> AssetData = GetAssetData();
+		const TSharedPtr<FJsonObject> AssetObjectProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
+		const TArray<TSharedPtr<FJsonValue>> ReferencedObjects = AssetObjectProperties->GetArrayField(TEXT("$ReferencedObjects"));
 
+		const TArray<TSharedPtr<FJsonValue>> AssetUserDataObjects = AssetObjectProperties->GetArrayField(TEXT("AssetUserData"));
 
-		TArray<TSharedPtr<FJsonValue>> ReferencedObjects = GetAssetData()->GetArrayField(TEXT("ReferencedObjects"));
+		TArray<int32> AssetUserDataObjectIndices;
+		for (const TSharedPtr<FJsonValue>& ObjectIndexValue : AssetUserDataObjects) {
+			AssetUserDataObjectIndices.Add((int32) ObjectIndexValue->AsNumber());
+		}
 		
 		TArray<FString> OutReferencedPackages;
-		GetObjectSerializer()->CollectReferencedPackages(ReferencedObjects, OutReferencedPackages);
+		for (const TSharedPtr<FJsonValue>& ObjectIndexValue : ReferencedObjects) {
+			const int32 ObjectIndex = (int32) ObjectIndexValue->AsNumber();
+
+			if (!AssetUserDataObjectIndices.Contains(ObjectIndex)) {
+				GetObjectSerializer()->CollectObjectPackages(ObjectIndex, OutReferencedPackages);
+			}
+		}
+
+		TArray<TSharedPtr<FJsonValue>> ReferencedObjectsRoot = GetAssetData()->GetArrayField(TEXT("ReferencedObjects"));
+		
+		GetObjectSerializer()->CollectReferencedPackages(ReferencedObjectsRoot, OutReferencedPackages);
+		
 		for (const FString& DependencyPackageName : OutReferencedPackages) {
 			OutDependencies.Add(FPackageDependency{*DependencyPackageName, EAssetGenerationStage::CDO_FINALIZATION});
 		}		
+	}
+	
+	if (GetCurrentStage() == EAssetGenerationStage::PRE_FINSHED) {
+		TArray<FString> ReferencedPackages;
+		const TSharedPtr<FJsonObject> AssetData = GetAssetData();
+		const TSharedPtr<FJsonObject> AssetObjectProperties = AssetData->GetObjectField(TEXT("AssetObjectData"));
+
+		const TArray<TSharedPtr<FJsonValue>> AssetUserDataObjects = AssetObjectProperties->GetArrayField(TEXT("AssetUserData"));
+
+		for (const TSharedPtr<FJsonValue>& AssetObjectValue : AssetUserDataObjects) {
+			const int32 ObjectIndex = (int32) AssetObjectValue->AsNumber();
+			GetObjectSerializer()->CollectObjectPackages(ObjectIndex, ReferencedPackages);
+		}
+		for (const FString& PackageName : ReferencedPackages) {
+			OutDependencies.Add(FPackageDependency{*PackageName, EAssetGenerationStage::CDO_FINALIZATION});	
+		}
 	}
 }
 
