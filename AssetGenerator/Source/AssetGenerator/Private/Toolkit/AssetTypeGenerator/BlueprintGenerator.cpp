@@ -94,19 +94,6 @@ void UBlueprintGenerator::PostInitializeAssetGenerator() {
 }
 
 void UBlueprintGenerator::PostConstructOrUpdateAsset(UBlueprint* Blueprint) {
-	TArray<TSharedPtr<FJsonValue>> ImplementedInterfaces = GetAssetData()->GetArrayField(TEXT("Interfaces"));
-
-	//Make sure blueprint implements are required interfaces
-	for (int32 i = 0; i < ImplementedInterfaces.Num(); i++) {
-		const TSharedPtr<FJsonObject> InterfaceObject = ImplementedInterfaces[i]->AsObject();
-		const int32 ClassObjectIndex = InterfaceObject->GetIntegerField(TEXT("Class"));
-
-		UClass* InterfaceClass = CastChecked<UClass>(GetObjectSerializer()->DeserializeObject(ClassObjectIndex));
-		if (FBlueprintGeneratorUtils::ImplementNewInterface(Blueprint, InterfaceClass)) {
-			MarkAssetChanged();
-		}
-	}
-
 	EClassFlags ClassFlags = (EClassFlags) FCString::Atoi64(*GetAssetData()->GetStringField(TEXT("ClassFlags")));
 	
 	const bool bGenerateConstClass = (ClassFlags & CLASS_Const) != 0;
@@ -135,6 +122,23 @@ void UBlueprintGenerator::PopulateAssetWithData() {
 	UpdateDeserializerBlueprintClassObject(false);
 	
 	UBlueprint* Blueprint = GetAsset<UBlueprint>();
+	
+	//Make sure blueprint implements are required interfaces
+	TArray<TSharedPtr<FJsonValue>> ImplementedInterfaces = GetAssetData()->GetArrayField(TEXT("Interfaces"));
+	bool bInterfaceChanged = false;
+	for (int32 i = 0; i < ImplementedInterfaces.Num(); i++) {
+		const TSharedPtr<FJsonObject> InterfaceObject = ImplementedInterfaces[i]->AsObject();
+		const int32 ClassObjectIndex = InterfaceObject->GetIntegerField(TEXT("Class"));
+
+		UClass* InterfaceClass = CastChecked<UClass>(GetObjectSerializer()->DeserializeObject(ClassObjectIndex));
+		if (FBlueprintGeneratorUtils::ImplementNewInterface(Blueprint, InterfaceClass)) {
+			bInterfaceChanged = true;
+		}
+	}
+	if (bInterfaceChanged) {
+		UpdateDeserializerBlueprintClassObject(true);
+		MarkAssetChanged();
+	}
 
 	const TArray<TSharedPtr<FJsonValue>>& ChildProperties = GetAssetData()->GetArrayField(TEXT("ChildProperties"));
 	const TArray<TSharedPtr<FJsonValue>>& Children = GetAssetData()->GetArrayField(TEXT("Children"));
@@ -250,6 +254,9 @@ UClass* UBlueprintGenerator::GetFallbackParentClass() const {
 }
 
 void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const {
+	if (GetAssetName().ToString().Contains(TEXT("MinerMk1"))) {
+		// __debugbreak();
+	}
 	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
 		//For construction we want parent class to be FULLY generated
 		TArray<FString> ReferencedPackages;
@@ -257,27 +264,34 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 		const int32 SuperStructIndex = GetAssetData()->GetIntegerField(TEXT("SuperStruct"));
 		GetObjectSerializer()->CollectObjectPackages(SuperStructIndex, ReferencedPackages);
 
-		//Same applies to interfaces, we want them ready by that time too
-		TArray<TSharedPtr<FJsonValue>> ImplementedInterfaces = GetAssetData()->GetArrayField(TEXT("Interfaces"));
-
-		for (int32 i = 0; i < ImplementedInterfaces.Num(); i++) {
-			const TSharedPtr<FJsonObject> InterfaceObject = ImplementedInterfaces[i]->AsObject();
-			const int32 ClassObjectIndex = InterfaceObject->GetIntegerField(TEXT("Class"));
-			GetObjectSerializer()->CollectObjectPackages(ClassObjectIndex, ReferencedPackages);
-		}
-
 		for (const FString& PackageName : ReferencedPackages) {
 			OutDependencies.Add(FPackageDependency{*PackageName, EAssetGenerationStage::CDO_FINALIZATION});
 		}
 	}
 	
 	if (GetCurrentStage() == EAssetGenerationStage::DATA_POPULATION) {
+		TArray<FDependency> AllDependencies;
+		{
+			//We need interfaces to be fully ready
+			TArray<FString> ReferencedPackages;
+			TArray<TSharedPtr<FJsonValue>> ImplementedInterfaces = GetAssetData()->GetArrayField(TEXT("Interfaces"));
+
+			for (int32 i = 0; i < ImplementedInterfaces.Num(); i++) {
+				const TSharedPtr<FJsonObject> InterfaceObject = ImplementedInterfaces[i]->AsObject();
+				const int32 ClassObjectIndex = InterfaceObject->GetIntegerField(TEXT("Class"));
+				GetObjectSerializer()->CollectObjectPackages(ClassObjectIndex, ReferencedPackages);
+			}
+
+			for (const FString& PackageName : ReferencedPackages) {
+				AllDependencies.Add({*PackageName, false});
+			}
+		}
+		
 		//For data population we want to have all objects referenced by properties fully constructed
 		
 		const TArray<TSharedPtr<FJsonValue>>& ChildProperties = GetAssetData()->GetArrayField(TEXT("ChildProperties"));
 		const TArray<TSharedPtr<FJsonValue>>& Children = GetAssetData()->GetArrayField(TEXT("Children"));
 		
-		TArray<FDependency> AllDependencies;
 		for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 			const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
 			check(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
