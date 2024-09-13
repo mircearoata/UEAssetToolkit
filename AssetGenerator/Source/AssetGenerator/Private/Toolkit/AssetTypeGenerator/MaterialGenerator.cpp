@@ -633,6 +633,11 @@ void UMaterialGenerator::CleanupStubMaterialNodes(UMaterial* Material) {
 	for (int32 i = Material->GetExpressions().Num() - 1; i >= 0; i--) {
 		UMaterialExpression* Expression = Material->GetExpressions()[i];
 		if (Expression->Desc.StartsWith(TEXT("[STUB NODE]"))) {
+			if (Expression->IsRooted()) {
+				// I have no idea why, but these might be rooted.
+				// Couldn't get the debugger to stop on AddToRoot() either.
+				Expression->RemoveFromRoot();
+			}
 			UMaterialEditingLibrary::DeleteMaterialExpression(Material, Expression);
 			if (Expression->GraphNode) {
 				FBlueprintEditorUtils::RemoveNode(NULL, Expression->GraphNode, true);
