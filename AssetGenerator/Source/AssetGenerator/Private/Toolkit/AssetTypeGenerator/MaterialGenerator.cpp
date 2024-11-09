@@ -293,7 +293,7 @@ UClass* GetTextureSampleParameterClassForTexture(UTexture* Texture) {
 	if (Texture->IsA(UTexture2DArray::StaticClass())) {
 		return UMaterialExpressionTextureSampleParameter2DArray::StaticClass();
 	}
-	checkf(0, TEXT("Unsupported Texture Class: %s"), *Texture->GetPathName());
+	fgcheckf(0, TEXT("Unsupported Texture Class: %s"), *Texture->GetPathName());
 	return NULL;
 }
 

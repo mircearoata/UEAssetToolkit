@@ -87,7 +87,7 @@ public:
 	template<typename T>
 	T* GetAsset() const {
 		//Make sure we are not trying to retrieve a blueprint, because it's a pretty common source of errors
-		checkf(!T::StaticClass()->IsChildOf(UBlueprint::StaticClass()), TEXT("Cannot access 'Blueprint' asset object in cooked data as it has been stripped. Asset is a 'BlueprintGeneratedClass' object instead."));
+		fgcheckf(!T::StaticClass()->IsChildOf(UBlueprint::StaticClass()), TEXT("Cannot access 'Blueprint' asset object in cooked data as it has been stripped. Asset is a 'BlueprintGeneratedClass' object instead."));
 		return CastChecked<T>(AssetObject);
 	}
 

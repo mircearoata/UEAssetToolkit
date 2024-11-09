@@ -45,7 +45,7 @@ UObjectHierarchySerializer::UObjectHierarchySerializer() {
 }
 
 void UObjectHierarchySerializer::SetPropertySerializer(UPropertySerializer* NewPropertySerializer) {
-	check(NewPropertySerializer);
+	fgcheck(NewPropertySerializer);
 	this->PropertySerializer = NewPropertySerializer;
 	NewPropertySerializer->ObjectHierarchySerializer = this;
 }
@@ -58,12 +58,12 @@ void UObjectHierarchySerializer::InitializeForDeserialization(const TArray<TShar
 }
 
 void UObjectHierarchySerializer::InitializeForSerialization(UPackage* NewSourcePackage) {
-	check(NewSourcePackage);
+	fgcheck(NewSourcePackage);
 	this->SourcePackage = NewSourcePackage;
 }
 
 void UObjectHierarchySerializer::SetPackageForDeserialization(UPackage* SelfPackage) {
-	check(SelfPackage);
+	fgcheck(SelfPackage);
 	this->SourcePackage = SelfPackage;
 }
 
@@ -166,7 +166,7 @@ UObject* UObjectHierarchySerializer::DeserializeObject(int32 Index) {
             //Object is serialized through object mark
             const FString ObjectMark = ObjectJson->GetStringField(TEXT("ObjectMark"));
             UObject* const* FoundObject = ObjectMarks.FindKey(ObjectMark);
-            checkf(FoundObject, TEXT("Cannot resolve object serialized using mark: %s"), *ObjectMark);
+            fgcheckf(FoundObject, TEXT("Cannot resolve object serialized using mark: %s"), *ObjectMark);
             ConstructedObject = *FoundObject;
             
         } else {
@@ -262,7 +262,7 @@ bool UObjectHierarchySerializer::CompareObjectsWithContext(const int32 ObjectInd
 	if (ObjectJson->HasField(TEXT("ObjectMark"))) {
 		const FString ObjectMark = ObjectJson->GetStringField(TEXT("ObjectMark"));
 		UObject* const* FoundObject = ObjectMarks.FindKey(ObjectMark);
-		checkf(FoundObject, TEXT("Cannot resolve object serialized using mark: %s"), *ObjectMark);
+		fgcheckf(FoundObject, TEXT("Cannot resolve object serialized using mark: %s"), *ObjectMark);
 		UObject* RegisteredObject = *FoundObject;
 
 		//Marked objects only match if they point to the same UObject
@@ -325,23 +325,23 @@ bool UObjectHierarchySerializer::AreObjectPropertiesUpToDate(const TSharedPtr<FJ
 }
 
 void UObjectHierarchySerializer::FlushPropertiesIntoObject(const int32 ObjectIndex, UObject* Object, const bool bVerifyNameAndRename, const bool bVerifyOuterAndMove) {
-	check(ObjectIndex != INDEX_NONE);
-	check(Object);
+	fgcheck(ObjectIndex != INDEX_NONE);
+	fgcheck(Object);
 	
 	const TSharedPtr<FJsonObject> ObjectData = this->SerializedObjects.FindChecked(ObjectIndex);
 	if (ObjectData->Values.Num() == 0) return; // If the object entry is empty, ignore
 
-	checkf(!this->LoadedObjects.Contains(ObjectIndex), TEXT("Cannot flush properties into already deserialized object"));
+	fgcheckf(!this->LoadedObjects.Contains(ObjectIndex), TEXT("Cannot flush properties into already deserialized object"));
 	this->LoadedObjects.Add(ObjectIndex, Object);
 	
 	const FString ObjectType = ObjectData->GetStringField(TEXT("Type"));
-	checkf(ObjectType == TEXT("Export"), TEXT("Can only call FlushPropertiesIntoObject for exported objects"));
+	fgcheckf(ObjectType == TEXT("Export"), TEXT("Can only call FlushPropertiesIntoObject for exported objects"));
 	
 	const int32 ObjectClassIndex = ObjectData->GetIntegerField(TEXT("ObjectClass"));
 	UObject* ObjectClassRaw = DeserializeObject(ObjectClassIndex);
 	
 	UClass* ObjectClass = CastChecked<UClass>(ObjectClassRaw);
-	checkf(Object->GetClass()->IsChildOf(ObjectClass), TEXT("Can only call FlushPropertiesIntoObject for objects matching serialized object class"));
+	fgcheckf(Object->GetClass()->IsChildOf(ObjectClass), TEXT("Can only call FlushPropertiesIntoObject for objects matching serialized object class"));
 	
 	if (bVerifyNameAndRename) {
 		const FString ObjectName = ObjectData->GetStringField(TEXT("ObjectName"));
@@ -380,7 +380,7 @@ TArray<TSharedPtr<FJsonValue>> UObjectHierarchySerializer::FinalizeSerialization
     TArray<TSharedPtr<FJsonValue>> ObjectsArray;
     for (int32 i = 0; i < LastObjectIndex; i++) {
         if (!SerializedObjects.Contains(i)) {
-            checkf(false, TEXT("Object not in serialized objects: %s"), *(*ObjectIndices.FindKey(i))->GetPathName());
+            fgcheckf(false, TEXT("Object not in serialized objects: %s"), *(*ObjectIndices.FindKey(i))->GetPathName());
         }
         ObjectsArray.Add(MakeShareable(new FJsonValueObject(SerializedObjects.FindChecked(i))));
     }
@@ -486,7 +486,7 @@ FString UObjectHierarchySerializer::GetObjectFullPath(int32 ObjectIndex) {
 		return ResultPath;
 	}
 	
-	checkf(0, TEXT("Unknown object type: %s"), *ObjectType);
+	fgcheckf(0, TEXT("Unknown object type: %s"), *ObjectType);
 	return TEXT("");
 }
 
@@ -501,7 +501,7 @@ UObject* UObjectHierarchySerializer::DeserializeExportedObject(int32 ObjectIndex
         
     //Outer will be missing for root UPackage export, e.g SourcePackage
     if (!ObjectJson->HasField(TEXT("Outer"))) {
-        check(ObjectClass == UPackage::StaticClass());
+        fgcheck(ObjectClass == UPackage::StaticClass());
         return SourcePackage;
     }
         
@@ -582,7 +582,7 @@ UObject* UObjectHierarchySerializer::DeserializeImportedObject(TSharedPtr<FJsonO
 	
 	//Outer is absent for root UPackage imports - Use ObjectName with LoadPackage directly
 	if (!ObjectJson->HasField(TEXT("Outer"))) {
-		check(ObjectClass == UPackage::StaticClass());
+		fgcheck(ObjectClass == UPackage::StaticClass());
 		UPackage* ResultPackage = FindOrLoadPackage(ObjectName);
 		if (ResultPackage == NULL) {
 			UE_LOG(LogObjectHierarchySerializer, Error, TEXT("Cannot resolve external referenced package %s (requested by %s)"), *ObjectName, *SourcePackage->GetName());
@@ -636,7 +636,7 @@ void UObjectHierarchySerializer::SerializeExportedObject(TSharedPtr<FJsonObject>
     //Object being serialized is this package itself
     //Make sure object is package and write only object class, that is enough
     if (OuterObject == NULL) {
-        check(ObjectClass == UPackage::StaticClass());
+        fgcheck(ObjectClass == UPackage::StaticClass());
         return;
     }
         

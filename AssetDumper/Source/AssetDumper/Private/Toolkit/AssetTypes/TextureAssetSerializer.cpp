@@ -28,8 +28,8 @@ void ClearAlphaFromBGRA8Texture(void* TextureData, int32 NumPixels) {
 void UTextureAssetSerializer::SerializeTextureData(const FString& ContextString, FTexturePlatformData* PlatformData, TSharedPtr<FJsonObject> Data, TSharedRef<FSerializationContext> Context, bool bResetAlpha, const FString& FileNamePostfix) {
     UEnum* PixelFormatEnum = UTexture2D::GetPixelFormatEnum();
 
-    check(PlatformData);
-    check(PlatformData->Mips.Num());
+    fgcheck(PlatformData);
+    fgcheck(PlatformData->Mips.Num());
 
     const EPixelFormat PixelFormat = PlatformData->PixelFormat;
     FTexture2DMipMap& FirstMipMap = PlatformData->Mips[0];
@@ -39,7 +39,7 @@ void UTextureAssetSerializer::SerializeTextureData(const FString& ContextString,
     const int32 TextureWidth = FirstMipMap.SizeX;
     const int32 TextureHeight = FirstMipMap.SizeY;
 	const int32 TextureDepth = FirstMipMap.SizeZ;
-	//check(FirstMipMap.SizeZ == 1);
+	//fgcheck(FirstMipMap.SizeZ == 1);
     
     //Write basic information about texture
     Data->SetNumberField(TEXT("TextureWidth"), TextureWidth);
@@ -60,7 +60,7 @@ void UTextureAssetSerializer::SerializeTextureData(const FString& ContextString,
 	//Retrieve a copy of the bulk data and use it for decompression
 	void* RawCompressedDataCopy = NULL;
 	FirstMipMap.BulkData.GetCopy(&RawCompressedDataCopy, false);
-	check(RawCompressedDataCopy);
+	fgcheck(RawCompressedDataCopy);
 
 	TArray<uint8> OutDecompressedData;
 	uint8* CurrentCompressedData = (uint8*) RawCompressedDataCopy;
@@ -73,7 +73,7 @@ void UTextureAssetSerializer::SerializeTextureData(const FString& ContextString,
 		const bool bSuccess = FTextureDecompressor::DecompressTextureData(PixelFormat, CurrentCompressedData, TextureWidth, TextureHeight, OutDecompressedData, &OutErrorMessage);
 
 		//Make sure extraction was successful. Theoretically only failure reason would be unsupported format, but we should support most of the used formats
-		checkf(bSuccess, TEXT("Failed to extract Texture %s (%dx%d, format %s): %s"), *ContextString, TextureWidth, TextureHeight, *PixelFormatName, *OutErrorMessage);
+		fgcheckf(bSuccess, TEXT("Failed to extract Texture %s (%dx%d, format %s): %s"), *ContextString, TextureWidth, TextureHeight, *PixelFormatName, *OutErrorMessage);
 			
 		//Skip amount of bytes read per slice from compressed data buffer
 		CurrentCompressedData += NumBytesPerSlice;
@@ -99,12 +99,12 @@ void UTextureAssetSerializer::SerializeTextureData(const FString& ContextString,
 
     //TextureHeight should be multiplied by amount of splices because we basically stack textures vertically by appending data to the end of buffer
     const int32 ActualTextureHeight = TextureHeight * NumTexturesInBulkData;
-    check(ImageWrapper->SetRaw(OutDecompressedData.GetData(), OutDecompressedData.Num(), TextureWidth, ActualTextureHeight, ERGBFormat::BGRA, 8));
+    fgcheck(ImageWrapper->SetRaw(OutDecompressedData.GetData(), OutDecompressedData.Num(), TextureWidth, ActualTextureHeight, ERGBFormat::BGRA, 8));
     const TArray64<uint8>& PNGResultData = ImageWrapper->GetCompressed();
 
     //Store data in serialization context
     const FString ImageFilename = Context->GetDumpFilePath(FileNamePostfix, TEXT("png"));
-    check(FFileHelper::SaveArrayToFile(PNGResultData, *ImageFilename));
+    fgcheck(FFileHelper::SaveArrayToFile(PNGResultData, *ImageFilename));
 }
 
 void UTextureAssetSerializer::SerializeTexture2D(UTexture2D* Asset, TSharedPtr<FJsonObject> Data, TSharedRef<FSerializationContext> Context, const FString& Postfix) {

@@ -5,13 +5,13 @@
 UObject* ResolveBlueprintClassAsset(UPackage* Package, const FAssetData& AssetData) {
 	FString GeneratedClassExportedPath;
 	if (!AssetData.GetTagValue(FBlueprintTags::GeneratedClassPath, GeneratedClassExportedPath)) {
-		checkf(0, TEXT("GetBlueprintAsset called on non-blueprint asset"));
+		fgcheckf(0, TEXT("GetBlueprintAsset called on non-blueprint asset"));
 		return NULL;
 	}
 		
 	//Make sure export path represents a valid path and convert it to pure object path
 	FString GeneratedClassPath;
-	check(FPackageName::ParseExportTextPath(GeneratedClassExportedPath, NULL, &GeneratedClassPath));
+	fgcheck(FPackageName::ParseExportTextPath(GeneratedClassExportedPath, NULL, &GeneratedClassPath));
 	const FString BlueprintClassObjectName = FPackageName::ObjectPathToObjectName(GeneratedClassPath);
 
 	//Load UBlueprintGeneratedClass for provided object and make sure it has been loaded
@@ -78,5 +78,5 @@ void FSerializationContext::Finalize() const {
 	FJsonSerializer::Serialize(RootObject, Writer);
 
 	const FString OutputFilename = GetDumpFilePath(TEXT(""), TEXT("json"));
-	check(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
+	fgcheck(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
 }

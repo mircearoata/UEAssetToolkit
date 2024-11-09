@@ -161,12 +161,12 @@ struct FKismetTerminal {
 	EContextType ContextType;
 
 	FORCEINLINE bool operator==(const FKismetTerminal& Terminal) const {
-		checkf(0, TEXT("Should implement it later"));
+		fgcheckf(0, TEXT("Should implement it later"));
 		return true;
 	}
 };
 
 FORCEINLINE uint32 GetTypeHash(const FKismetTerminal& Terminal) {
-	checkf(0, TEXT("Should implement it later"));
+	fgcheckf(0, TEXT("Should implement it later"));
 	return 0;
 }

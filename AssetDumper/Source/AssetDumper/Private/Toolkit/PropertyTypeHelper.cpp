@@ -28,12 +28,12 @@ const FName PN_Execute(TEXT("execute"));
 
 UObject* DeserializeObjectRef(const FString& ObjectPath, UClass* SelfScope) {
 	if (ObjectPath == TEXT("<SELF>")) {
-		checkf(SelfScope, TEXT("Attempt to deserialize <SELF> object reference, but no scope was provided for self"));
+		fgcheckf(SelfScope, TEXT("Attempt to deserialize <SELF> object reference, but no scope was provided for self"));
 		return SelfScope;
 		
 	}
 	UObject* LoadedObject = LoadObject<UObject>(NULL, *ObjectPath);
-	checkf(LoadedObject, TEXT("Failed to deserializeo object reference %s"), *ObjectPath);
+	fgcheckf(LoadedObject, TEXT("Failed to deserializeo object reference %s"), *ObjectPath);
 	return LoadedObject;
 }
 

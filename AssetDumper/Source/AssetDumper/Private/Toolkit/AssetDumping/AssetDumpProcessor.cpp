@@ -40,7 +40,7 @@ FAssetDumpProcessor::FAssetDumpProcessor(const FAssetDumpSettings& Settings, con
 FAssetDumpProcessor::~FAssetDumpProcessor() {
 	//Unroot all currently unprocessed UPackages and make sure we have no in-fly package load requests,
 	//which will crash trying to call our method upon finishing after we've been destructed
-	check(PackageLoadRequestsInFlyCounter.GetValue() == 0);
+	fgcheck(PackageLoadRequestsInFlyCounter.GetValue() == 0);
 	
 	for (const FPendingPackageData& PackageData : this->LoadedPackages) {
 		PackageData.AssetObject->RemoveFromRoot();
@@ -52,7 +52,7 @@ FAssetDumpProcessor::~FAssetDumpProcessor() {
 }
 
 TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAssetDumpSettings& Settings, const TArray<FAssetData>& InAssets) {
-	checkf(!ActiveDumpProcessor.IsValid(), TEXT("StartAssetDump is called while another asset dump is in progress"));
+	fgcheckf(!ActiveDumpProcessor.IsValid(), TEXT("StartAssetDump is called while another asset dump is in progress"));
 	
 	TSharedRef<FAssetDumpProcessor> NewProcessor = MakeShareable(new FAssetDumpProcessor(Settings, InAssets));
 	ActiveDumpProcessor = NewProcessor;
@@ -60,7 +60,7 @@ TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAsset
 }
 
 TSharedRef<FAssetDumpProcessor> FAssetDumpProcessor::StartAssetDump(const FAssetDumpSettings& Settings, const TMap<FSoftObjectPath, FAssetData>& InAssets) {
-	checkf(!ActiveDumpProcessor.IsValid(), TEXT("StartAssetDump is called while another asset dump is in progress"));
+	fgcheckf(!ActiveDumpProcessor.IsValid(), TEXT("StartAssetDump is called while another asset dump is in progress"));
 	
 	TSharedRef<FAssetDumpProcessor> NewProcessor = MakeShareable(new FAssetDumpProcessor(Settings, InAssets));
 	ActiveDumpProcessor = NewProcessor;
@@ -162,7 +162,7 @@ void FAssetDumpProcessor::OnPackageLoaded(const FName& PackageName, UPackage* Lo
 		return;
 	}
 
-	check(LoadedPackage);
+	fgcheck(LoadedPackage);
 	FPendingPackageData PendingPackageData;
 	
 	if (!CreatePackageData(LoadedPackage, PendingPackageData)) {
@@ -217,7 +217,7 @@ bool FAssetDumpProcessor::CreatePackageData(UPackage* Package, FPendingPackageDa
 	}
 
 	UObject* AssetObject = FSerializationContext::GetAssetObjectFromPackage(Package, *AssetData);
-	checkf(AssetObject, TEXT("Failed to find asset object '%s' inside of the package '%s'"), *AssetData->AssetName.ToString(), *Package->GetPathName());
+	fgcheckf(AssetObject, TEXT("Failed to find asset object '%s' inside of the package '%s'"), *AssetData->AssetName.ToString(), *Package->GetPathName());
 
 	const TSharedPtr<FSerializationContext> Context = MakeShareable(new FSerializationContext(Settings.RootDumpDirectory, *AssetData, AssetObject));
 	

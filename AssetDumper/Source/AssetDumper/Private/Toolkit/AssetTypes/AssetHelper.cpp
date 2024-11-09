@@ -67,7 +67,7 @@ void FAssetHelper::SerializeStruct(TSharedPtr<FJsonObject> OutObject, UStruct* S
             FieldObject->SetStringField(TEXT("FieldKind"), TEXT("Function"));
             SerializeFunction(FieldObject, Cast<UFunction>(Child), ObjectHierarchySerializer);
         } else {
-            checkf(0, TEXT("Unsupported Children object type: %s"), *Child->GetClass()->GetPathName());
+            fgcheckf(0, TEXT("Unsupported Children object type: %s"), *Child->GetClass()->GetPathName());
         }
         
         Children.Add(MakeShareable(new FJsonValueObject(FieldObject)));
@@ -85,7 +85,7 @@ void FAssetHelper::SerializeStruct(TSharedPtr<FJsonObject> OutObject, UStruct* S
             FieldObject->SetStringField(TEXT("FieldKind"), TEXT("Property"));
             SerializeProperty(FieldObject, CastField<FProperty>(ChildField), ObjectHierarchySerializer);
         } else {
-            checkf(0, TEXT("Unsupported ChildProperties object type: %s"), *ChildField->GetClass()->GetName());
+            fgcheckf(0, TEXT("Unsupported ChildProperties object type: %s"), *ChildField->GetClass()->GetName());
         }
         
         ChildProperties.Add(MakeShareable(new FJsonValueObject(FieldObject)));

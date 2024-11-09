@@ -38,7 +38,7 @@ void UFileMediaSourceGenerator::PopulateSimpleAssetWithData(UObject* Asset) {
 	const FString FullDumpFilePath = FPaths::Combine(GetRootDumpDirectory(), DumpFilePath);
 
 	FString ResultDestFilePath;
-	check(FPackageName::TryConvertLongPackageNameToFilename(DumpPackageName, ResultDestFilePath));
+	fgcheck(FPackageName::TryConvertLongPackageNameToFilename(DumpPackageName, ResultDestFilePath));
 
 	if (!IsGeneratingPublicProject()) {
 		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();

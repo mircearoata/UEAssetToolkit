@@ -20,7 +20,7 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 			Result->SetStringField(TEXT("Inst"), TEXT("Cast"));
 			// A type conversion.
 			uint8 ConversionType = ReadByte(ScriptIndex);
-			checkf(CastNameTable[ConversionType] != nullptr, TEXT("Unsupported cast type %d"), ConversionType);
+			fgcheckf(CastNameTable[ConversionType] != nullptr, TEXT("Unsupported cast type %d"), ConversionType);
 			
 			Result->SetObjectField(TEXT("Expression"), SerializeExpression(ScriptIndex));
 			break;
@@ -394,7 +394,7 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 			//EX_CallMath will never have EX_Context instructions because they don't need any context,
 			//And because of that we need to record context type manually. It should always be a native class though.
 			UClass* MemberParentClass = StackNode->GetOuterUClass();
-			check(MemberParentClass->HasAllClassFlags(CLASS_Native));
+			fgcheck(MemberParentClass->HasAllClassFlags(CLASS_Native));
 
 			Result->SetStringField(TEXT("ContextClass"), MemberParentClass->GetPathName());
 
@@ -600,7 +600,7 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 					break;
 				}
 			default:
-				checkf(false, TEXT("Unknown EBlueprintTextLiteralType! Please update FKismetBytecodeDisassembler::ProcessCommon to handle this type of text."));
+				fgcheckf(false, TEXT("Unknown EBlueprintTextLiteralType! Please update FKismetBytecodeDisassembler::ProcessCommon to handle this type of text."));
 				break;
 			}
 			break;
@@ -958,7 +958,7 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 					Result->SetStringField(TEXT("EventType"), TEXT("TunnelEndOfThread"));
 					break;
 				default:
-					checkf(0, TEXT("Unhandled instrumentation event type: %d"), EventType);
+					fgcheckf(0, TEXT("Unhandled instrumentation event type: %d"), EventType);
 					break;
 			}
 			break;
@@ -1052,12 +1052,12 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 	default:
 		{
 			// This should never occur.
-			checkf(0, TEXT("Unknown bytecode 0x%02X"), (uint8) Opcode);
+			fgcheckf(0, TEXT("Unknown bytecode 0x%02X"), (uint8) Opcode);
 			break;
 		}
 	}
 	//Make sure no instruction identifier is ever missing from returned json object
-	check(Result->HasField(TEXT("Inst")));
+	fgcheck(Result->HasField(TEXT("Inst")));
 	return Result;
 }
 
@@ -1213,7 +1213,7 @@ FString FKismetBytecodeDisassemblerJson::ReadString(int32& ScriptIndex) {
 	case EX_UnicodeStringConst:
         return ReadString16(ScriptIndex);
 	default:
-        checkf(false, TEXT("FKismetBytecodeDisassembler::ReadString - Unexpected opcode. Expected %d or %d, got %d"), (int)EX_StringConst, (int)EX_UnicodeStringConst, (int)Opcode);
+        fgcheckf(false, TEXT("FKismetBytecodeDisassembler::ReadString - Unexpected opcode. Expected %d or %d, got %d"), (int)EX_StringConst, (int)EX_UnicodeStringConst, (int)Opcode);
 		break;
 	}
 

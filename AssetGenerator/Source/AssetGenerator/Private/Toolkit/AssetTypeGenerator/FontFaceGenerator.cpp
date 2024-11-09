@@ -30,7 +30,7 @@ void UFontFaceGenerator::PopulateFontFaceWithData(UFontFace* FontFace) {
 	GetObjectSerializer()->DeserializeObjectProperties(AssetObjectData.ToSharedRef(), FontFace);
 	
 	TArray<uint8> LoadedFontfaceData;
-	checkf(FFileHelper::LoadFileToArray(LoadedFontfaceData, *FontFilename), TEXT("Failed to load fontface file %s"), *FontFilename);
+	fgcheckf(FFileHelper::LoadFileToArray(LoadedFontfaceData, *FontFilename), TEXT("Failed to load fontface file %s"), *FontFilename);
 	FontFace->FontFaceData->SetData(MoveTemp(LoadedFontfaceData));
 	FontFace->CacheSubFaces();
 }

@@ -45,7 +45,7 @@ void USkeletalMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationConte
 
 	FString OutErrorMessage;
     const bool bSuccess = FFbxMeshExporter::ExportSkeletalMeshIntoFbxFile(Asset, OutFbxMeshFileName, false, &OutErrorMessage);
-    checkf(bSuccess, TEXT("Failed to export skeletal mesh %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
+    fgcheckf(bSuccess, TEXT("Failed to export skeletal mesh %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
 
 	//Serialize exported model hash to avoid reading it during generation pass
 	const FMD5Hash ModelFileHash = FMD5Hash::HashFile(*OutFbxMeshFileName);

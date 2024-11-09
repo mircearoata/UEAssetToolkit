@@ -443,9 +443,9 @@ FAssetGenerationProcessor::FAssetGenerationProcessor(const FAssetGeneratorConfig
 }
 
 TSharedRef<FAssetGenerationProcessor> FAssetGenerationProcessor::CreateAssetGenerator(const FAssetGeneratorConfiguration& Configuration, const TArray<FName>& PackagesToGenerate) {
-	check(IsInGameThread());
-	check(ActiveAssetGenerator.IsValid() == false);
-	check(PackagesToGenerate.Num());
+	fgcheck(IsInGameThread());
+	fgcheck(ActiveAssetGenerator.IsValid() == false);
+	fgcheck(PackagesToGenerate.Num());
 
 	ActiveAssetGenerator = MakeShareable(new FAssetGenerationProcessor(Configuration, PackagesToGenerate));
 	return ActiveAssetGenerator.ToSharedRef();

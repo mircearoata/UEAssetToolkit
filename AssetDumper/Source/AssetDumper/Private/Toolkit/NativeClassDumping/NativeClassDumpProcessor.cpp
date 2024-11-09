@@ -29,7 +29,7 @@ FNativeClassDumpProcessor::~FNativeClassDumpProcessor() {
 }
 
 TSharedRef<FNativeClassDumpProcessor> FNativeClassDumpProcessor::StartNativeClassDump(const FNativeClassDumpSettings& Settings, const TArray<UClass*>& InClasses, const TArray<UStruct*>& InStructs) {
-	checkf(!ActiveDumpProcessor.IsValid(), TEXT("StartNativeClassDump is called while another native class dump is in progress"));
+	fgcheckf(!ActiveDumpProcessor.IsValid(), TEXT("StartNativeClassDump is called while another native class dump is in progress"));
 	
 	TSharedRef<FNativeClassDumpProcessor> NewProcessor = MakeShareable(new FNativeClassDumpProcessor(Settings, InClasses, InStructs));
 	ActiveDumpProcessor = NewProcessor;
@@ -120,7 +120,7 @@ void FNativeClassDumpProcessor::PerformNativeClassDumpForClass(UClass* Class) {
 	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&ResultString);
 	FJsonSerializer::Serialize(RootObject, Writer);
 
-	check(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
+	fgcheck(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
 	
 	this->ClassesProcessed.Increment();
 }
@@ -156,7 +156,7 @@ void FNativeClassDumpProcessor::PerformNativeClassDumpForStruct(UStruct* Struct)
 	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&ResultString);
 	FJsonSerializer::Serialize(RootObject, Writer);
 
-	check(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
+	fgcheck(FFileHelper::SaveStringToFile(ResultString, *OutputFilename));
 	
 	this->ClassesProcessed.Increment();
 }
@@ -179,6 +179,6 @@ void FNativeClassDumpProcessor::InitializeNativeClassDump() {
 	this->RemainingClasses = Classes;
 	this->RemainingStructs = Structs;
 	this->ClassesTotal = Classes.Num();
-	check(ClassesTotal);
+	fgcheck(ClassesTotal);
 	UE_LOG(LogNativeClassDumper, Display, TEXT("Starting native class dump of %d classes..."), ClassesTotal);
 }

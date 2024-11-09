@@ -89,8 +89,8 @@ UPropertySerializer::UPropertySerializer() {
 
 	UScriptStruct* DateTimeStruct = FindObject<UScriptStruct>(NULL, TEXT("/Script/CoreUObject.DateTime"));
 	UScriptStruct* TimespanStruct = FindObject<UScriptStruct>(NULL, TEXT("/Script/CoreUObject.Timespan"));
-	check(DateTimeStruct);
-	check(TimespanStruct);
+	fgcheck(DateTimeStruct);
+	fgcheck(TimespanStruct);
 	
 	this->StructSerializers.Add(DateTimeStruct, MakeShared<FDateTimeSerializer>());
 	this->StructSerializers.Add(TimespanStruct, MakeShared<FTimespanSerializer>());
@@ -103,7 +103,7 @@ void UPropertySerializer::DeserializePropertyValue(FProperty* Property, const TS
 	//Handle statically sized array properties
 	if (Property->ArrayDim != 1) {
 		const TArray<TSharedPtr<FJsonValue>>& ArrayElements = JsonValue->AsArray();
-		check(ArrayElements.Num() == Property->ArrayDim);
+		fgcheck(ArrayElements.Num() == Property->ArrayDim);
 		
 		for (int32 ArrayIndex = 0; ArrayIndex < Property->ArrayDim; ArrayIndex++) {
 			uint8* ArrayPropertyValue = (uint8*) Value + Property->ElementSize * ArrayIndex;
@@ -209,7 +209,7 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 		UObject* Object = ObjectHierarchySerializer ? ObjectHierarchySerializer->DeserializeObject((int32) JsonValue->AsNumber()) : NULL;
 		if (Object != nullptr) {
 			void* InterfacePtr = Object->GetInterfaceAddress(InterfaceProperty->InterfaceClass);
-			check(InterfacePtr != nullptr);
+			fgcheck(InterfacePtr != nullptr);
 			Interface->SetObject(Object);
 			Interface->SetInterface(InterfacePtr);
 		}
@@ -232,7 +232,7 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 	} else if (const FByteProperty* ByteProperty = CastField<const FByteProperty>(Property)) {
 		//If we have a string provided, make sure Enum is not null
 		if (JsonValue->Type == EJson::String) {
-			check(ByteProperty->Enum);
+			fgcheck(ByteProperty->Enum);
 			const int64 EnumerationValue = ByteProperty->Enum->GetValueByNameString(JsonValue->AsString());
 			ByteProperty->SetIntPropertyValue(Value, EnumerationValue);
 		} else {
@@ -285,7 +285,7 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 
 void UPropertySerializer::DisablePropertySerialization(UStruct* Struct, FName PropertyName) {
 	FProperty* Property = Struct->FindPropertyByName(PropertyName);
-	checkf(Property, TEXT("Cannot find Property %s in Struct %s"), *PropertyName.ToString(), *Struct->GetPathName());
+	fgcheckf(Property, TEXT("Cannot find Property %s in Struct %s"), *PropertyName.ToString(), *Struct->GetPathName());
 	this->PinnedStructs.Add(Struct);
 	this->BlacklistedProperties.Add(Property);
 }
@@ -538,7 +538,7 @@ bool UPropertySerializer::ComparePropertyValues(FProperty* Property, const TShar
 
 	if (Property->ArrayDim != 1) {
 		const TArray<TSharedPtr<FJsonValue>>& ArrayElements = JsonValue->AsArray();
-		check(ArrayElements.Num() == Property->ArrayDim);
+		fgcheck(ArrayElements.Num() == Property->ArrayDim);
 		
 		for (int32 ArrayIndex = 0; ArrayIndex < Property->ArrayDim; ArrayIndex++) {
 			const uint8* ArrayPropertyValue = (const uint8*) CurrentValue + Property->ElementSize * ArrayIndex;
@@ -742,7 +742,7 @@ bool UPropertySerializer::CompareStructs(UScriptStruct* Struct, const TSharedRef
 }
 
 FStructSerializer* UPropertySerializer::GetStructSerializer(UScriptStruct* Struct) const {
-	check(Struct);
+	fgcheck(Struct);
 	TSharedPtr<FStructSerializer> const* StructSerializer = StructSerializers.Find(Struct);
 	return StructSerializer && ensure(StructSerializer->IsValid()) ? StructSerializer->Get() : FallbackStructSerializer.Get();
 }
