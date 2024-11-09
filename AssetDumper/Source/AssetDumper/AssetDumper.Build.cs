@@ -2,9 +2,6 @@
 
 using UnrealBuildTool;
 using System.IO;
-using System;
-using System.Runtime.InteropServices;
-using System.Text;
 using EpicGames.Core;
 
 public class AssetDumper : ModuleRules
@@ -12,7 +9,7 @@ public class AssetDumper : ModuleRules
     public AssetDumper(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        
+        CppStandard = CppStandardVersion.Cpp20;
         bLegacyPublicIncludePaths = false;
         ShadowVariableWarningLevel = WarningLevel.Off;
 
