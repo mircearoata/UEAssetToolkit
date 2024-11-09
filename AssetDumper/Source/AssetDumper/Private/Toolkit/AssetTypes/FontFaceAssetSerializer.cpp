@@ -19,7 +19,7 @@ void UFontFaceAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
         FFileHelper::LoadFileToArray(FontRawData, *Asset->SourceFilename);
     }
     //Make sure we loaded data and dump it into destination file
-    check(FontRawData.Num());
+    fgcheck(FontRawData.Num());
 
 	//Record file hash so we do not have to load it again to check for asset changes in editor
 	Data->SetStringField(TEXT("FontPayloadHash"), FAssetHelper::ComputePayloadHash(FontRawData));
@@ -28,7 +28,7 @@ void UFontFaceAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
     //but since most of the programs (including UE importer and Windows font viewer) are able to
     //differentiate between TrueType and OpenType without looking at the extension, we just assume ttf format
     const FString ResultFontFilename = Context->GetDumpFilePath(TEXT(""), TEXT("ttf"));
-    check(FFileHelper::SaveArrayToFile(FontRawData, *ResultFontFilename));
+    fgcheck(FFileHelper::SaveArrayToFile(FontRawData, *ResultFontFilename));
     
     SERIALIZE_ASSET_OBJECT
     END_ASSET_SERIALIZATION

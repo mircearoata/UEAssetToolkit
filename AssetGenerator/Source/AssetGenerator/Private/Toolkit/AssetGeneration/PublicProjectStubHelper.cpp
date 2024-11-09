@@ -10,7 +10,7 @@ FStubFileInfo::FStubFileInfo(const FString& FileName) {
 	this->FullFilePath = FPublicProjectStubHelper::ResolveStubFilePath(FileName);
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-	checkf(PlatformFile.FileExists(*FullFilePath), TEXT("Cannot resolve stub file at path %s"), *FullFilePath);
+	fgcheckf(PlatformFile.FileExists(*FullFilePath), TEXT("Cannot resolve stub file at path %s"), *FullFilePath);
 
 	const FMD5Hash FileHash = FMD5Hash::HashFile(*FullFilePath);
 	this->FileHash = LexToString(FileHash);

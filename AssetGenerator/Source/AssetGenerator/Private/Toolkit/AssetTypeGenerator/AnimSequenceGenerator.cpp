@@ -49,9 +49,9 @@ UAnimSequence* UAnimSequenceGenerator::ImportAnimation(UPackage* Package, const 
 	bool bOperationCancelled = false;
 	UObject* ResultAnimation = AnimationFactory->ImportObject(UAnimSequence::StaticClass(), Package, AssetName, ObjectFlags, AssetFbxFilePath, TEXT(""), bOperationCancelled);
 	
-	checkf(ResultAnimation, TEXT("Failed to import AnimSequence %s from FBX file %s. See log for errors"), *GetPackageName().ToString(), *AssetFbxFilePath);
-	checkf(ResultAnimation->GetOuter() == Package, TEXT("Expected Outer to be package %s, found %s"), *Package->GetName(), *ResultAnimation->GetOuter()->GetPathName());
-	checkf(ResultAnimation->GetFName() == AssetName, TEXT("Expected Name to be %s, but found %s"), *AssetName.ToString(), *ResultAnimation->GetName());
+	fgcheckf(ResultAnimation, TEXT("Failed to import AnimSequence %s from FBX file %s. See log for errors"), *GetPackageName().ToString(), *AssetFbxFilePath);
+	fgcheckf(ResultAnimation->GetOuter() == Package, TEXT("Expected Outer to be package %s, found %s"), *Package->GetName(), *ResultAnimation->GetOuter()->GetPathName());
+	fgcheckf(ResultAnimation->GetFName() == AssetName, TEXT("Expected Name to be %s, but found %s"), *AssetName.ToString(), *ResultAnimation->GetName());
 	
 	return CastChecked<UAnimSequence>(ResultAnimation);
 }

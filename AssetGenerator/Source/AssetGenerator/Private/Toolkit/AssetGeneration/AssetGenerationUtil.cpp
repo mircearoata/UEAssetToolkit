@@ -23,7 +23,7 @@ FString GetPropertyFriendlyName(const FString& PropertyName) {
 		}
 	}
 
-	check(UnderscoreIndex != INDEX_NONE);
+	fgcheck(UnderscoreIndex != INDEX_NONE);
 	return PropertyName.Mid(0, UnderscoreIndex);
 }
 
@@ -119,7 +119,7 @@ void FAssetGenerationUtil::GetPropertyDependencies(const TSharedPtr<FJsonObject>
 }
 
 FDeserializedProperty::FDeserializedProperty(const TSharedPtr<FJsonObject>& Object, UObjectHierarchySerializer* ObjectSerializer, bool bPotentialFunctionParam) {
-	check(Object->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
+	fgcheck(Object->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 	
 	this->PropertyName = FName(*Object->GetStringField(TEXT("ObjectName")));
 	this->PropertyFlags = (EPropertyFlags) FCString::Atoi64(*Object->GetStringField(TEXT("PropertyFlags")));
@@ -132,7 +132,7 @@ FDeserializedProperty::FDeserializedProperty(const TSharedPtr<FJsonObject>& Obje
 }
 
 FDeserializedFunction::FDeserializedFunction(const TSharedPtr<FJsonObject>& Object, UObjectHierarchySerializer* ObjectSerializer, bool bDeserializeOnlySignatureProperties) {
-	check(Object->GetStringField(TEXT("FieldKind")) == TEXT("Function"));
+	fgcheck(Object->GetStringField(TEXT("FieldKind")) == TEXT("Function"));
 
 	const FString FunctionNameString = Object->GetStringField(TEXT("ObjectName"));
 	this->FunctionName = FName(*FunctionNameString);

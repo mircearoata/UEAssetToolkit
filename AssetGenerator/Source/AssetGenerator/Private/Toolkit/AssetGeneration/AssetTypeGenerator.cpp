@@ -58,7 +58,7 @@ void UAssetTypeGenerator::InitializeInternal(const FString& DumpRootDirectory, c
 	this->PackageName = FName(*RootFileObject->GetStringField(TEXT("AssetPackage")));
 	this->AssetName = FName(*RootFileObject->GetStringField(TEXT("AssetName")));
 	this->AssetClassPath = FTopLevelAssetPath(*RootFileObject->GetStringField(TEXT("AssetClassPath")));
-	checkf(this->PackageName == InPackageName, TEXT("InitializeInternal called with inconsistent package name. Externally provided name was '%s', but internal dump package name is '%s'"),
+	fgcheckf(this->PackageName == InPackageName, TEXT("InitializeInternal called with inconsistent package name. Externally provided name was '%s', but internal dump package name is '%s'"),
 		*InPackageName.ToString(), *this->PackageName.ToString());
 
 	const TArray<TSharedPtr<FJsonValue>> ObjectHierarchy = RootFileObject->GetArrayField(TEXT("ObjectHierarchy"));
@@ -77,7 +77,7 @@ void UAssetTypeGenerator::ConstructAssetAndPackage() {
 	if (ExistingPackage == NULL) {
 		//Make new package if we don't have existing one, make sure asset object is also allocated
 		CreateAssetPackage();
-		checkf(AssetPackage, TEXT("CreateAssetPackage should call SetPackageAndAsset"));
+		fgcheckf(AssetPackage, TEXT("CreateAssetPackage should call SetPackageAndAsset"));
 
 		//Make sure to mark package as changed because it has never been saved to disk before
 		MarkAssetChanged();
@@ -87,7 +87,7 @@ void UAssetTypeGenerator::ConstructAssetAndPackage() {
 		if (AssetObject == NULL) return; // TODO: Yes, I know this is a horrible hackfix, but it seems to mostly work. Needs a proper fix though.
 
 		//We need to verify package exists and provide meaningful error message, so user knows what is wrong
-		checkf(AssetObject, TEXT("Existing package %s does not contain an asset named %s, requested by asset dump"), *PackageName.ToString(), *AssetName.ToString());
+		fgcheckf(AssetObject, TEXT("Existing package %s does not contain an asset named %s, requested by asset dump"), *PackageName.ToString(), *AssetName.ToString());
 		SetPackageAndAsset(ExistingPackage, AssetObject);
 			
 		//Notify generator we are reusing existing package, so it can do additional cleanup and settings
@@ -105,12 +105,12 @@ void UAssetTypeGenerator::MarkAssetChanged() {
 }
 
 void UAssetTypeGenerator::SetPackageAndAsset(UPackage* NewPackage, UObject* NewAsset, bool bSetObjectMark) {
-	checkf(CurrentStage == EAssetGenerationStage::CONSTRUCTION, TEXT("SetPackageAndAsset can only be called during CONSTRUCTION"));
-	checkf(AssetPackage == NULL, TEXT("SetPackageAndAsset can only be called once during CreateAssetPackage"));
+	fgcheckf(CurrentStage == EAssetGenerationStage::CONSTRUCTION, TEXT("SetPackageAndAsset can only be called during CONSTRUCTION"));
+	fgcheckf(AssetPackage == NULL, TEXT("SetPackageAndAsset can only be called once during CreateAssetPackage"));
 	
-	check(NewPackage->GetFName() == GetPackageName());
-	check(NewAsset->GetFName() == GetAssetName());
-	check(NewAsset->GetOuter() == NewPackage);
+	fgcheck(NewPackage->GetFName() == GetPackageName());
+	fgcheck(NewAsset->GetFName() == GetAssetName());
+	fgcheck(NewAsset->GetOuter() == NewPackage);
 	
 	this->AssetPackage = NewPackage;
 	this->AssetObject = NewAsset;

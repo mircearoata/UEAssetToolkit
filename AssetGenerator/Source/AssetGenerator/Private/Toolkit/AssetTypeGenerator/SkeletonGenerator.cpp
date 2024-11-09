@@ -92,11 +92,11 @@ bool FSkeletonCompareData::IsSkeletonUpToDate(USkeleton* Skeleton) const {
 		
 		//find a name correlating with the provided bone
 		const FName BoneName = ReferenceSkeleton.GetBoneName(BoneIndex);
-		check(BoneName != NAME_None);
+		fgcheck(BoneName != NAME_None);
 		
 		//Find bone index in the existing reference skeleton matching the provided bone name
 		const int32 TargetBoneIndex = ExistingReferenceSkeleton.FindRawBoneIndex(BoneName);
-		check(TargetBoneIndex != INDEX_NONE);
+		fgcheck(TargetBoneIndex != INDEX_NONE);
 
 		const EBoneTranslationRetargetingMode::Type ExistingType = Skeleton->GetBoneTranslationRetargetingMode(TargetBoneIndex);
 		if (ExistingType != TranslationRetargetingMode) {
@@ -134,7 +134,7 @@ bool FSkeletonCompareData::IsSkeletonUpToDate(USkeleton* Skeleton) const {
 			const FName BoneName = ExistingReferenceSkeleton.GetBoneName(i);
 				
 			const int32 OriginalBoneIndex = ReferenceSkeleton.FindRawBoneIndex(BoneName);
-			check(OriginalBoneIndex != INDEX_NONE);
+			fgcheck(OriginalBoneIndex != INDEX_NONE);
 
 			if (!ExistingPose.ReferencePose[i].Equals(NewPose.ReferencePose[OriginalBoneIndex])) {
 				return false;
@@ -183,7 +183,7 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 				const FMeshBoneInfo& ParentBoneInfo = ReferenceSkeleton.GetRawRefBoneInfo()[NewBoneInfo.ParentIndex];
 				
 				RemappedParentBoneIndex = ExistingReferenceSkeleton.FindRawBoneIndex(ParentBoneInfo.Name);
-				check(RemappedParentBoneIndex != INDEX_NONE);
+				fgcheck(RemappedParentBoneIndex != INDEX_NONE);
 			}
 
 			const FMeshBoneInfo RemappedBoneInfo(NewBoneInfo.Name, NewBoneInfo.Name.ToString(), RemappedParentBoneIndex);
@@ -228,11 +228,11 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 		
 		//find a name correlating with the provided bone
 		const FName BoneName = ReferenceSkeleton.GetRawRefBoneNames()[BoneIndex];
-		check(BoneName != NAME_None);
+		fgcheck(BoneName != NAME_None);
 		
 		//Find bone index in the existing reference skeleton matching the provided bone name
 		const int32 TargetBoneIndex = ExistingReferenceSkeleton.FindRawBoneIndex(BoneName);
-		check(TargetBoneIndex != INDEX_NONE);
+		fgcheck(TargetBoneIndex != INDEX_NONE);
 		
 		const EBoneTranslationRetargetingMode::Type ExistingType = Skeleton->GetBoneTranslationRetargetingMode(TargetBoneIndex);
 		
@@ -273,7 +273,7 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 				const FName BoneName = ExistingReferenceSkeleton.GetBoneName(i);
 				
 				const int32 OriginalBoneIndex = ReferenceSkeleton.FindRawBoneIndex(BoneName);
-				check(OriginalBoneIndex != INDEX_NONE);
+				fgcheck(OriginalBoneIndex != INDEX_NONE);
 				RetargetedReferencePose.ReferencePose[i] = NewPose.ReferencePose[OriginalBoneIndex];
 			}
 
@@ -286,7 +286,7 @@ bool FSkeletonCompareData::ApplySkeletonChanges(USkeleton* Skeleton) const {
 				const FName BoneName = ExistingReferenceSkeleton.GetBoneName(i);
 				
 				const int32 OriginalBoneIndex = ReferenceSkeleton.FindRawBoneIndex(BoneName);
-				check(OriginalBoneIndex != INDEX_NONE);
+				fgcheck(OriginalBoneIndex != INDEX_NONE);
 
 				if (!ExistingPose.ReferencePose[i].Equals(NewPose.ReferencePose[OriginalBoneIndex])) {
 					ExistingPose.ReferencePose[i] = NewPose.ReferencePose[OriginalBoneIndex];

@@ -70,17 +70,17 @@ void UTextureGenerator::SetTextureSourceToDumpFile(UTexture* Texture) {
 	const TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
 
 	TArray<uint8> CompressedFileData;
-	checkf(FFileHelper::LoadFileToArray(CompressedFileData, *ImageFilePath), TEXT("Failed to read dump image file %s"), *ImageFilePath);
+	fgcheckf(FFileHelper::LoadFileToArray(CompressedFileData, *ImageFilePath), TEXT("Failed to read dump image file %s"), *ImageFilePath);
 
-	check(ImageWrapper->SetCompressed(CompressedFileData.GetData(), CompressedFileData.Num() * sizeof(uint8)));
+	fgcheck(ImageWrapper->SetCompressed(CompressedFileData.GetData(), CompressedFileData.Num() * sizeof(uint8)));
 	CompressedFileData.Empty();
 
 	TArray64<uint8> ResultUncompressedData;
-	check(ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, ResultUncompressedData));
+	fgcheck(ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, ResultUncompressedData));
 	
 	uint8* LockedMipData = Texture->Source.LockMip(0);
 	const int64 MipMapSize = Texture->Source.CalcMipSize(0);
-	check(ResultUncompressedData.Num() == MipMapSize);
+	fgcheck(ResultUncompressedData.Num() == MipMapSize);
 	
 	FMemory::Memcpy(LockedMipData, ResultUncompressedData.GetData(), MipMapSize);
 	Texture->Source.UnlockMip(0);
@@ -88,7 +88,7 @@ void UTextureGenerator::SetTextureSourceToDumpFile(UTexture* Texture) {
 
 FString UTextureGenerator::ComputeTextureHash(UTexture* Texture) {
 	TArray64<uint8> OutSourceMipMapData;
-	check(Texture->Source.GetMipData(OutSourceMipMapData, 0));
+	fgcheck(Texture->Source.GetMipData(OutSourceMipMapData, 0));
 
 	FString TextureHash = FMD5::HashBytes(OutSourceMipMapData.GetData(), OutSourceMipMapData.Num() * sizeof(uint8));
 	TextureHash.Append(FString::Printf(TEXT("%llx"), OutSourceMipMapData.Num()));

@@ -10,12 +10,12 @@ void UUserDefinedStructGenerator::CreateAssetPackage() {
 	UPackage* NewPackage = CreatePackage(*GetPackageName().ToString());
 
 	UUserDefinedStruct* NewStruct = NewObject<UUserDefinedStruct>(NewPackage, GetAssetName(), RF_Public | RF_Standalone);
-	check(NewStruct);
+	fgcheck(NewStruct);
 	NewStruct->EditorData = NewObject<UUserDefinedStructEditorData>(NewStruct, NAME_None, RF_Transactional);
-	check(NewStruct->EditorData);
+	fgcheck(NewStruct->EditorData);
 
 	const FString StructGuid = GetAssetData()->GetStringField(TEXT("Guid"));
-	check(FGuid::Parse(StructGuid, NewStruct->Guid));
+	fgcheck(FGuid::Parse(StructGuid, NewStruct->Guid));
 	
 	NewStruct->SetMetaData(TEXT("BlueprintType"), TEXT("true"));
 	NewStruct->Bind();
@@ -48,14 +48,14 @@ void UUserDefinedStructGenerator::PopulateStructWithData(UUserDefinedStruct* Str
 	
 	//We ignore StructFlags, because UserDefinedStructs cannot have any manually set flags
 	//UserDefinedStructs can never have any SuperStruct definitions or functions, so we validate it here
-	check(GetAssetData()->GetIntegerField(TEXT("SuperStruct")) == INDEX_NONE);
-	check(GetAssetData()->GetArrayField(TEXT("Children")).Num() == 0);
+	fgcheck(GetAssetData()->GetIntegerField(TEXT("SuperStruct")) == INDEX_NONE);
+	fgcheck(GetAssetData()->GetArrayField(TEXT("Children")).Num() == 0);
 
 	const TArray<TSharedPtr<FJsonValue>>& ChildProperties = GetAssetData()->GetArrayField(TEXT("ChildProperties"));
 
 	for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 		const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
-		check(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
+		fgcheck(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 
 		FStructVariableDescription& VariableDesc = EditorData->VariablesDescriptions.AddDefaulted_GetRef();
 		FAssetGenerationUtil::PopulateStructVariable(PropertyObject, GetObjectSerializer(), VariableDesc);
@@ -64,7 +64,7 @@ void UUserDefinedStructGenerator::PopulateStructWithData(UUserDefinedStruct* Str
 	//Force struct recompilation
 	Struct->Status = EUserDefinedStructureStatus::UDSS_Dirty;
     FStructureEditorUtils::CompileStructure(Struct);
-	check(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
+	fgcheck(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
 	
 	MarkAssetChanged();
 }
@@ -81,7 +81,7 @@ bool UUserDefinedStructGenerator::IsStructUpToDate(UUserDefinedStruct* Struct) c
 	
 	for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 		const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
-		check(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
+		fgcheck(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 		const FString PropertyName = PropertyObject->GetStringField(TEXT("ObjectName"));
 
 		FStructVariableDescription& VariableDesc = NewVariableDescriptions.Add(FName(*PropertyName));
@@ -108,7 +108,7 @@ void UUserDefinedStructGenerator::FinalizeAssetCDO() {
 				*Struct->GetPathName());
 		return;
 	}
-	//check(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
+	//fgcheck(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
 	
 	const TSharedPtr<FJsonObject> DefaultInstance = GetAssetData()->GetObjectField(TEXT("StructDefaultInstance"));
 
@@ -151,7 +151,7 @@ void UUserDefinedStructGenerator::FinalizeAssetCDO() {
 		Struct->Status = EUserDefinedStructureStatus::UDSS_Dirty;
 		FStructureEditorUtils::CompileStructure(Struct);
 		
-		check(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
+		fgcheck(Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate);
 		MarkAssetChanged();
 	}
 }

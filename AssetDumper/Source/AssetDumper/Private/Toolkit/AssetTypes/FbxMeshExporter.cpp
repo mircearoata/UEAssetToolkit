@@ -17,11 +17,11 @@ FString GetNameForUVChannel(uint32 Index) {
 
 FbxManager* AllocateFbxManagerForExport() {
 	FbxManager* FbxManager = FbxManager::Create();
-	check(FbxManager);
+	fgcheck(FbxManager);
 
 	//Initialize root I/O settings for created manager
 	FbxIOSettings* IOSettings = FbxIOSettings::Create(FbxManager, IOSROOT);
-	check(IOSettings);
+	fgcheck(IOSettings);
 	
 	//IOSettings->SetBoolProp(EXP_FBX_MATERIAL, true);
 	IOSettings->SetBoolProp(EXP_FBX_TEXTURE, true);
@@ -91,9 +91,9 @@ bool ExportFbxSceneToFileByPath(const FString& OutFileName, FbxScene* Scene, boo
 
 bool FFbxMeshExporter::ExportStaticMeshIntoFbxFile(UStaticMesh* StaticMesh, const FString& OutFileName, const bool bExportAsText, FString* OutErrorMessage) {
     //Make sure we either force static mesh data on CPU globally or mesh has it set locally
-    check(StaticMesh->bAllowCPUAccess);
+    fgcheck(StaticMesh->bAllowCPUAccess);
     FbxManager* FbxManager = AllocateFbxManagerForExport();
-    check(FbxManager);
+    fgcheck(FbxManager);
 
     //Create root scene which we will use to export mesh
     FbxScene* Scene = CreateFbxSceneForFbxManager(FbxManager);
@@ -119,7 +119,7 @@ bool FFbxMeshExporter::ExportStaticMeshIntoFbxFile(UStaticMesh* StaticMesh, cons
 
 bool FFbxMeshExporter::ExportSkeletonIntoFbxFile(USkeleton* Skeleton, const FString& OutFileName, bool bExportAsText, FString* OutErrorMessage) {
 	FbxManager* FbxManager = AllocateFbxManagerForExport();
-	check(FbxManager);
+	fgcheck(FbxManager);
 
 	//Create root scene which we will use to export mesh
 	FbxScene* Scene = CreateFbxSceneForFbxManager(FbxManager);
@@ -140,7 +140,7 @@ bool FFbxMeshExporter::ExportSkeletonIntoFbxFile(USkeleton* Skeleton, const FStr
 
 bool FFbxMeshExporter::ExportSkeletalMeshIntoFbxFile(USkeletalMesh* SkeletalMesh, const FString& OutFileName, bool bExportAsText, FString* OutErrorMessage) {
 	FbxManager* FbxManager = AllocateFbxManagerForExport();
-	check(FbxManager);
+	fgcheck(FbxManager);
 
 	//Create root scene which we will use to export mesh
 	FbxScene* Scene = CreateFbxSceneForFbxManager(FbxManager);
@@ -205,7 +205,7 @@ bool FFbxMeshExporter::ExportSkeletalMeshIntoFbxFile(USkeletalMesh* SkeletalMesh
 
 bool FFbxMeshExporter::ExportAnimSequenceIntoFbxFile(UAnimSequence* AnimSequence, const FString& OutFileName, bool bExportAsText, FString* OutErrorMessage) {
 	FbxManager* FbxManager = AllocateFbxManagerForExport();
-	check(FbxManager);
+	fgcheck(FbxManager);
 
 	//Create root scene which we will use to export mesh
 	FbxScene* Scene = CreateFbxSceneForFbxManager(FbxManager);
@@ -228,7 +228,7 @@ bool FFbxMeshExporter::ExportAnimSequenceIntoFbxFile(UAnimSequence* AnimSequence
 	TArray<FbxNode*> BoneNodes;
 
 	USkeleton* Skeleton = AnimSequence->GetSkeleton();
-	check(Skeleton);
+	fgcheck(Skeleton);
 	
 	// Add the skeleton to the scene
 	FbxNode* SkeletonRootNode = ExportSkeleton(Scene, Skeleton->GetReferenceSkeleton(), BoneNodes);
@@ -271,8 +271,8 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 	FMemMark Mark(FMemStack::Get());
 
 	USkeleton* Skeleton = AnimSeq->GetSkeleton();
-	check(Skeleton);
-	check(SetupAnimStack(AnimSeq, AnimStack));
+	fgcheck(Skeleton);
+	fgcheck(SetupAnimStack(AnimSeq, AnimStack));
 
 	//Prepare root anim curves data to be exported
 	TArray<FName> AnimCurveNames;
@@ -372,7 +372,7 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 }
 
 bool FFbxMeshExporter::SetupAnimStack(const UAnimSequence* AnimSequence, FbxAnimStack* AnimStack) {
-	check(AnimSequence->GetPlayLength() > 0.0f);
+	fgcheck(AnimSequence->GetPlayLength() > 0.0f);
 	const float FrameRate = AnimSequence->GetSamplingFrameRate().AsDecimal();
 
 	//Configure the scene time line
@@ -428,7 +428,7 @@ void FFbxMeshExporter::ExportCustomAnimCurvesToFbx(const TMap<FName, FbxAnimCurv
 	FMemMark Mark(FMemStack::Get());
 
 	const USkeleton* Skeleton = AnimSequence->GetSkeleton();
-	check(Skeleton);
+	fgcheck(Skeleton);
 	
 	TArray<FName> AnimCurveNames;
 	Skeleton->GetCurveMetaDataNames(AnimCurveNames);
@@ -557,7 +557,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
 
     //Initialize vertex colors (if we have any)
     if (VertexBuffers.ColorVertexBuffer.GetNumVertices() > 0) {
-        check(VertexBuffers.ColorVertexBuffer.GetNumVertices() == NumVertices);
+        fgcheck(VertexBuffers.ColorVertexBuffer.GetNumVertices() == NumVertices);
     	
         FbxGeometryElementVertexColor* VertexColor = FbxMesh->CreateElementVertexColor();
         VertexColor->SetMappingMode(FbxLayerElement::eByControlPoint);
@@ -572,7 +572,7 @@ void FFbxMeshExporter::ExportCommonMeshResources(const FStaticMeshVertexBuffers&
         }
     }
 
-    check(VertexBuffers.StaticMeshVertexBuffer.GetNumVertices() == NumVertices);
+    fgcheck(VertexBuffers.StaticMeshVertexBuffer.GetNumVertices() == NumVertices);
 
 	//Initialize normals
 	FbxGeometryElementNormal* Normal = FbxMesh->CreateElementNormal();
@@ -648,7 +648,7 @@ int32 ExportDummyMaterialIntoFbxScene(const FString& MaterialSlotName, FbxNode* 
     //MaterialSlotName will be either current material name or predefined name
 	FbxScene* Scene = Node->GetScene();
     FbxSurfaceMaterial* DummySectionMaterial = FbxSurfaceMaterial::Create(Scene, FFbxDataConverter::ConvertToFbxString(MaterialSlotName));
-    check(DummySectionMaterial);
+    fgcheck(DummySectionMaterial);
     return Node->AddMaterial(DummySectionMaterial);
 }
 
@@ -843,7 +843,7 @@ void FFbxMeshExporter::ExportSkeletalMesh(const FSkeletalMeshLODRenderData& Skel
 	//Currently all skeletal mesh data is kept on CPU to support skeletal mesh merging functionality
 	//At least that's what UE source code and comments seem to imply. So we just make sure it is the case here
 	//We check skin weight buffer because it's the only buffer with NeedsCPUAccess accessible from outside
-	checkf(SkeletalMeshLOD.SkinWeightVertexBuffer.GetNeedsCPUAccess(), TEXT("Cannot export skeletal mesh without CPU access to buffers"));
+	fgcheckf(SkeletalMeshLOD.SkinWeightVertexBuffer.GetNeedsCPUAccess(), TEXT("Cannot export skeletal mesh without CPU access to buffers"));
 	
     //Initialize material element
     FbxGeometryElementMaterial* Material = FbxMesh->CreateElementMaterial();
