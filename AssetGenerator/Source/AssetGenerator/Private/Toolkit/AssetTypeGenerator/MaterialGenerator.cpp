@@ -4,6 +4,7 @@
 #include "Engine/Texture.h"
 #include "Engine/Texture2DArray.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "MaterialDomain.h"
 #include "MaterialEditor/Public/MaterialEditingLibrary.h"
 #include "MaterialGraph/MaterialGraphNode_Comment.h"
 #include "Materials/Material.h"
@@ -664,20 +665,55 @@ void DisconnectIfExpressionMissing(FExpressionInput& Input, UMaterial* Material)
 	}
 }
 
+static bool PreferEmissiveColor(EMaterialDomain Domain) {
+	return Domain == EMaterialDomain::MD_PostProcess || Domain == EMaterialDomain::MD_UI;
+}
+
 void UMaterialGenerator::TryConnectBasicMaterialPins(UMaterial* Material) {
 	FExpressionInput& BaseColorInput = Material->GetEditorOnlyData()->BaseColor;
 	FExpressionInput& NormalInput = Material->GetEditorOnlyData()->Normal;
+	FExpressionInput& EmissiveColorInput = Material->GetEditorOnlyData()->EmissiveColor;
 
 	DisconnectIfExpressionMissing(BaseColorInput, Material);
 	DisconnectIfExpressionMissing(NormalInput, Material);
+	DisconnectIfExpressionMissing(EmissiveColorInput, Material);
+
+	if (Material->MaterialDomain == EMaterialDomain::MD_PostProcess) {
+		const FVector2D NodePos = FVector2D(Material->EditorX - 384, Material->EditorY);
+		// This terribleness is necessary because UMaterialExpressionSceneTexture
+		// is not exported at all, so there is no way to use the type directly...
+		UPackage* EngineScriptPackage = UEngine::StaticClass()->GetOuterUPackage();
+		TSubclassOf<UMaterialExpression> SceneTextureExpressionClass = FindObjectChecked<UClass>(EngineScriptPackage, TEXT("MaterialExpressionSceneTexture"));
+		UMaterialExpression* SceneTextureExpression = SpawnMaterialExpression<UMaterialExpression>(Material, NodePos, SceneTextureExpressionClass);
+		if (FByteProperty* Prop = CastField<FByteProperty>(SceneTextureExpressionClass->FindPropertyByName(TEXT("SceneTextureId")))) {
+			if (uint8* ValuePtr = Prop->ContainerPtrToValuePtr<uint8>(SceneTextureExpression)) {
+				*ValuePtr = PPI_PostProcessInput0;
+			} else {
+				fgcheckf(0, TEXT("bad ValuePtr"));
+			}
+		} else {
+			fgcheckf(0, TEXT("bad Prop"));
+		}
+		EmissiveColorInput.Connect(0, SceneTextureExpression);
+		return;
+	}
+
+	FExpressionInput& ColorInput = PreferEmissiveColor(Material->MaterialDomain) ? EmissiveColorInput : BaseColorInput;
 	
 	for (UMaterialExpression* Expression : Material->GetExpressions()) {
 		if (UMaterialExpressionTextureSample* TextureSample = Cast<UMaterialExpressionTextureSample>(Expression)) {
-			if ((TextureSample->SamplerType == SAMPLERTYPE_Color || TextureSample->SamplerType == SAMPLERTYPE_LinearColor) && !BaseColorInput.IsConnected()) {
-				BaseColorInput.Connect(0, TextureSample);
-			}
-			else if (TextureSample->SamplerType == SAMPLERTYPE_Normal && !NormalInput.IsConnected()) {
-				NormalInput.Connect(0, TextureSample);
+			switch (TextureSample->SamplerType) {
+			case SAMPLERTYPE_Color:
+			case SAMPLERTYPE_LinearColor:
+				if (!ColorInput.IsConnected()) {
+					ColorInput.Connect(0, TextureSample);
+				}
+				break;
+			case SAMPLERTYPE_Normal:
+				if (!NormalInput.IsConnected()) {
+					NormalInput.Connect(0, TextureSample);
+				}
+				break;
 			}
 		}
 	}
