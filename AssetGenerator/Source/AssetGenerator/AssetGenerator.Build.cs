@@ -1,13 +1,11 @@
 ﻿using UnrealBuildTool;
-using System.IO;
-using System;
 
 public class AssetGenerator : ModuleRules
 {
     public AssetGenerator(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        
+        CppStandard = CppStandardVersion.Cpp20;
         bLegacyPublicIncludePaths = false;
         ShadowVariableWarningLevel = WarningLevel.Off;
         
