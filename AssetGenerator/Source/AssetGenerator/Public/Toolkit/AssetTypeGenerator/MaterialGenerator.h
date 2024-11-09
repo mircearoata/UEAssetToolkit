@@ -149,15 +149,21 @@ public:
 	static FVector2D GetGoodPlaceForNewMaterialExpression(UMaterial* Material);
 	static void ForceMaterialCompilation(UMaterial* Material);
 	static void ConnectBasicParameterPinsIfPossible(UMaterial* Material, const FString& ErrorMessage);
-	
+
 	template<typename T>
-	FORCEINLINE static T* SpawnMaterialExpression(UMaterial* Material, UClass* ExpressionClass = T::StaticClass()) {
-		const FVector2D NodePos = GetGoodPlaceForNewMaterialExpression(Material);
-		T* NewMaterialExpression =  CastChecked<T>(UMaterialEditingLibrary::CreateMaterialExpressionEx(Material, NULL, ExpressionClass, NULL, NodePos.X, NodePos.Y));
+	FORCEINLINE static T* SpawnMaterialExpression(UMaterial* Material, const FVector2D NodePos, UClass* ExpressionClass = T::StaticClass())
+	{
+		T* NewMaterialExpression = CastChecked<T>(UMaterialEditingLibrary::CreateMaterialExpressionEx(Material, NULL, ExpressionClass, NULL, NodePos.X, NodePos.Y));
 
 		if (Material->MaterialGraph) {
 			Material->MaterialGraph->AddExpression(NewMaterialExpression, false);
 		}
 		return NewMaterialExpression;
+	}
+
+	template<typename T>
+	FORCEINLINE static T* SpawnMaterialExpression(UMaterial* Material, UClass* ExpressionClass = T::StaticClass())
+	{
+		return SpawnMaterialExpression<T>(Material, GetGoodPlaceForNewMaterialExpression(Material), ExpressionClass);
 	}
 };
