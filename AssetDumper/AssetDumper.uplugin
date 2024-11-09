@@ -2,7 +2,6 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0.0",
-	"EngineVersion": "5.1",
 	"FriendlyName": "Asset Dumper",
 	"Description": "Tools for dumping game assets into readable JSON files",
 	"Category": "Modding",
@@ -19,7 +18,10 @@
 		{
 			"Name": "AssetDumper",
 			"Type": "Runtime",
-			"LoadingPhase": "PostDefault"
+			"LoadingPhase": "PostDefault",
+			"PlatformAllowList": [
+				"Win64"
+			]
 		}
 	]
 }
