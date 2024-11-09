@@ -15,6 +15,7 @@
 #include "Materials/MaterialExpressionLandscapeGrassOutput.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionQualitySwitch.h"
+#include "Materials/MaterialExpressionReflectionVectorWS.h"
 #include "Materials/MaterialExpressionRuntimeVirtualTextureSampleParameter.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"
@@ -297,6 +298,10 @@ UClass* GetTextureSampleParameterClassForTexture(UTexture* Texture) {
 	return NULL;
 }
 
+FORCEINLINE static bool DoesTextureSamplerRequireUVW(UClass* ExpressionClass) {
+	return ExpressionClass->IsChildOf<UMaterialExpressionTextureSampleParameterCube>() || ExpressionClass->IsChildOf<UMaterialExpressionTextureSampleParameter2DArray>();
+}
+
 void UMaterialGenerator::ApplyOtherLayoutChanges(UMaterial* Material, FMaterialLayoutChangeInfo& LayoutChangeInfo) {
 	//Add Parameter Collection parameter nodes
 	for (UMaterialParameterCollection* NewCollection : LayoutChangeInfo.NewReferencedParameterCollections) {
@@ -464,6 +469,12 @@ void UMaterialGenerator::SpawnNewMaterialParameterNodes(UMaterial* Material, FMa
 			Expression->SetParameterName(NewTextureParameter.ParameterInfo.Name);
 			Expression->Texture = NewTextureParameter.ParameterValue.Get();
 			Expression->AutoSetSampleType();
+
+			if (DoesTextureSamplerRequireUVW(ExpressionClass)) {
+				const FVector2D NodePos = FVector2D(Expression->MaterialExpressionEditorX - 256, Expression->MaterialExpressionEditorY);
+				UMaterialExpressionReflectionVectorWS* ReflectionVector = SpawnMaterialExpression<UMaterialExpressionReflectionVectorWS>(Material, NodePos);
+				Expression->Coordinates.Connect(0, ReflectionVector);
+			}
 		}
 	}
 
