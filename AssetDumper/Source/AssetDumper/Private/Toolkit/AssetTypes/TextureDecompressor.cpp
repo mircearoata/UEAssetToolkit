@@ -3,6 +3,22 @@
 #include "RenderUtils.h"
 #include "detex.h"
 
+void ConvertABGR32FToBGRA8(const void* SourcePixelData, void* DestPixelData, int32 NumPixels) {
+    const FLinearColor* SourceData = static_cast<const FLinearColor*>(SourcePixelData);
+    FColor* DestData = static_cast<FColor*>(DestPixelData);
+
+    for (int i = 0; i < NumPixels; i++) {
+        //Use a FLinearColor for source data but swizzle the components
+        const FLinearColor* CurrentColorFloat = SourceData++;
+        FColor* CurrentColor = DestData++;
+        FLinearColor LinearColor(CurrentColorFloat->G,
+            CurrentColorFloat->B,
+            CurrentColorFloat->A,
+            CurrentColorFloat->R);
+        *CurrentColor = LinearColor.ToFColor(true);
+    }
+}
+
 void ConvertFloatRGBAToBGRA8(const void* SourcePixelData, void* DestPixelData, int32 NumPixels) {
     const FFloat16Color* SourceData = static_cast<const FFloat16Color*>(SourcePixelData);
     FColor* DestData = static_cast<FColor*>(DestPixelData);
@@ -102,10 +118,14 @@ bool FTextureDecompressor::DecompressTextureData(EPixelFormat PixelFormat, const
             //Convert 16-bit FloatRGBA image to BGRA8 image
             ConvertFloatRGBAToBGRA8(SourceData, DestData, NumPixels);
 
+        } else if (PixelFormat == EPixelFormat::PF_A32B32G32R32F) {
+            //Convert 32-bit FloatABGR image to BGRA8 image
+            ConvertABGR32FToBGRA8(SourceData, DestData, NumPixels);
+
         } else if (PixelFormat == EPixelFormat::PF_FloatRGB || PixelFormat == EPixelFormat::PF_FloatR11G11B10) {
             //Convert that weird float low-precision format that nobody is using to BGRA8 image
             ConvertFloatR11G11B10ToBGRA8(SourceData, DestData, NumPixels);
-            
+
         } else {
             //Well, this format is not supported apparently
             if (OutErrorMessage) {
