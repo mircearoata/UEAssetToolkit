@@ -78,7 +78,7 @@ void UBlueprintGenerator::OnExistingPackageLoaded() {
 		Blueprint->ParentClass = ParentClass;
 		FBlueprintGeneratorUtils::EnsureBlueprintUpToDate(Blueprint);
 		
-		FBlueprintCompilationManager::CompileSynchronously(FBPCompileRequest(Blueprint, EBlueprintCompileOptions::None, NULL));
+		FBlueprintCompilationManager::CompileSynchronously(FBPCompileRequest(Blueprint, EBlueprintCompileOptions::SkipDefaultObjectValidation, NULL));
 		MarkAssetChanged();
 	}
 	
@@ -242,7 +242,7 @@ void UBlueprintGenerator::FinalizeAssetCDO() {
 void UBlueprintGenerator::UpdateDeserializerBlueprintClassObject(bool bRecompileBlueprint) {
 	UBlueprint* Blueprint = GetAsset<UBlueprint>();
 	if (bRecompileBlueprint) {
-		FBlueprintCompilationManager::CompileSynchronously(FBPCompileRequest(Blueprint, EBlueprintCompileOptions::None, NULL));
+		FBlueprintCompilationManager::CompileSynchronously(FBPCompileRequest(Blueprint, EBlueprintCompileOptions::SkipDefaultObjectValidation, NULL));
 	}
 
 	UClass* BlueprintGeneratedClass = Blueprint->GeneratedClass;
