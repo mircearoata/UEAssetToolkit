@@ -19,6 +19,6 @@ TSharedPtr<SWindow> FGameEditorHelper::GetMainWindow() {
 		return MainFrame.GetParentWindow();
 	}
 #endif
-	checkf(0, TEXT("GetMainWindow called before engine is initialized"));
+	fgcheckf(0, TEXT("GetMainWindow called before engine is initialized"));
 	return NULL;
 }

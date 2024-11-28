@@ -294,20 +294,20 @@ void UBlueprintGenerator::PopulateStageDependencies(TArray<FPackageDependency>& 
 		
 		for (const TSharedPtr<FJsonValue>& PropertyPtr : ChildProperties) {
 			const TSharedPtr<FJsonObject> PropertyObject = PropertyPtr->AsObject();
-			check(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
+			fgcheck(PropertyObject->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 			
 			FAssetGenerationUtil::GetPropertyDependencies(PropertyObject, GetObjectSerializer(), AllDependencies);
 		}
 
 		for (int32 i = 0; i < Children.Num(); i++) {
 			const TSharedPtr<FJsonObject> FunctionObject = Children[i]->AsObject();
-			check(FunctionObject->GetStringField(TEXT("FieldKind")) == TEXT("Function"));
+			fgcheck(FunctionObject->GetStringField(TEXT("FieldKind")) == TEXT("Function"));
 			
 			const TArray<TSharedPtr<FJsonValue>> FunctionProperties = FunctionObject->GetArrayField(TEXT("ChildProperties"));
 			
 			for (int32 j = 0; j < FunctionProperties.Num(); j++) {
 				const TSharedPtr<FJsonObject> FunctionProperty = FunctionProperties[j]->AsObject();
-				check(FunctionProperty->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
+				fgcheck(FunctionProperty->GetStringField(TEXT("FieldKind")) == TEXT("Property"));
 			
 				if (FAssetGenerationUtil::IsFunctionSignatureRelevantProperty(FunctionProperty)) {
 					FAssetGenerationUtil::GetPropertyDependencies(FunctionProperty, GetObjectSerializer(), AllDependencies);
@@ -694,7 +694,7 @@ UK2Node* FBlueprintGeneratorUtils::CreateFunctionOverride(UBlueprint* Blueprint,
 			FunctionResult = Result;
 		}
 	}
-	checkf(FunctionEntry, TEXT("K2Node_FunctionEntry not found on newly created function graph"));
+	fgcheckf(FunctionEntry, TEXT("K2Node_FunctionEntry not found on newly created function graph"));
 
 	//Make parent function call if we've been asked to
 	if (bCreateParentCall) {
@@ -952,7 +952,7 @@ bool FBlueprintGeneratorUtils::CreateBlueprintVariablesForProperties(UBlueprint*
 			//Make sure delegate function parameters are up to date
 			TArray<UK2Node_FunctionEntry*> FunctionEntries;
 			DelegateSignatureGraph->GetNodesOfClass(FunctionEntries);
-			check(FunctionEntries.Num());
+			fgcheck(FunctionEntries.Num());
 
 			const FString DelegateSignatureFunctionName = FString::Printf(TEXT("%s%s"), *VariableDescription->VarName.ToString(), HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX);
 			// TODO: In AnimBPs this map can be empty (as functions aren't generated into the JSON yet) so causes a crash - is this a proper fix?
@@ -1053,7 +1053,7 @@ UEdGraph* FBlueprintGeneratorUtils::CreateNewBlueprintEventDispatcherSignatureGr
 	const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
 	
 	UEdGraph* NewGraph = FBlueprintEditorUtils::CreateNewGraph(Blueprint, DispatcherName, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
-	checkf(NewGraph, TEXT("Failed to create new graph %s for Event Dispatcher in BLueprint %s"), *DispatcherName.ToString(), *Blueprint->GetPathName());
+	fgcheckf(NewGraph, TEXT("Failed to create new graph %s for Event Dispatcher in BLueprint %s"), *DispatcherName.ToString(), *Blueprint->GetPathName());
 	
 	NewGraph->bEditable = false;
 	K2Schema->CreateDefaultNodesForGraph(*NewGraph);

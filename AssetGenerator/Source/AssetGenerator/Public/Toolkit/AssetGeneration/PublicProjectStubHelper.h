@@ -17,7 +17,7 @@ class TStubAssetInfo {
 public:
 	FORCEINLINE TStubAssetInfo(const TCHAR* PackageName) {
 		this->Object = LoadObject<T>(NULL, PackageName);
-		checkf(Object, TEXT("Failed to load stub %s asset from %s"), *T::StaticClass()->GetName(), PackageName);
+		fgcheckf(Object, TEXT("Failed to load stub %s asset from %s"), *T::StaticClass()->GetName(), PackageName);
 		this->Object->AddToRoot();
 	}
 	

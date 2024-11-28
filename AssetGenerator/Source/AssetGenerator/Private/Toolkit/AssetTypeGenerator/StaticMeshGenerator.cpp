@@ -49,9 +49,9 @@ UStaticMesh* UStaticMeshGenerator::ImportStaticMesh(UPackage* Package, const FNa
 	bool bOperationCancelled = false;
 	UObject* ResultMesh = StaticMeshFactory->ImportObject(UStaticMesh::StaticClass(), Package, AssetName, ObjectFlags, AssetFbxFilePath, TEXT(""), bOperationCancelled);
 	
-	checkf(ResultMesh, TEXT("Failed to import StaticMesh %s from FBX file %s. See log for errors"), *GetPackageName().ToString(), *AssetFbxFilePath);
-	checkf(ResultMesh->GetOuter() == Package, TEXT("Expected Outer to be package %s, found %s"), *Package->GetName(), *ResultMesh->GetOuter()->GetPathName());
-	checkf(ResultMesh->GetFName() == AssetName, TEXT("Expected Name to be %s, but found %s"), *AssetName.ToString(), *ResultMesh->GetName());
+	fgcheckf(ResultMesh, TEXT("Failed to import StaticMesh %s from FBX file %s. See log for errors"), *GetPackageName().ToString(), *AssetFbxFilePath);
+	fgcheckf(ResultMesh->GetOuter() == Package, TEXT("Expected Outer to be package %s, found %s"), *Package->GetName(), *ResultMesh->GetOuter()->GetPathName());
+	fgcheckf(ResultMesh->GetFName() == AssetName, TEXT("Expected Name to be %s, but found %s"), *AssetName.ToString(), *ResultMesh->GetName());
 	
 	return CastChecked<UStaticMesh>(ResultMesh);
 }

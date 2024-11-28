@@ -65,7 +65,7 @@ void USkeletonAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext> 
     const FString OutFbxFilename = Context->GetDumpFilePath(TEXT(""), TEXT("fbx"));
     FString OutErrorMessage;
     const bool bSuccess = FFbxMeshExporter::ExportSkeletonIntoFbxFile(Asset, OutFbxFilename, false, &OutErrorMessage);
-    checkf(bSuccess, TEXT("Failed to export skeleton %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
+    fgcheckf(bSuccess, TEXT("Failed to export skeleton %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
     
     END_ASSET_SERIALIZATION
 }

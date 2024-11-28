@@ -73,7 +73,7 @@ private:
     FORCEINLINE T* FindFirstGraphNodeOfClass() {
         TArray<T*> FoundKismetNodes;
         EditorGraph->GetNodesOfClass<T>(FoundKismetNodes);
-        check(FoundKismetNodes.Num());
+        fgcheck(FoundKismetNodes.Num());
         return FoundKismetNodes[0];
     }
     

@@ -12,7 +12,7 @@ void UFileMediaSourceAssetSerializer::SerializeAsset(TSharedRef<FSerializationCo
 	//Carry over referenced media asset from the game to the resulting dump folder
 	const FString FullFilePath = Asset->GetFullPath();
 	FString FilePackageName;
-	check(FPackageName::TryConvertFilenameToLongPackageName(FullFilePath, FilePackageName));
+	fgcheck(FPackageName::TryConvertFilenameToLongPackageName(FullFilePath, FilePackageName));
 	FilePackageName.Append(FPaths::GetExtension(FullFilePath, true));
 
 	Data->SetStringField(TEXT("FilePath"), FilePackageName);

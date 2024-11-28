@@ -51,7 +51,7 @@ void UStaticMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationContext
     const FString OutFbxMeshFileName = Context->GetDumpFilePath(TEXT(""), TEXT("fbx"));
     FString OutErrorMessage;
     const bool bSuccess = FFbxMeshExporter::ExportStaticMeshIntoFbxFile(Asset, OutFbxMeshFileName, false, &OutErrorMessage);
-    checkf(bSuccess, TEXT("Failed to export static mesh %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
+    fgcheckf(bSuccess, TEXT("Failed to export static mesh %s: %s"), *Asset->GetPathName(), *OutErrorMessage);
 
 	//Serialize exported model hash to avoid reading it during generation pass
 	const FMD5Hash ModelFileHash = FMD5Hash::HashFile(*OutFbxMeshFileName);

@@ -38,7 +38,7 @@ void UUserDefinedEnumGenerator::PopulateEnumWithData(UUserDefinedEnum* Enum) {
 
 	//Last entry should always be a MAX one, just skip it because SetEnums will make one on it's own
 	const TSharedPtr<FJsonObject> LastNamePair = Names.Last()->AsObject();
-	check(LastNamePair->GetStringField(TEXT("Name")).EndsWith(TEXT("_MAX")));
+	fgcheck(LastNamePair->GetStringField(TEXT("Name")).EndsWith(TEXT("_MAX")));
 	
 	for (int32 i = 0; i < Names.Num() - 1; i++) {
 		const TSharedPtr<FJsonObject> PairObject = Names[i]->AsObject();
@@ -50,7 +50,7 @@ void UUserDefinedEnumGenerator::PopulateEnumWithData(UUserDefinedEnum* Enum) {
 	}
 	
 	Enum->SetEnums(ResultEnumNames, UEnum::ECppForm::Namespaced);
-	check(LastNamePair->GetIntegerField(TEXT("Value")) == Enum->GetMaxEnumValue());
+	fgcheck(LastNamePair->GetIntegerField(TEXT("Value")) == Enum->GetMaxEnumValue());
 
 	//Update display names according to the json ones
 	for (const TSharedPtr<FJsonValue> NameValue : DisplayNames) {
