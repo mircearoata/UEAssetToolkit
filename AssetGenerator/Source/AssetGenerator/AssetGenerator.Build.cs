@@ -39,7 +39,8 @@ public class AssetGenerator : ModuleRules
             "PhysicsCore",
             "MediaAssets",
             "AudioEditor",
-            "GraphEditor"
+            "GraphEditor",
+            "WwiseFileHandler", "AkAudio"
         });
 
 	    PrivateDependencyModuleNames.Add("DeveloperSettings");
