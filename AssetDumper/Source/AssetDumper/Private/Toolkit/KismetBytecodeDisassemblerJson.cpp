@@ -1060,7 +1060,7 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 	default:
 		{
 			// This should only really occur if the caller has passed an incorrect index that is not the start of an instruction.
-			fgcheckf(0, TEXT("Unknown bytecode 0x%02X at ScriptIndex %d. Either a new opcode has been added or the supplied index does not contain a valid instruction!"), (uint8)Opcode, ScriptIndex);
+			checkf(0, TEXT("Unknown bytecode 0x%02X at ScriptIndex %d. Either a new opcode has been added or the supplied index does not contain a valid instruction!"), (uint8)Opcode, ScriptIndex);
 			break;
 		}
 	}
