@@ -3,10 +3,12 @@
 #include "Toolkit/PropertyTypeHelper.h"
 
 TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int32& ScriptIndex) {
+	int32 OpcodeIndex = ScriptIndex;
 	EExprToken Opcode = (EExprToken) ReadByte(ScriptIndex);
 	TSharedPtr<FJsonObject> Result = MakeShareable(new FJsonObject());
 	
-	
+	Result->SetNumberField(TEXT("Opcode"), Opcode);
+	Result->SetNumberField(TEXT("OpcodeIndex"), OpcodeIndex);
 	switch (Opcode) {
 	case EX_Cast:
 		{
@@ -1049,13 +1051,21 @@ TSharedPtr<FJsonObject> FKismetBytecodeDisassemblerJson::SerializeExpression(int
 			Result->SetObjectField(TEXT("Expression"), SerializeExpression(ScriptIndex));
 			break;
 		}
+	case EX_NothingInt32:
+		{
+			Result->SetStringField(TEXT("Inst"), TEXT("NothingInt32"));
+			ReadInt(ScriptIndex); //Skip element amount
+			break;
+		}
 	default:
 		{
-			// This should never occur.
-			checkf(0, TEXT("Unknown bytecode 0x%02X"), (uint8) Opcode);
+			// This should only really occur if the caller has passed an incorrect index that is not the start of an instruction.
+			checkf(0, TEXT("Unknown bytecode 0x%02X at ScriptIndex %d. Either a new opcode has been added or the supplied index does not contain a valid instruction!"), (uint8)Opcode, ScriptIndex);
 			break;
 		}
 	}
+
+	Result->SetNumberField(TEXT("OpSizeInBytes"), ScriptIndex - OpcodeIndex);
 	//Make sure no instruction identifier is ever missing from returned json object
 	check(Result->HasField(TEXT("Inst")));
 	return Result;
