@@ -1,3 +1,4 @@
+#if PLATFORM_WINDOWS
 #include "Util/FileDialogHelper.h"
 #include "Misc/Paths.h"
 #include "Framework/Application/SlateApplication.h"
@@ -80,3 +81,4 @@ bool FFileDialogHelper::OpenDirectoryDialog(const void* ParentWindowHandle, cons
 	}
 	return false;
 }
+#endif

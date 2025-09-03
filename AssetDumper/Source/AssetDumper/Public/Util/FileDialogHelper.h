@@ -1,4 +1,5 @@
 #pragma once
+#if PLATFORM_WINDOWS
 #include "CoreMinimal.h"
 
 /**
@@ -12,3 +13,4 @@ class ASSETDUMPER_API FFileDialogHelper {
 public:
 	static bool OpenDirectoryDialog(const void* ParentWindowHandle, const FString& DialogTitle, const FString& DefaultPath, FString& OutFolderName);
 };
+#endif

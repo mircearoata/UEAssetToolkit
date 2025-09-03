@@ -477,7 +477,7 @@ void UMaterialGenerator::SpawnNewMaterialParameterNodes(UMaterial* Material, FMa
 		}
 	}
 
-	for (const TMaterialParameter<TSoftObjectPtr<UTexture>> NewTextureParameter : LayoutChangeInfo.NewTextureParameters) {
+	for (const TMaterialParameter<TSoftObjectPtr<UTexture>>& NewTextureParameter : LayoutChangeInfo.NewTextureParameters) {
 		if (NewTextureParameter.ParameterInfo.Association == GlobalParameter && NewTextureParameter.ParameterValue) {
 			UClass* ExpressionClass = GetTextureSampleParameterClassForTexture(NewTextureParameter.ParameterValue.Get());
 			UMaterialExpressionTextureSampleParameter* Expression = SpawnMaterialExpression<UMaterialExpressionTextureSampleParameter>(Material, ExpressionClass);
@@ -992,7 +992,7 @@ void UMaterialGenerator::AddNewParameterInfo(const FMaterialCachedExpressionData
 	}
 	else if (Type == EMaterialParameterType::Font) {
 		TSoftObjectPtr<UFont> Font = Data.FontValues[Index];
-		ChangeInfo.NewFontParameters.Add({ParameterInfo, Font});
+		ChangeInfo.NewFontParameters.Add({ParameterInfo, {Font}});
 	}
 	else if (Type == EMaterialParameterType::RuntimeVirtualTexture) {
 		TSoftObjectPtr<URuntimeVirtualTexture> Texture = Data.RuntimeVirtualTextureValues[Index];

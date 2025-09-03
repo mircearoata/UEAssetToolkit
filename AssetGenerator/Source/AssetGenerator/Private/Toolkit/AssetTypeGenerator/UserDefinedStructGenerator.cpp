@@ -103,7 +103,7 @@ void UUserDefinedStructGenerator::FinalizeAssetCDO() {
 	UUserDefinedStruct* Struct = GetAsset<UUserDefinedStruct>();
 
 	//Struct should be up to date at this point (but when generating from BP, it usually isn't)
-	if (!Struct->Status == EUserDefinedStructureStatus::UDSS_UpToDate) {
+	if (Struct->Status != EUserDefinedStructureStatus::UDSS_UpToDate) {
 		UE_LOG(LogAssetGenerator, Error, TEXT("Struct %s not up to date!"),
 				*Struct->GetPathName());
 		return;

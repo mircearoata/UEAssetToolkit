@@ -174,7 +174,6 @@ bool FNativeClassDumpProcessor::IsTickableWhenPaused() const {
 }
 
 void FNativeClassDumpProcessor::InitializeNativeClassDump() {
-	this->Settings = Settings;
 	this->bHasFinishedDumping = false;
 	this->RemainingClasses = Classes;
 	this->RemainingStructs = Structs;

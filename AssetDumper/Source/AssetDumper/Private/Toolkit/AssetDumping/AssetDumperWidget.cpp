@@ -3,6 +3,7 @@
 #include "Toolkit/AssetDumping/AssetRegistryViewWidget.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializer.h"
 #include "Util/FileDialogHelper.h"
+#include "DesktopPlatformModule.h"
 #include "Widgets/Input/SSlider.h"
 
 #define LOCTEXT_NAMESPACE "AssetDumper"
@@ -181,8 +182,16 @@ FReply SAssetDumperWidget::OnBrowseOutputPathPressed() {
 	//Make sure currently selected path exists so we can show it in the explorer
 	FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*AssetDumpSettings.RootDumpDirectory);
 
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 	FString PickedOutputFolderPath;
-    if (FFileDialogHelper::OpenDirectoryDialog(ParentWindowHandle, DialogTitle, AssetDumpSettings.RootDumpDirectory, PickedOutputFolderPath)) {
+
+	if (
+#if PLATFORM_WINDOWS
+		FFileDialogHelper::OpenDirectoryDialog
+#else
+		DesktopPlatform->OpenDirectoryDialog
+#endif
+			(ParentWindowHandle, DialogTitle, AssetDumpSettings.RootDumpDirectory, PickedOutputFolderPath)) {
     	OutputPathText->SetText(FText::FromString(PickedOutputFolderPath));
     	AssetDumpSettings.RootDumpDirectory = PickedOutputFolderPath;
     }

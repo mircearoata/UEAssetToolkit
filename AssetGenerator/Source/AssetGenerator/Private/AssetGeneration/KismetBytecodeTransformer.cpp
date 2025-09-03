@@ -18,7 +18,7 @@ void FKismetBytecodeTransformer::SetSourceStatements(const FString& FunctionName
     this->CurrentFunctionName = FunctionName;
     this->ResultStatements.Reserve(Statements.Num());
     
-    for (const TSharedPtr<FJsonObject> StatementObject : Statements) {
+    for (const TSharedPtr<FJsonObject>& StatementObject : Statements) {
         const uint32 StatementIndex = StatementObject->GetIntegerField(TEXT("StatementIndex"));
         TSharedPtr<FKismetCompiledStatement> Statement = ProcessStatement(StatementObject);
 

@@ -52,7 +52,7 @@ void UUserDefinedEnumGenerator::PopulateEnumWithData(UUserDefinedEnum* Enum) {
 	check(LastNamePair->GetIntegerField(TEXT("Value")) == Enum->GetMaxEnumValue());
 
 	//Update display names according to the json ones
-	for (const TSharedPtr<FJsonValue> NameValue : DisplayNames) {
+	for (const TSharedPtr<FJsonValue>& NameValue : DisplayNames) {
 		const TSharedPtr<FJsonObject> PairObject = NameValue->AsObject();
 		const FName Name = FName(*PairObject->GetStringField(TEXT("Name")));
 		const FString DisplayNameJson = PairObject->GetStringField(TEXT("DisplayName"));
