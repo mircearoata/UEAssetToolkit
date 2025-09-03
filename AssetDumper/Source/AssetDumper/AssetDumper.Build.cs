@@ -46,11 +46,36 @@ public class AssetDumper : ModuleRules
         
         var platformName = Target.Platform.ToString();
         var libraryFolder = Path.Combine(thirdPartyFolder, platformName);
-        
-        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libfbxsdk-md.lib"));
-        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libxml2-md.lib"));
-        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "zlib-md.lib"));
-        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "detex.lib"));
+
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libfbxsdk-md.lib"));
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libxml2-md.lib"));
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "zlib-md.lib"));
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "detex.lib"));
+        }
+        else if (Target.IsInPlatformGroup(UnrealPlatformGroup.Unix))
+        {
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libxml2.a"));
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libz.a"));
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libdetex.a"));
+
+	        // On Windows we use a static library. I have no idea how, as the fbx sdk only provides a shared library build
+	        // For linux let's just do what UE does and link the shared library
+	        // This does mean that two libfbxsdk.so will be loaded, but we're not going to dump assets in a Linux (Editor) build anyway
+	        PublicDefinitions.Add("FBXSDK_SHARED");
+
+	        PublicRuntimeLibraryPaths.Add(libraryFolder);
+	        PublicAdditionalLibraries.Add(Path.Combine(libraryFolder, "libfbxsdk.so"));
+	        RuntimeDependencies.Add(Path.Combine(libraryFolder, "libfbxsdk.so"));
+
+	        /* There is a bug in fbxarch.h where is doesn't do the check
+	         * for clang under linux */
+	        PublicDefinitions.Add("FBXSDK_COMPILER_CLANG");
+
+	        // libfbxsdk has been built against libstdc++ and as such needs this library
+	        PublicSystemLibraries.Add("stdc++");
+        }
         
         var pluginsDirectory = DirectoryReference.Combine(Target.ProjectFile.Directory, "Plugins");
         var smlPluginDirectory = DirectoryReference.Combine(pluginsDirectory, "SML");

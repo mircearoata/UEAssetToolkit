@@ -461,7 +461,7 @@ public:
       *	                                 deleted when the pointer is released or the object is destroyed. At the moment of 
       *                                  release or destruction, the values in this buffer are copied back into this object.
 	  */
-	template <class T> inline T* GetLocked(T*, ELockMode pLockMode=eReadWriteLock) {T v; return (T*)GetLocked(pLockMode, FbxTypeOf(v)); }
+	template <class T> inline T* GetLocked(T*, ELockMode pLockMode=eReadWriteLock) {T v{}; return (T*)GetLocked(pLockMode, FbxTypeOf(v)); }
 
 	/** Unlock the data buffer.
 	  * \param pDataPtr                  The buffer to be released.
