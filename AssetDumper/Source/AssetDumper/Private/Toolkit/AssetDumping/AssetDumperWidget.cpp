@@ -2,8 +2,11 @@
 #include "Toolkit/AssetDumping/AssetDumpConsoleWidget.h"
 #include "Toolkit/AssetDumping/AssetRegistryViewWidget.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializer.h"
+#if PLATFORM_WINDOWS
 #include "Util/FileDialogHelper.h"
+#else
 #include "DesktopPlatformModule.h"
+#endif
 #include "Widgets/Input/SSlider.h"
 
 #define LOCTEXT_NAMESPACE "AssetDumper"
@@ -182,7 +185,9 @@ FReply SAssetDumperWidget::OnBrowseOutputPathPressed() {
 	//Make sure currently selected path exists so we can show it in the explorer
 	FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*AssetDumpSettings.RootDumpDirectory);
 
+#if !PLATFORM_WINDOWS
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+#endif
 	FString PickedOutputFolderPath;
 
 	if (
