@@ -699,18 +699,10 @@ void UMaterialGenerator::TryConnectBasicMaterialPins(UMaterial* Material) {
 		const FVector2D NodePos = FVector2D(Material->EditorX - 384, Material->EditorY);
 		// This terribleness is necessary because UMaterialExpressionSceneTexture
 		// is not exported at all, so there is no way to use the type directly...
-		UPackage* EngineScriptPackage = UEngine::StaticClass()->GetOuterUPackage();
+		UPackage* EngineScriptPackage = FindPackage(NULL, UMaterialExpressionSceneTexture::StaticPackage());
 		TSubclassOf<UMaterialExpression> SceneTextureExpressionClass = FindObjectChecked<UClass>(EngineScriptPackage, TEXT("MaterialExpressionSceneTexture"));
-		UMaterialExpression* SceneTextureExpression = SpawnMaterialExpression<UMaterialExpression>(Material, NodePos, SceneTextureExpressionClass);
-		if (FByteProperty* Prop = CastField<FByteProperty>(SceneTextureExpressionClass->FindPropertyByName(TEXT("SceneTextureId")))) {
-			if (uint8* ValuePtr = Prop->ContainerPtrToValuePtr<uint8>(SceneTextureExpression)) {
-				*ValuePtr = PPI_PostProcessInput0;
-			} else {
-				fgcheckf(0, TEXT("bad ValuePtr"));
-			}
-		} else {
-			fgcheckf(0, TEXT("bad Prop"));
-		}
+		UMaterialExpressionSceneTexture* SceneTextureExpression = static_cast<UMaterialExpressionSceneTexture*>(SpawnMaterialExpression<UMaterialExpression>(Material, NodePos, SceneTextureExpressionClass));
+		SceneTextureExpression->SceneTextureId = PPI_PostProcessInput0;
 		EmissiveColorInput.Connect(0, SceneTextureExpression);
 		return;
 	}
