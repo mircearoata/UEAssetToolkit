@@ -23,5 +23,12 @@
 				"Win64"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "SML",
+			"Enabled": true,
+			"Optional": true
+		},
 	]
 }
