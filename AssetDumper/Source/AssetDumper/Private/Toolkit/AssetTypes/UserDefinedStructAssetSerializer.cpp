@@ -1,5 +1,6 @@
 #include "Toolkit/AssetTypes/UserDefinedStructAssetSerializer.h"
 #include "Engine/UserDefinedStruct.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/PropertySerializer.h"

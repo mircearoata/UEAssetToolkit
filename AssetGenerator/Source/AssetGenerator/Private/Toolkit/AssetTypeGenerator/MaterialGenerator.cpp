@@ -3,8 +3,9 @@
 #include "MaterialEditorUtilities.h"
 #include "Engine/Texture.h"
 #include "Engine/Texture2DArray.h"
+#include "Engine/VolumeTexture.h"
 #include "Kismet2/BlueprintEditorUtils.h"
-#include "MaterialEditor/Public/MaterialEditingLibrary.h"
+#include "MaterialEditingLibrary.h"
 #include "MaterialGraph/MaterialGraphNode_Comment.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAdd.h"
@@ -28,7 +29,9 @@
 #include "Engine/TextureCube.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2DArray.h"
 #include "MediaTexture.h"
+#include "Engine/Engine.h"
 #include "Materials/MaterialExpressionFontSampleParameter.h"
+#include "Materials/MaterialExpressionTextureSampleParameterVolume.h"
 
 static const TArray<FName> ExcludedMaterialDumpProperties = {
 	//We cannot recompile game materials and add usages since we do not have their sources, so we ignore this value and force it to false
@@ -129,8 +132,6 @@ void UMaterialGenerator::TryApplyMaterialLayoutChange(UMaterial* Material, FMate
 	}
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
-
 void UMaterialGenerator::ApplyLayoutChangelistToMaterial(UMaterial* Material, FMaterialLayoutChangeInfo& LayoutChangeInfo, bool bSoftMerge) {
 	RemoveOutdatedMaterialLayoutNodes(Material, LayoutChangeInfo, bSoftMerge);
 	
@@ -162,8 +163,6 @@ void UMaterialGenerator::PopulateLayoutChangeInfoForNewMaterial(FMaterialLayoutC
 	FMaterialLayoutChangeInfo MaterialLayoutChangeInfo{};
 	DetectMaterialExpressionChanges(FMaterialCachedExpressionData{}, NewExpressionData, OutLayoutChangeInfo);
 }
-
-PRAGMA_ENABLE_OPTIMIZATION
 
 bool UMaterialGenerator::IsMaterialUpToDate(UMaterial* Asset, FMaterialLayoutChangeInfo& MaterialLayoutChangeInfo) const {
 	const TSharedPtr<FJsonObject> AssetData = GetAssetData();
@@ -297,7 +296,10 @@ UClass* GetTextureSampleParameterClassForTexture(UTexture* Texture) {
 	if (Texture->IsA(UTexture2DArray::StaticClass())) {
 		return UMaterialExpressionTextureSampleParameter2DArray::StaticClass();
 	}
-	checkf(0, TEXT("Unsupported Texture Class: %s"), *Texture->GetPathName());
+	if (Texture->IsA<UVolumeTexture>()) {
+		return UMaterialExpressionTextureSampleParameterVolume::StaticClass();
+	}
+	checkf(0, TEXT("Unsupported Texture Class: %s"), *Texture->GetClass()->GetPathName());
 	return NULL;
 }
 
@@ -632,8 +634,8 @@ void UMaterialGenerator::RemoveOutdatedMaterialLayoutNodes(UMaterial* Material, 
 
 			if (!CheckedExpressions.Contains(Input->Expression)) {
 				CheckedExpressions.Add(Input->Expression);
-				for (FExpressionInput* ExpressionInput : Input->Expression->GetInputs()) {
-					InputsToCheck.Enqueue(ExpressionInput);
+				for (FExpressionInputIterator It(Input->Expression); It; ++It) {
+					InputsToCheck.Enqueue(It.Input);
 				}
 			}
 			
@@ -692,8 +694,6 @@ void UMaterialGenerator::TryConnectBasicMaterialPins(UMaterial* Material) {
 		}
 	}
 }
-
-PRAGMA_DISABLE_OPTIMIZATION
 
 void UMaterialGenerator::ConnectDummyParameterNodes(UMaterial* Material) {
 	if (Material->GetEditorOnlyData()->Roughness.IsConnected()) {
@@ -762,8 +762,6 @@ void UMaterialGenerator::ConnectDummyParameterNodes(UMaterial* Material) {
 		Material->GetEditorOnlyData()->Roughness.Connect(0, ZeroMultiply);
 	}
 }
-
-PRAGMA_ENABLE_OPTIMIZATION
 
 void UMaterialGenerator::CreateGeneratedMaterialComment(UMaterial* Material) {
 	FString ResultCommentText;

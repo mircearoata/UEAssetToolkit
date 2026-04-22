@@ -100,7 +100,7 @@ void FAssetDumpProcessor::Tick(float DeltaTime) {
 	
 	const int32 ElementsToCopy = FMath::Min(LoadedPackages.Num(), MaxPackagesToProcessInOneTick);
 	PackagesToProcessThisTick.Append(LoadedPackages.GetData(), ElementsToCopy);
-	LoadedPackages.RemoveAt(0, ElementsToCopy, false);
+	LoadedPackages.RemoveAt(0, ElementsToCopy, EAllowShrinking::No);
 	PackagesWaitingForProcessing.Subtract(ElementsToCopy);	
 
 	this->LoadedPackagesCriticalSection.Unlock();

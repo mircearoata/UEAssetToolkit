@@ -3,11 +3,12 @@
 #include "Blueprint/WidgetTree.h"
 #include "Channels/MovieSceneEvent.h"
 #include "Kismet2/KismetEditorUtilities.h"
-#include "UMGEditor/Public/WidgetBlueprint.h"
+#include "WidgetBlueprint.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Dom/JsonObject.h"
 #include "Toolkit/PropertySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
+#include "UObject/Package.h"
 
 void UUserWidgetGenerator::PostInitializeAssetGenerator() {
 	//TEMPFIX: Fix for old dumps that have this data serialized, we should never attempt to load it
@@ -39,19 +40,31 @@ void UUserWidgetGenerator::FinalizeAssetCDO() {
 	const bool bWidgetTreeChanged = !GetObjectSerializer()->CompareUObjects(WidgetTreeObject, WidgetBlueprint->WidgetTree, false, false);
 
 	if (bWidgetTreeChanged) {
+		if (WidgetBlueprint->WidgetTree) {
+			//Trash out old widget tree so it does not interfere with the newly generated one
+			MoveToTransientPackageAndRename(WidgetBlueprint->WidgetTree);
+		}
+
+		UWidgetBlueprintGeneratedClass* GeneratedClass = Cast<UWidgetBlueprintGeneratedClass>(WidgetBlueprint->GeneratedClass);
+		if (GeneratedClass && GeneratedClass->GetWidgetTreeArchetype()) {
+			//Trash out old widget tree so it does not interfere with the newly generated one
+			MoveToTransientPackageAndRename(GeneratedClass->GetWidgetTreeArchetype());
+			GeneratedClass->SetWidgetTreeArchetype(NULL);
+		}
+
 		//Deserialize widget tree as it was present on the generated class
 		UObject* NewWidgetTree = GetObjectSerializer()->DeserializeObject(WidgetTreeObject);
 
-		//Trash out old widget tree so it does not interfere with the newly generated one
-		MoveToTransientPackageAndRename(WidgetBlueprint->WidgetTree);
-		
 		//Since deserialized widget tree is the original tree copied to BPGC, renamed and with flags changed,
 		//we need to duplicate it with the correct name, outer and flags, and only then assign to the blueprint
 		UObject* DuplicatedWidgetTree = DuplicateObject(NewWidgetTree, WidgetBlueprint, TEXT("WidgetTree"));
 		DuplicatedWidgetTree->ClearFlags(RF_Transient);
 		DuplicatedWidgetTree->SetFlags(RF_Public | RF_DefaultSubObject | RF_Transactional | RF_ArchetypeObject);
-		
+
 		WidgetBlueprint->WidgetTree = CastChecked<UWidgetTree>(DuplicatedWidgetTree);
+
+		// This gets updated by the blueprint compiler. We could also update it ourselves, but that's more work
+		WidgetBlueprint->WidgetVariableNameToGuidMap.Empty();
 
 		UpdateDeserializerBlueprintClassObject(true);
 		MarkAssetChanged();
@@ -101,6 +114,9 @@ void UUserWidgetGenerator::FinalizeAssetCDO() {
 			}
 			WidgetBlueprint->Animations.Add(CastChecked<UWidgetAnimation>(AnimationObject));
 		}
+
+		// This gets updated by the blueprint compiler. We could also update it ourselves, but that's more work
+		WidgetBlueprint->WidgetVariableNameToGuidMap.Empty();
 
 		UpdateDeserializerBlueprintClassObject(true);
 		MarkAssetChanged();

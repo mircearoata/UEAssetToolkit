@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
-#include "AssetRegistry/Private/AssetRegistry.h"
 #include "Commandlets/Commandlet.h"
 #include "AssetGeneratorCommandlet.generated.h"
 
@@ -16,6 +15,4 @@ public:
 private:
 	void ProcessDeferredCommands();
 	void ClearEmptyGamePackagesLoadedDuringDisregardGC();
-
-	virtual UAssetRegistryImpl& Get();
 };

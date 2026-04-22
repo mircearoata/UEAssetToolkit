@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
+#include "Animation/Skeleton.h"
+#include "UObject/GCObject.h"
 
 class ASSETGENERATOR_API FStubFileInfo {
 	FString FullFilePath;
@@ -12,21 +14,23 @@ public:
 };
 
 template<typename T>
-class TStubAssetInfo {
-	T* Object;
+class TStubAssetInfo : public FGCObject  {
+	TObjectPtr<T> Object;
 public:
 	FORCEINLINE TStubAssetInfo(const TCHAR* PackageName) {
 		this->Object = LoadObject<T>(NULL, PackageName);
 		checkf(Object, TEXT("Failed to load stub %s asset from %s"), *T::StaticClass()->GetName(), PackageName);
-		this->Object->AddToRoot();
-	}
-	
-	FORCEINLINE ~TStubAssetInfo() {
-		this->Object->RemoveFromRoot();
-		this->Object = NULL;
 	}
 
-	FORCEINLINE T* GetObject() const { return Object; }
+	FORCEINLINE TObjectPtr<T> GetObject() const { return Object; }
+
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override{
+		Collector.AddReferencedObject(Object);
+	}
+
+	virtual FString GetReferencerName() const override{
+		return FString::Printf(TEXT("TStubAssetInfo<%s>(%s)"), *T::StaticClass()->GetName(), Object ? *Object->GetFullName() : TEXT("N/A"));
+	}
 };
 
 class ASSETGENERATOR_API FPublicProjectStubHelper {

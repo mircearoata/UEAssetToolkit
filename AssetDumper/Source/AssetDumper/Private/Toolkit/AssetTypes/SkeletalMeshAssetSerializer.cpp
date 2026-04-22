@@ -2,6 +2,7 @@
 #include "Toolkit/AssetTypes/FbxMeshExporter.h"
 #include "Toolkit/PropertySerializer.h"
 #include "Engine/SkeletalMesh.h"
+#include "Materials/MaterialInterface.h"
 #include "PhysicsEngine/BodySetup.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
@@ -12,9 +13,9 @@ void USkeletalMeshAssetSerializer::SerializeAsset(TSharedRef<FSerializationConte
 	
 	DISABLE_SERIALIZATION_RAW(USkeletalMesh, "SamplingInfo");
 	DISABLE_SERIALIZATION_RAW(USkeletalMesh, "LODInfo");
-	
+
 	DISABLE_SERIALIZATION(USkeletalMesh, bHasVertexColors);
-	DISABLE_SERIALIZATION(USkeletalMesh, bHasBeenSimplified);
+	// DISABLE_SERIALIZATION(USkeletalMesh, bHasBeenSimplified);
 
 	//TODO support physic asset dumping/generation
 	DISABLE_SERIALIZATION(USkeletalMesh, PhysicsAsset);

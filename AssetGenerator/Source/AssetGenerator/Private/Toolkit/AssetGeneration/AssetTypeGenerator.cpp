@@ -1,5 +1,6 @@
 #include "Toolkit/AssetGeneration/AssetTypeGenerator.h"
 #include "FileHelpers.h"
+#include "Misc/Paths.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/PropertySerializer.h"
 #include "Toolkit/AssetGeneration/AssetGenerationUtil.h"

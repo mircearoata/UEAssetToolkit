@@ -3,6 +3,7 @@
 #include "Engine/Blueprint.h"
 #include "Engine/LatentActionManager.h"
 #include "Toolkit/PropertyTypeHelper.h"
+#include "UObject/TextProperty.h"
 
 FKismetBytecodeTransformer::FKismetBytecodeTransformer(UBlueprint* Blueprint) {
     this->OwnerBlueprint = Blueprint;
@@ -551,7 +552,7 @@ TSharedPtr<FKismetTerminal> FKismetBytecodeTransformer::ProcessLiteralExpression
             const FString SourceString = Expression->GetStringField(TEXT("SourceString"));
             const FString KeyString = Expression->GetStringField(TEXT("LocalizationKey"));
             const FString Namespace = Expression->GetStringField(TEXT("LocalizationNamespace"));
-            const FText Text = FInternationalization::ForUseOnlyByLocMacroAndGraphNodeTextLiterals_CreateText(*SourceString, *Namespace, *KeyString);
+            const FText Text = FText::AsLocalizable_Advanced(Namespace, KeyString, SourceString);
             LiteralTerminal->TextLiteral = Text;
             
         } else if (LiteralType == TEXT("InvariantText")) {

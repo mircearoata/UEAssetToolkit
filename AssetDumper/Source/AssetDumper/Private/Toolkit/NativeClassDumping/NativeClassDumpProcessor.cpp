@@ -43,14 +43,14 @@ void FNativeClassDumpProcessor::Tick(float DeltaTime) {
 	
 	const int32 ClassElementsToCopy = FMath::Min(RemainingClasses.Num(), Settings.MaxClassesToProcessInOneTick);
 	ClassesToProcessThisTick.Append(RemainingClasses.GetData(), ClassElementsToCopy);
-	RemainingClasses.RemoveAt(0, ClassElementsToCopy, false);
+	RemainingClasses.RemoveAt(0, ClassElementsToCopy, EAllowShrinking::No);
 	
 	TArray<UStruct*, TInlineAllocator<16>> StructsToProcessThisTick;
 	StructsToProcessThisTick.Reserve(Settings.MaxStructsToProcessInOneTick);
 	
 	const int32 StructElementsToCopy = FMath::Min(RemainingStructs.Num(), Settings.MaxStructsToProcessInOneTick);
 	StructsToProcessThisTick.Append(RemainingStructs.GetData(), StructElementsToCopy);
-	RemainingStructs.RemoveAt(0, StructElementsToCopy, false);
+	RemainingStructs.RemoveAt(0, StructElementsToCopy, EAllowShrinking::No);
 
 	if (ClassesToProcessThisTick.Num()) {
 		EParallelForFlags ParallelFlags = EParallelForFlags::Unbalanced;

@@ -1,6 +1,11 @@
 #include "Toolkit/AssetTypes/DataAssetSerializer.h"
 
+#include "AssetRegistry/AssetData.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Blueprint/BlueprintSupport.h"
+#include "Dom/JsonObject.h"
+#include "Engine/Blueprint.h"
+#include "Engine/DataAsset.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "Toolkit/AssetDumping/AssetTypeSerializerMacros.h"
 #include "Toolkit/AssetDumping/SerializationContext.h"

@@ -4,8 +4,11 @@
 #include "Toolkit/AssetGeneration/AssetGenerationProcessor.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "ShaderCompiler.h"
-#include "AssetRegistry/Private/AssetRegistry.h"
+#include "Engine/Engine.h"
+#include "HAL/PlatformFileManager.h"
+#include "Misc/FileHelper.h"
 #include "Toolkit/AssetGeneration/AssetGenerationUtil.h"
+#include "UObject/UObjectIterator.h"
 
 DEFINE_LOG_CATEGORY(LogAssetGeneratorCommandlet)
 
@@ -51,12 +54,6 @@ UAssetGeneratorCommandlet::UAssetGeneratorCommandlet() {
 	HelpDescription = TEXT("Generates assets from the dump located in the provided folder using the provided settings");
 	HelpUsage = TEXT("assetgenerator -DumpDirectory=Path/To/Directory [-ForceGeneratePackageNames=ForceGeneratePackageNames.txt] [-BlacklistPackageNames=BlacklistPackageNames.txt] [-AssetClassWhitelist=Class1,Class2] [-NoRefresh] [-PublicProject]");
 	ShowErrorCount = false;
-}
-
-UAssetRegistryImpl& UAssetGeneratorCommandlet::Get()
-{
-	FAssetRegistryModule& Module = FModuleManager::GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
-	return static_cast<UAssetRegistryImpl&>(Module.Get());
 }
 
 

@@ -7,11 +7,9 @@ void USimpleAssetGenerator::CreateAssetPackage() {
 	UClass* AssetClass = GetAssetObjectClass();
 	UObject* NewAssetObject = NewObject<UObject>(NewPackage, AssetClass, GetAssetName(), RF_Public | RF_Standalone);
 	SetPackageAndAsset(NewPackage, NewAssetObject);
-	
-	PopulateSimpleAssetWithData(NewAssetObject);
 }
 
-void USimpleAssetGenerator::OnExistingPackageLoaded() {
+void USimpleAssetGenerator::PopulateAssetWithData() {
 	UObject* ExistingAssetObject = GetAsset<UObject>();
 
 	if (!IsSimpleAssetUpToDate(ExistingAssetObject)) {
@@ -36,7 +34,7 @@ bool USimpleAssetGenerator::IsSimpleAssetUpToDate(UObject* Asset) const {
 }
 
 void USimpleAssetGenerator::PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const {
-	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
+	if (GetCurrentStage() == EAssetGenerationStage::DATA_POPULATION) {
 		PopulateReferencedObjectsDependencies(OutDependencies);
 	}
 }

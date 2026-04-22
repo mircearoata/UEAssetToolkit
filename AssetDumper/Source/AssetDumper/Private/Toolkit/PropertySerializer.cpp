@@ -1,6 +1,7 @@
 #include "Toolkit/PropertySerializer.h"
 #include "Toolkit/ObjectHierarchySerializer.h"
 #include "UObject/TextProperty.h"
+#include "Containers/AnsiString.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogPropertySerializer, Error, Log);
 
@@ -106,7 +107,7 @@ void UPropertySerializer::DeserializePropertyValue(FProperty* Property, const TS
 		check(ArrayElements.Num() == Property->ArrayDim);
 		
 		for (int32 ArrayIndex = 0; ArrayIndex < Property->ArrayDim; ArrayIndex++) {
-			uint8* ArrayPropertyValue = (uint8*) Value + Property->ElementSize * ArrayIndex;
+			uint8* ArrayPropertyValue = (uint8*) Value + Property->GetElementSize() * ArrayIndex;
 			const TSharedRef<FJsonValue> ArrayJsonValue = ArrayElements[ArrayIndex].ToSharedRef();
 			
 			DeserializePropertyValueInner(Property, ArrayJsonValue, ArrayPropertyValue);
@@ -144,7 +145,7 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 		FScriptSetHelper SetHelper(SetProperty, Value);
 		const TArray<TSharedPtr<FJsonValue>>& SetArray = JsonValue->AsArray();
 		SetHelper.EmptyElements();
-		uint8* TempElementStorage = static_cast<uint8*>(FMemory::Malloc(ElementProperty->ElementSize));
+		uint8* TempElementStorage = static_cast<uint8*>(FMemory::Malloc(ElementProperty->GetElementSize()));
 		ElementProperty->InitializeValue(TempElementStorage);
 		
 		for (int32 i = 0; i < SetArray.Num(); i++) {
@@ -255,6 +256,14 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 		const FString StringValue = JsonValue->AsString();
 		*static_cast<FString*>(Value) = StringValue;
 
+	} else if (Property->IsA<FUtf8StrProperty>()) {
+		const FString StringValue = JsonValue->AsString();
+		*static_cast<FUtf8String*>(Value) = *StringValue;
+
+	} else if (Property->IsA<FAnsiStrProperty>()) {
+		const FString StringValue = JsonValue->AsString();
+		*static_cast<FAnsiString*>(Value) = *StringValue;
+
 	} else if (const FEnumProperty* EnumProperty = CastField<const FEnumProperty>(Property)) {
 		//Prefer readable enum names in result json to raw numbers
 		const FString EnumName = JsonValue->AsString();
@@ -278,6 +287,13 @@ void UPropertySerializer::DeserializePropertyValueInner(FProperty* Property, con
 		FFieldPath FieldPath;
 		FieldPath.Generate(*JsonValue->AsString());
 		*static_cast<FFieldPath*>(Value) = FieldPath;
+	} else if (const FOptionalProperty* OptionalProperty = CastField<const FOptionalProperty>(Property)) {
+		if (JsonValue->IsNull()) {
+			OptionalProperty->MarkUnset(Value);
+		} else {
+			void* InnerValue = OptionalProperty->MarkSetAndGetInitializedValuePointerToReplace(Value);
+			DeserializePropertyValue(OptionalProperty->GetValueProperty(), JsonValue, InnerValue);
+		}
 	} else {
 		UE_LOG(LogPropertySerializer, Fatal, TEXT("Found unsupported property type when deserializing value: %s"), *Property->GetClass()->GetName());
 	}
@@ -319,7 +335,7 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValue(FProperty* Pr
 	if (Property->ArrayDim != 1) {
 		TArray<TSharedPtr<FJsonValue>> OutJsonValueArray;
 		for (int32 ArrayIndex = 0; ArrayIndex < Property->ArrayDim; ArrayIndex++) {
-			const uint8* ArrayPropertyValue = (const uint8*) Value + Property->ElementSize * ArrayIndex;
+			const uint8* ArrayPropertyValue = (const uint8*) Value + Property->GetElementSize() * ArrayIndex;
 			const TSharedRef<FJsonValue> ElementValue = SerializePropertyValueInner(Property, ArrayPropertyValue, OutReferencedSubobjects);
 			OutJsonValueArray.Add(ElementValue);
 		}
@@ -493,6 +509,16 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 		return MakeShareable(new FJsonValueString(StringValue));
 	}
 	
+	if (Property->IsA<FUtf8StrProperty>()) {
+		const FUtf8String& StringValue = *reinterpret_cast<const FUtf8String*>(Value);
+		return MakeShareable(new FJsonValueString(*StringValue));
+	}
+	
+	if (Property->IsA<FAnsiStrProperty>()) {
+		const FAnsiString& StringValue = *reinterpret_cast<const FAnsiString*>(Value);
+		return MakeShareable(new FJsonValueString(*StringValue));
+	}
+	
 	if (const FEnumProperty* EnumProperty = CastField<const FEnumProperty>(Property)) {
 		const int64 UnderlyingValue = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(Value);
 		const FString EnumName = EnumProperty->GetEnum()->GetNameByValue(UnderlyingValue).ToString();
@@ -515,6 +541,13 @@ TSharedRef<FJsonValue> UPropertySerializer::SerializePropertyValueInner(FPropert
 	if (Property->IsA<FFieldPathProperty>()) {
 		FFieldPath* Temp = ((FFieldPath*) Value);
 		return MakeShareable(new FJsonValueString(Temp->ToString()));
+	}
+
+	if (const FOptionalProperty* OptionalProperty = CastField<const FOptionalProperty>(Property)) {
+		if (const void* InnerValue = OptionalProperty->GetValuePointerForReadIfSet(Value)) {
+			return SerializePropertyValue(OptionalProperty->GetValueProperty(), InnerValue, OutReferencedSubobjects);
+		}
+		return MakeShareable(new FJsonValueNull());
 	}
 	
 	UE_LOG(LogPropertySerializer, Fatal, TEXT("Found unsupported property type when serializing value: %s"), *Property->GetClass()->GetName());
@@ -541,7 +574,7 @@ bool UPropertySerializer::ComparePropertyValues(FProperty* Property, const TShar
 		check(ArrayElements.Num() == Property->ArrayDim);
 		
 		for (int32 ArrayIndex = 0; ArrayIndex < Property->ArrayDim; ArrayIndex++) {
-			const uint8* ArrayPropertyValue = (const uint8*) CurrentValue + Property->ElementSize * ArrayIndex;
+			const uint8* ArrayPropertyValue = (const uint8*) CurrentValue + Property->GetElementSize() * ArrayIndex;
 			const TSharedRef<FJsonValue> ArrayJsonValue = ArrayElements[ArrayIndex].ToSharedRef();
 			
 			if (!ComparePropertyValuesInner(Property, ArrayJsonValue, ArrayPropertyValue, Context)) {

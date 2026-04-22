@@ -11,8 +11,8 @@
     #undef TEXT
 #endif
 
-#include "Windows/MinWindows.h"
-#include "Windows/COMPointer.h"
+#include "Windows/WindowsHWrapper.h"
+#include "Microsoft/COMPointer.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include <shlobj.h>
     #include <LM.h>

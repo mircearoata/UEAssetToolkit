@@ -258,7 +258,7 @@ bool FFbxMeshExporter::ExportAnimSequenceIntoFbxFile(UAnimSequence* AnimSequence
 
 int32 USkeleton_GetCompressedAnimationTrackIndex(const int32 InSkeletonBoneIndex, const UAnimSequence* InAnimSeq) {
 	if(InSkeletonBoneIndex != INDEX_NONE) {
-		return InAnimSeq->GetCompressedTrackToSkeletonMapTable().IndexOfByPredicate([&](const FTrackToSkeletonMap& TrackToSkel){
+		return InAnimSeq->GetCompressedData().Get().CompressedTrackToSkeletonMapTable.IndexOfByPredicate([&](const FTrackToSkeletonMap& TrackToSkel){
 			return TrackToSkel.BoneTreeIndex == InSkeletonBoneIndex;
 		});
 	}
@@ -338,7 +338,8 @@ void FFbxMeshExporter::ExportAnimSequence(const UAnimSequence* AnimSeq, TArray<F
 
 		auto ExportLambda = [&](double AnimTime, FbxTime ExportTime, bool bLastKey) {
 			FTransform BoneAtom;
-			AnimSeq->GetBoneTransform(BoneAtom, FSkeletonPoseBoneIndex(BoneTreeIndex), AnimTime, false);
+			FAnimExtractContext ExtractionContext(AnimTime);
+			AnimSeq->GetBoneTransform(BoneAtom, FSkeletonPoseBoneIndex(BoneIndex), ExtractionContext, false);
 			
 			const FbxVector4 Translation = FFbxDataConverter::ConvertToFbxPos(SanitizeVector(BoneAtom.GetTranslation()));
 			const FbxVector4 Rotation = FFbxDataConverter::ConvertToFbxRot(SanitizeVector(BoneAtom.GetRotation().Euler()));
@@ -436,7 +437,7 @@ void FFbxMeshExporter::ExportCustomAnimCurvesToFbx(const TMap<FName, FbxAnimCurv
 		CustomCurve.Value->KeyModifyBegin();
 	}
 	
-	auto ExportLambda = [&](float AnimTime, FbxTime ExportTime, bool bLastKey) {
+	auto ExportLambda = [&](double AnimTime, FbxTime ExportTime, bool bLastKey) {
 		FBlendedCurve BlendedCurve;
 		AnimSequence->EvaluateCurveData(BlendedCurve, AnimTime, false);
 		

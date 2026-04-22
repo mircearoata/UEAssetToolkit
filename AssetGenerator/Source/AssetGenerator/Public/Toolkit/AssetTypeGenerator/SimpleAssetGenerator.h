@@ -9,7 +9,7 @@ class ASSETGENERATOR_API USimpleAssetGenerator : public UAssetTypeGenerator {
 protected:
 	virtual UClass* GetAssetObjectClass() const PURE_VIRTUAL(GetAssetObjectClass, return NULL;);
 	virtual void CreateAssetPackage() override;
-	virtual void OnExistingPackageLoaded() override final;
+	virtual void PopulateAssetWithData() override;
 	
 	virtual void PopulateSimpleAssetWithData(UObject* Asset);
 	virtual bool IsSimpleAssetUpToDate(UObject* Asset) const;

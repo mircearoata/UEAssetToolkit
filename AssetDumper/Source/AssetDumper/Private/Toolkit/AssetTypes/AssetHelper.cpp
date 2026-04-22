@@ -43,7 +43,7 @@ void FAssetHelper::SerializeClass(TSharedPtr<FJsonObject> OutObject, UClass* Cla
     OutObject->SetArrayField(TEXT("Interfaces"), ImplementedInterfaces);
     
     //Serialize ClassDefaultObject
-    const int32 ClassDefaultObjectIndex = ObjectHierarchySerializer->SerializeObject(Class->ClassDefaultObject);
+    const int32 ClassDefaultObjectIndex = ObjectHierarchySerializer->SerializeObject(Class->GetDefaultObject());
     OutObject->SetNumberField(TEXT("ClassDefaultObject"), ClassDefaultObjectIndex);
 }
 
@@ -149,7 +149,7 @@ void FAssetHelper::SerializeProperty(TSharedPtr<FJsonObject> OutObject, FPropert
         
     } else if (FBoolProperty* BoolProperty = CastField<FBoolProperty>(Property)) {
         //Serialize bool property native type and size
-        OutObject->SetNumberField(TEXT("BoolSize"), BoolProperty->ElementSize);
+        OutObject->SetNumberField(TEXT("BoolSize"), BoolProperty->GetElementSize());
         OutObject->SetBoolField(TEXT("NativeBool"), BoolProperty->IsNativeBool());
         
     } else if (FByteProperty* ByteProperty = CastField<FByteProperty>(Property)) {

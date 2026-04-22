@@ -11,4 +11,5 @@ protected:
 public:
 	virtual FTopLevelAssetPath GetAssetClass() override;
 	virtual void GetAdditionallyHandledAssetClasses(TArray<FTopLevelAssetPath>& OutExtraAssetClasses) override;
+	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
 };

@@ -1,7 +1,11 @@
 #include "Toolkit/AssetTypeGenerator/DataAssetGenerator.h"
 
+#include "AssetRegistry/AssetData.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
+#include "Blueprint/BlueprintSupport.h"
+#include "Engine/Blueprint.h"
+#include "Engine/DataAsset.h"
 
 UClass* UDataAssetGenerator::GetAssetObjectClass() const {
 	return FindObjectChecked<UClass>(NULL, *GetAssetClassPath().ToString());
@@ -32,5 +36,12 @@ void UDataAssetGenerator::GetAdditionallyHandledAssetClasses(TArray<FTopLevelAss
 		FString GeneratedClassPath;
 		BlueprintDataAsset.GetTagValue(FBlueprintTags::GeneratedClassPath, GeneratedClassPath);
 		OutExtraAssetClasses.Add(FTopLevelAssetPath(GeneratedClassPath));
+	}
+}
+
+void UDataAssetGenerator::PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const {
+	Super::PopulateStageDependencies(OutDependencies);
+	if (GetCurrentStage() == EAssetGenerationStage::CONSTRUCTION) {
+		OutDependencies.Add(FPackageDependency{GetAssetClassPath().GetPackageName(), EAssetGenerationStage::CONSTRUCTION});
 	}
 }

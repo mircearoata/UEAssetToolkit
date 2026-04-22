@@ -61,6 +61,30 @@ void ConvertFloatR11G11B10ToBGRA8(const void* SourcePixelData, void* DestPixelDa
     }
 }
 
+void ConvertR16FToBGRA8(const void* SourcePixelData, void* DestPixelData, int32 NumPixels) {
+    const FFloat16* SourceData = static_cast<const FFloat16*>(SourcePixelData);
+    FColor* DestData = static_cast<FColor*>(DestPixelData);
+
+    for (int i = 0; i < NumPixels; i++) {
+        const FFloat16* CurrentRed = SourceData++;
+        const FColor SourceColor = FLinearColor(CurrentRed->GetFloat(), 0.0f, 0.0f).ToFColor(false);
+        FColor* CurrentColor = DestData++;
+        *CurrentColor = SourceColor;
+    }
+}
+
+void ConvertR32FToBGRA8(const void* SourcePixelData, void* DestPixelData, int32 NumPixels) {
+    const float* SourceData = static_cast<const float*>(SourcePixelData);
+    FColor* DestData = static_cast<FColor*>(DestPixelData);
+
+    for (int i = 0; i < NumPixels; i++) {
+        const float* CurrentRed = SourceData++;
+        const FColor SourceColor = FLinearColor(*CurrentRed, 0.0f, 0.0f).ToFColor(false);
+        FColor* CurrentColor = DestData++;
+        *CurrentColor = SourceColor;
+    }
+}
+
 bool FTextureDecompressor::DecompressTextureData(EPixelFormat PixelFormat, const uint8* CompressedData, int32 TextureWidth, int32 TextureHeight, TArray<uint8>& OutDecompressedData, FString* OutErrorMessage) {
 
     uint32 SourceTextureFormat = 0;
@@ -113,6 +137,14 @@ bool FTextureDecompressor::DecompressTextureData(EPixelFormat PixelFormat, const
         } else if (PixelFormat == EPixelFormat::PF_G8) {
             //Convert grayscale 8-bit image to gray BGRA8 image
             ConvertGrayscale8ToBGRA8(SourceData, DestData, NumPixels);
+
+        } else if (PixelFormat == EPixelFormat::PF_R16F) {
+            //Convert grayscale 16-bit R-only image to red BGRA8 image
+            ConvertR16FToBGRA8(SourceData, DestData, NumPixels);
+
+        } else if (PixelFormat == EPixelFormat::PF_R32_FLOAT) {
+            //Convert grayscale 32-bit R-only image to red BGRA8 image
+            ConvertR32FToBGRA8(SourceData, DestData, NumPixels);
 
         } else if (PixelFormat == EPixelFormat::PF_FloatRGBA) {
             //Convert 16-bit FloatRGBA image to BGRA8 image

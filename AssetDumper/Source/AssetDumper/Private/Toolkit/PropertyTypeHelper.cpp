@@ -51,7 +51,7 @@ FEdGraphPinType FPropertyTypeHelper::DeserializeGraphPinType(const TSharedRef<FJ
 	if (PinJson->HasField(TEXT("PinSubCategoryMemberReference"))) {
 		FSimpleMemberReference& MemberRef = GraphPinType.PinSubCategoryMemberReference;
 		const TSharedPtr<FJsonObject>& MemberJson = PinJson->GetObjectField(TEXT("PinSubCategoryMemberReference"));
-		if (MemberJson->HasField("MemberParent")) {
+		if (MemberJson->HasField(TEXT("MemberParent"))) {
 			const FString& ObjectPath = MemberJson->GetStringField(TEXT("MemberParent"));
 			MemberRef.MemberParent = DeserializeObjectRef(*ObjectPath, SelfScope);
 		}
