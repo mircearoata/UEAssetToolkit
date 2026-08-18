@@ -16,6 +16,16 @@ void USimpleAssetGenerator::PopulateAssetWithData() {
 		UE_LOG(LogAssetGenerator, Display, TEXT("%s %s is not up to date, regenerating data"), *ExistingAssetObject->GetClass()->GetName(), *ExistingAssetObject->GetPathName());
 		
 		PopulateSimpleAssetWithData(ExistingAssetObject);
+
+		// Commit d665fd6 ("Update to UE 5.6.1")
+		// moved data population out of CreateAssetPackage() (CONSTRUCTION, which always marks
+		// the asset changed) into this DATA_POPULATION stage, but never marks the asset as
+		// changed here. UAssetTypeGenerator::AdvanceGenerationState only saves when
+		// bAssetChanged is set, and the property serializer does not dirty the package, so
+		// every simple asset (MaterialInstance, PhysicalMaterial, MPC, DataAsset, curves...)
+		// was written to disk as the empty CONSTRUCTION shell and the populated data was lost.
+		// Marking the asset changed makes AdvanceGenerationState save the populated package.
+		MarkAssetChanged();
 	}
 }
 

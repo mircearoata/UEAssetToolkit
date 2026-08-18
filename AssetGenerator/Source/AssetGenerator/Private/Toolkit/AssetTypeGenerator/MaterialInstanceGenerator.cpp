@@ -98,6 +98,11 @@ void UMaterialInstanceGenerator::PreFinishAssetGeneration() {
 	const TSharedPtr<FJsonValue> AssetUserDataJson = AssetObjectProperties->GetField<EJson::Array>(TEXT("AssetUserData"));
 	
 	GetPropertySerializer()->DeserializePropertyValue(AssetUserDataProperty, AssetUserDataJson.ToSharedRef(), AssetUserData);
+
+	// AssetUserData is deserialized in PRE_FINSHED, after the
+	// DATA_POPULATION save. Without marking the asset changed the package is not re-saved and the
+	// AssetUserData written here is lost (IsSimpleAssetUpToDate then fails on every re-run).
+	MarkAssetChanged();
 }
 
 void EnsureStaticSwitchNodesPresent(UMaterial* Material, const FStaticParameterSet& StaticParameters) {
