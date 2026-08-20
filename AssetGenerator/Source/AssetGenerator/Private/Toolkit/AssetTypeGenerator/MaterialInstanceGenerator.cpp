@@ -100,8 +100,31 @@ void UMaterialInstanceGenerator::PreFinishAssetGeneration() {
 	GetPropertySerializer()->DeserializePropertyValue(AssetUserDataProperty, AssetUserDataJson.ToSharedRef(), AssetUserData);
 }
 
-void EnsureStaticSwitchNodesPresent(UMaterial* Material, const FStaticParameterSet& StaticParameters) {
+// Returns true when the parent material graph was modified (new parameter nodes were spawned).
+// The caller is responsible for making sure the parent package is saved in that case.
+bool EnsureStaticSwitchNodesPresent(UMaterial* Material, const FStaticParameterSet& StaticParameters) {
 	TArray<FName> ExistingParameters;
+
+	// Parameters that live inside material function calls are not visible as top level
+	// expressions, so also collect them from the cached expression data. Real (non stub)
+	// materials can keep their switches inside functions, and scanning only GetExpressions()
+	// would spawn duplicate parameters into them. Generated stub materials update their
+	// cached data right after their graph is built (UMaterialGenerator calls
+	// UpdateCachedExpressionData), so this is reliable for both.
+	{
+		TArray<FMaterialParameterInfo> CachedParameterInfos;
+		TArray<FGuid> CachedParameterGuids;
+		Material->GetAllParameterInfoOfType(EMaterialParameterType::StaticSwitch, CachedParameterInfos, CachedParameterGuids);
+		for (const FMaterialParameterInfo& ParameterInfo : CachedParameterInfos) {
+			ExistingParameters.Add(ParameterInfo.Name);
+		}
+		CachedParameterInfos.Empty();
+		CachedParameterGuids.Empty();
+		Material->GetAllParameterInfoOfType(EMaterialParameterType::StaticComponentMask, CachedParameterInfos, CachedParameterGuids);
+		for (const FMaterialParameterInfo& ParameterInfo : CachedParameterInfos) {
+			ExistingParameters.Add(ParameterInfo.Name);
+		}
+	}
 
 	for (UMaterialExpression* Expression : Material->GetExpressions()) {
 		if (UMaterialExpressionStaticSwitchParameter* StaticSwitchParameter = Cast<UMaterialExpressionStaticSwitchParameter>(Expression)) {
@@ -117,28 +140,91 @@ void EnsureStaticSwitchNodesPresent(UMaterial* Material, const FStaticParameterS
 
 	bool bMaterialGraphChanged = false;
 
-	// TODO: These are now editor only, so this won't do anything. What does this mean for the generated asset? Modified the code to use EditorOnly to compile without commenting
-	// TODO: UE 5.2 now also marked StaticSwitchParameters as deprecated, I'll just comment this whole thing out
-	// for (const FStaticSwitchParameter& StaticSwitchParameter : StaticParameters.EditorOnly.StaticSwitchParameters) {
-	// 	if (!ExistingParameters.Contains(StaticSwitchParameter.ParameterInfo.Name)) {
-	// 		 UMaterialExpressionStaticSwitchParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticSwitchParameter>(Material);
-	// 		 Parameter->SetParameterName(StaticSwitchParameter.ParameterInfo.Name);
-	// 		 bMaterialGraphChanged = true;
-	// 	}
-	// }
-	//
-	// for (const FStaticComponentMaskParameter& StaticComponentMaskParameter : StaticParameters.EditorOnly.StaticComponentMaskParameters) {
-	// 	if (!ExistingParameters.Contains(StaticComponentMaskParameter.ParameterInfo.Name)) {
-	// 		UMaterialExpressionStaticComponentMaskParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticComponentMaskParameter>(Material);
-	// 		Parameter->SetParameterName(StaticComponentMaskParameter.ParameterInfo.Name);
-	// 		bMaterialGraphChanged = true;
-	// 	}
-	// }
+	// This block was disabled for UE 5.2, which moved static switch parameters into
+	// FStaticParameterSetEditorOnlyData and deprecated the old field. In UE 5.6 the switches
+	// live in the runtime base again (FStaticParameterSetRuntimeData::StaticSwitchParameters;
+	// the editor-only copy is now StaticSwitchParameters_DEPRECATED), so the original logic
+	// works with the runtime field. Component masks are still editor-only data in 5.6.
+	for (const FStaticSwitchParameter& StaticSwitchParameter : StaticParameters.StaticSwitchParameters) {
+		if (!ExistingParameters.Contains(StaticSwitchParameter.ParameterInfo.Name)) {
+			UMaterialExpressionStaticSwitchParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticSwitchParameter>(Material);
+			Parameter->SetParameterName(StaticSwitchParameter.ParameterInfo.Name);
+			bMaterialGraphChanged = true;
+		}
+	}
+
+	for (const FStaticComponentMaskParameter& StaticComponentMaskParameter : StaticParameters.EditorOnly.StaticComponentMaskParameters) {
+		if (!ExistingParameters.Contains(StaticComponentMaskParameter.ParameterInfo.Name)) {
+			UMaterialExpressionStaticComponentMaskParameter* Parameter = UMaterialGenerator::SpawnMaterialExpression<UMaterialExpressionStaticComponentMaskParameter>(Material);
+			Parameter->SetParameterName(StaticComponentMaskParameter.ParameterInfo.Name);
+			bMaterialGraphChanged = true;
+		}
+	}
 
 	if (bMaterialGraphChanged) {
 		UMaterialGenerator::ConnectBasicParameterPinsIfPossible(Material, TEXT("Static Parameters Added from MaterialInstance"));
 		UMaterialGenerator::ForceMaterialCompilation(Material);
 	}
+	return bMaterialGraphChanged;
+}
+
+// Compares the dumped static switch overrides against the ones stored in the generated asset.
+// ExpressionGUID is deliberately ignored: the GUID in the dump belongs to the original game
+// material, while generated stub parent materials re-create parameter expressions with fresh
+// GUIDs and UMaterialInstance::PostLoad (UpdateParameterSet) rewrites the instance-side GUIDs
+// to match the parent. Comparing GUIDs would flag such assets as "not up to date" on every run.
+// Non-overridden entries are skipped because UpdateStaticPermutation trims them on apply.
+static bool StaticSwitchParametersMatch(const TArray<FStaticSwitchParameter>& Overrides, const TArray<FStaticSwitchParameter>& Existing) {
+	int32 NumOverridden = 0;
+	for (const FStaticSwitchParameter& Override : Overrides) {
+		if (!Override.bOverride) {
+			continue;
+		}
+		NumOverridden++;
+
+		const FStaticSwitchParameter* ExistingParameter = Existing.FindByPredicate([&](const FStaticSwitchParameter& Parameter) {
+			return Parameter.ParameterInfo == Override.ParameterInfo;
+		});
+		if (ExistingParameter == NULL || !ExistingParameter->bOverride || ExistingParameter->Value != Override.Value) {
+			return false;
+		}
+	}
+
+	int32 NumExistingOverridden = 0;
+	for (const FStaticSwitchParameter& Parameter : Existing) {
+		if (Parameter.bOverride) {
+			NumExistingOverridden++;
+		}
+	}
+	return NumOverridden == NumExistingOverridden;
+}
+
+// Same as above for static component mask parameters (still editor-only data in UE 5.6).
+static bool StaticComponentMaskParametersMatch(const TArray<FStaticComponentMaskParameter>& Overrides, const TArray<FStaticComponentMaskParameter>& Existing) {
+	int32 NumOverridden = 0;
+	for (const FStaticComponentMaskParameter& Override : Overrides) {
+		if (!Override.bOverride) {
+			continue;
+		}
+		NumOverridden++;
+
+		const FStaticComponentMaskParameter* ExistingParameter = Existing.FindByPredicate([&](const FStaticComponentMaskParameter& Parameter) {
+			return Parameter.ParameterInfo == Override.ParameterInfo;
+		});
+		if (ExistingParameter == NULL || !ExistingParameter->bOverride ||
+			ExistingParameter->R != Override.R || ExistingParameter->G != Override.G ||
+			ExistingParameter->B != Override.B || ExistingParameter->A != Override.A) {
+			return false;
+		}
+	}
+
+	int32 NumExistingOverridden = 0;
+	for (const FStaticComponentMaskParameter& Parameter : Existing) {
+		if (Parameter.bOverride) {
+			NumExistingOverridden++;
+		}
+	}
+	return NumOverridden == NumExistingOverridden;
 }
 
 void UMaterialInstanceGenerator::PopulateSimpleAssetWithData(UObject* Asset) {
@@ -154,7 +240,12 @@ void UMaterialInstanceGenerator::PopulateSimpleAssetWithData(UObject* Asset) {
 	UMaterial* ParentMaterial = MaterialInstance->GetMaterial();
 	const FStaticParameterSet StaticParameterOverrides = GetStaticParameterOverrides();
 
-	EnsureStaticSwitchNodesPresent(ParentMaterial, StaticParameterOverrides);
+	// If we had to spawn missing parameter nodes into the (stub) parent material, remember its
+	// package so it is saved together with this asset. The parent asset was already saved during
+	// its own generation pass, so without this the spawned nodes would be silently lost.
+	if (EnsureStaticSwitchNodesPresent(ParentMaterial, StaticParameterOverrides)) {
+		ModifiedParentPackages.AddUnique(ParentMaterial->GetOutermost());
+	}
 	MaterialInstance->UpdateStaticPermutation(StaticParameterOverrides);
 	
 	//Regenerate ExpressionGUID values on updated parameter values by calling UpdateParameters()
@@ -178,13 +269,17 @@ bool UMaterialInstanceGenerator::IsSimpleAssetUpToDate(UObject* Asset) const {
 	}
 
 	const FStaticParameterSet StaticParameterOverrides = GetStaticParameterOverrides();
-	const FStaticParameterSet& ExistingStaticParameters = MaterialInstance->GetStaticParameters();
+	const FStaticParameterSet ExistingStaticParameters = MaterialInstance->GetStaticParameters();
 
-	// TODO: These are now editor only, so this won't do anything. What does this mean for the generated asset? Modified the code to use EditorOnly to compile without commenting
-	// TODO: UE 5.2 now also marked StaticSwitchParameters as deprecated, I'll just comment this whole thing out
-	// return StaticParameterOverrides.EditorOnly.StaticSwitchParameters == ExistingStaticParameters.EditorOnly.StaticSwitchParameters &&
-	// 	StaticParameterOverrides.EditorOnly.StaticComponentMaskParameters == ExistingStaticParameters.EditorOnly.StaticComponentMaskParameters;
-	return true;
+	// In UE 5.6 static switches are runtime data again (see EnsureStaticSwitchNodesPresent),
+	// so the comparison disabled for UE 5.2 can be performed. GUIDs are ignored on purpose
+	// (see StaticSwitchParametersMatch).
+	return StaticSwitchParametersMatch(StaticParameterOverrides.StaticSwitchParameters, ExistingStaticParameters.StaticSwitchParameters) &&
+		StaticComponentMaskParametersMatch(StaticParameterOverrides.EditorOnly.StaticComponentMaskParameters, ExistingStaticParameters.EditorOnly.StaticComponentMaskParameters);
+}
+
+void UMaterialInstanceGenerator::GetAdditionalPackagesToSave(TArray<UPackage*>& OutPackages) {
+	OutPackages.Append(ModifiedParentPackages);
 }
 
 FTopLevelAssetPath UMaterialInstanceGenerator::GetAssetClass() {

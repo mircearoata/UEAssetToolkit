@@ -17,8 +17,14 @@ public:
 	virtual void PopulateStageDependencies(TArray<FPackageDependency>& OutDependencies) const override;
 protected:
 	virtual void PreFinishAssetGeneration() override;
+	// Saves parent material packages we spawned static parameter nodes into (they were already
+	// written to disk during their own generation pass, so they must be re-saved with us).
+	virtual void GetAdditionalPackagesToSave(TArray<UPackage*>& OutPackages) override;
 public:
 	virtual FTopLevelAssetPath GetAssetClass() override;
 private:
 	FProperty* AssetUserDataProperty;
+	// Parent material packages modified by EnsureStaticSwitchNodesPresent during DATA_POPULATION
+	UPROPERTY()
+	TArray<UPackage*> ModifiedParentPackages;
 };
